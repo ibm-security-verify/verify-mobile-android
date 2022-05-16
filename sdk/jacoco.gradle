@@ -1,0 +1,104 @@
+/*
+ * Copyright contributors to the IBM Security Verify SDK for Android project
+ */
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = "0.8.7"
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}
+
+project.afterEvaluate {
+
+    (android.hasProperty('applicationVariants')
+            ? android.'applicationVariants'
+            : android.'libraryVariants').all { variant ->
+        if (variant.buildType.name == "debug") {
+            def variantName = variant.name
+            def unitTestTask = "test${variantName.capitalize()}UnitTest"
+            def androidTestCoverageTask = "create${variantName.capitalize()}CoverageReport"
+
+            tasks.create(name: "jacoco${variantName.capitalize()}CoverageReport", type: JacocoReport, dependsOn: [
+                    "$unitTestTask",
+                    "$androidTestCoverageTask",
+                    ":core:testDebugUnitTest",
+                    ":core:connectedDebugAndroidTest",
+                    ":adaptive:testDebugUnitTest",
+                    ":adaptive:connectedDebugAndroidTest"
+            ]) {
+                group = "Reporting"
+                description = "Generate Jacoco coverage reports for the ${variantName.capitalize()} build"
+
+                reports {
+                    html.required = true
+                    xml.required = true
+                    csv.required = false
+                }
+
+                def excludes = [
+                        // data binding
+                        'android/databinding/**/*.class',
+                        '**/android/databinding/*Binding.class',
+                        '**/android/databinding/*',
+                        '**/androidx/databinding/*',
+                        '**/BR.*',
+                        // android
+                        '**/R.class',
+                        '**/R$*.class',
+                        '**/BuildConfig.*',
+                        '**/Manifest*.*',
+                        '**/*Test*.*',
+                        'android/**/*.*',
+                        // kotlin
+                        '**/*MapperImpl*.*',
+                        '**/*$ViewInjector*.*',
+                        '**/*$ViewBinder*.*',
+                        '**/BuildConfig.*',
+                        '**/*Component*.*',
+                        '**/*BR*.*',
+                        '**/Manifest*.*',
+                        '**/*$Lambda$*.*',
+                        '**/*Companion*.*',
+                        '**/*Module*.*',
+                        '**/*Dagger*.*',
+                        '**/*Hilt*.*',
+                        '**/*MembersInjector*.*',
+                        '**/*_MembersInjector.class',
+                        '**/*_Factory*.*',
+                        '**/*_Provide*Factory*.*',
+                        '**/*Extensions*.*',
+                        // sealed and data classes
+                        '**/*$Result.*',
+                        '**/*$Result$*.*'
+                ]
+
+                def javaClasses = fileTree(dir: variant.javaCompileProvider.get().destinationDir, excludes: excludes)
+
+                classDirectories.setFrom(files([
+                        fileTree(dir: "${buildDir}/tmp/kotlin-classes/${variantName}", excludes: excludes),
+                        fileTree(dir: "$project.rootDir/core/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
+                        fileTree(dir: "$project.rootDir/adaptive/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
+                        javaClasses
+                ]))
+
+                def coverageSourceDirs = [
+                        "$project.rootDir/core/src/main/java",
+                        "$project.rootDir/adaptive/src/main/java"
+                ]
+
+                sourceDirectories.setFrom(project.files(coverageSourceDirs))
+
+                executionData(files([
+                        "$project.rootDir/core/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                        "$project.rootDir/adaptive/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                        fileTree(dir: "$project.rootDir/core/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"]),
+                        fileTree(dir: "$project.rootDir/adaptive/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"]),
+                ]))
+            }
+        }
+    }
+}

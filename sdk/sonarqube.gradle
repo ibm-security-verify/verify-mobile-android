@@ -1,0 +1,35 @@
+/*
+ * Copyright contributors to the IBM Security Verify SDK for Android project
+ */
+
+apply plugin: "org.sonarqube"
+
+sonarqube {
+    properties {
+        property "sonar.host.url", "http://cp4d-sonarqube.svl.ibm.com:9000/sonar"
+        property "sonar.login", "<pass_as_build_paramter -Dsonar.login=...>"
+        property "sonar.projectBaseDir", "${rootDir}"
+        property "sonar.projectKey", "com.ibm.security.verifysdk"
+        property "sonar.projectName", "IBM Security Verify SDK for Android"
+        property "sonar.projectVersion", "${project.android.defaultConfig.versionName}"
+        property "sonar.sourceEncoding", "UTF-8"
+        property "sonar.coverage.jacoco.xmlReportPaths", [
+                "core/build/reports/jacoco/jacocoDebugCoverageReport/jacocoDebugCoverageReport.xml",
+                "adaptive/build/reports/jacoco/jacocoDebugCoverageReport/jacocoDebugCoverageReport.xml"
+                ]
+
+        property "sonar.sources", [
+                "core/src/main",
+                "adaptive/src/main"
+        ]
+
+        property "sonar.test", [
+                "core/src/test/java",
+                "core/src/androidTest/java",
+                "adaptive/src/test/java",
+                "adaptive/src/androidTest/java"
+        ]
+
+        property "sonar.exclusions", "app/**/*"
+    }
+}

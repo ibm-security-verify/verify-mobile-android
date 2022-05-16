@@ -1,0 +1,258 @@
+/*
+ * Copyright contributors to the IBM Security Verify SDK for Android project
+ */
+
+package com.ibm.security.verifysdk.core
+
+import android.os.Build
+import android.util.Base64
+import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Test
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.security.KeyStoreException
+import java.util.*
+
+class KeystoreHelperTest {
+
+    private lateinit var log: Logger
+
+    private val supportedAlgorithms: ArrayList<String> =
+        arrayListOf("SHA1withRSA", "SHA256withRSA", "SHA512withRSA")
+
+    @Before
+    fun setUp() {
+        log = LoggerFactory.getLogger(javaClass)
+    }
+
+    @Test
+    fun getKeystoreType() {
+        assertEquals("AndroidKeyStore", KeystoreHelper.keystoreType)
+    }
+
+    @Test
+    fun setKeystoreType() {
+        val newKeystoreType = "BouncyCastle"
+        KeystoreHelper.keystoreType = newKeystoreType
+        assertEquals(newKeystoreType, KeystoreHelper.keystoreType)
+    }
+
+    @Test(expected = KeyStoreException::class)
+    fun setKeystoreType_unknownType_shouldThrowException() {
+        val newKeystoreType = "unknownKeyStoreType"
+        KeystoreHelper.keystoreType = newKeystoreType
+    }
+
+    @Test
+    fun getKeySize() {
+        assertEquals(2048, KeystoreHelper.keySize)
+    }
+
+    @Test
+    fun setKeySize() {
+        val previousKeysize = KeystoreHelper.keySize
+        val newKeysize = 4096
+        KeystoreHelper.keySize = newKeysize
+        assertEquals(newKeysize, KeystoreHelper.keySize)
+        KeystoreHelper.keySize = previousKeysize
+    }
+
+    @Test
+    fun getSupportedAlgorithms() {
+        assertEquals(supportedAlgorithms, KeystoreHelper.supportedAlgorithms)
+    }
+
+    @Test
+    fun createKeyPair_happyPath_shouldReturnPublicKey() {
+
+        for (algorithm in supportedAlgorithms) {
+            val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
+            val publicKey = KeystoreHelper.createKeyPair(keyName, algorithm)
+            assertEquals("X.509", publicKey.format)
+        }
+    }
+
+    @Test
+    fun createKeyPair_happyPathOverwriteDefaultsCase2of4_shouldReturnPublicKey() {
+
+        val authenticationRequired = true
+        val invalidatedByBiometricEnrollment = true
+
+        for (algorithm in supportedAlgorithms) {
+            val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
+            val publicKey = KeystoreHelper.createKeyPair(
+                keyName,
+                algorithm,
+                authenticationRequired,
+                invalidatedByBiometricEnrollment
+            )
+            assertEquals("X.509", publicKey.format)
+        }
+    }
+
+    @Test
+    fun createKeyPair_happyPathOverwriteDefaultsCase3of4_shouldReturnPublicKey() {
+
+        val authenticationRequired = false
+        val invalidatedByBiometricEnrollment = true
+
+        for (algorithm in supportedAlgorithms) {
+            val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
+            val publicKey = KeystoreHelper.createKeyPair(
+                keyName,
+                algorithm,
+                authenticationRequired,
+                invalidatedByBiometricEnrollment
+            )
+            assertEquals("X.509", publicKey.format)
+        }
+    }
+
+    @Test
+    fun createKeyPair_happyPathOverwriteDefaultsCase4of4_shouldReturnPublicKey() {
+
+        val authenticationRequired = true
+        val invalidatedByBiometricEnrollment = false
+
+        for (algorithm in supportedAlgorithms) {
+            val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
+            val publicKey = KeystoreHelper.createKeyPair(
+                keyName,
+                algorithm,
+                authenticationRequired,
+                invalidatedByBiometricEnrollment
+            )
+            assertEquals("X.509", publicKey.format)
+        }
+    }
+
+    @Test
+    fun createKeyPair_happyPathSdkQ_shouldReturnPublicKey() {
+        TestHelper.setFinalStatic(
+            Build.VERSION::class.java.getField("SDK_INT"),
+            Build.VERSION_CODES.Q
+        )
+        for (algorithm in supportedAlgorithms) {
+            val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
+            val publicKey = KeystoreHelper.createKeyPair(keyName, algorithm)
+            assertEquals("X.509", publicKey.format)
+        }
+        TestHelper.setFinalStatic(
+            Build.VERSION::class.java.getField("SDK_INT"),
+            Build.VERSION_CODES.R
+        )
+    }
+
+    @Test
+    fun createKeyPair_happyPathSdkM_shouldReturnPublicKey() {
+        TestHelper.setFinalStatic(
+            Build.VERSION::class.java.getField("SDK_INT"),
+            Build.VERSION_CODES.M
+        )
+        for (algorithm in supportedAlgorithms) {
+            val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
+            val publicKey = KeystoreHelper.createKeyPair(keyName, algorithm)
+            assertEquals("X.509", publicKey.format)
+        }
+        TestHelper.setFinalStatic(
+            Build.VERSION::class.java.getField("SDK_INT"),
+            Build.VERSION_CODES.R
+        )
+    }
+
+    @Test
+    fun createKeyPair_overwriteExistingKey_shouldReturnNewPublicKey() {
+
+        val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
+        val algorithm = supportedAlgorithms[0]
+        KeystoreHelper.createKeyPair(keyName, algorithm)
+        val publicKeyFirst = KeystoreHelper.exportPublicKey(keyName)
+        KeystoreHelper.createKeyPair(keyName, algorithm)
+        val publicKeySecond = KeystoreHelper.exportPublicKey(keyName)
+        assertNotEquals(publicKeyFirst, publicKeySecond)
+    }
+
+    @Test(expected = UnsupportedOperationException::class)
+    fun createKeyPair_unsupportedAlgorithm_shouldThrowException() {
+
+        val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
+        KeystoreHelper.createKeyPair(keyName, "unsupportedAlgorithm")
+        assertFalse(true)
+    }
+
+    @Test
+    fun deleteKeyPair() {
+        val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
+        val algorithm = supportedAlgorithms[0]
+        KeystoreHelper.createKeyPair(keyName, algorithm)
+        assertTrue(KeystoreHelper.exists(keyName))
+        KeystoreHelper.deleteKeyPair(keyName)
+        assertTrue(KeystoreHelper.exists(keyName).not())
+    }
+
+    @Test
+    fun exportPublicKey() {
+        val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
+        val algorithm = supportedAlgorithms[0]
+        KeystoreHelper.createKeyPair(keyName, algorithm)
+
+        val publicKey = KeystoreHelper.exportPublicKey(keyName)
+        assertNotNull(publicKey)
+        assertNotNull(publicKey)
+        publicKey?.let {
+            assert(publicKey.startsWith("MIIB"))
+        }
+    }
+
+    @Test
+    fun exportPublicKey_unknownKey_shouldReturnNull() {
+
+        val keyName = String.format("unknownKey-%s", UUID.randomUUID().toString())
+        val publicKey = KeystoreHelper.exportPublicKey(keyName)
+        assertNull(publicKey)
+    }
+
+    @Test
+    fun exists() {
+        val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
+        assertTrue(KeystoreHelper.exists(keyName).not())
+        KeystoreHelper.createKeyPair(keyName, supportedAlgorithms[0])
+        assertTrue(KeystoreHelper.exists(keyName))
+    }
+
+    @Test
+    fun signData_happyPath_shouldReturnData() {
+        val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
+        val algorithm = supportedAlgorithms[0]
+        KeystoreHelper.createKeyPair(keyName, algorithm)
+
+        val signedData = KeystoreHelper.signData(keyName, algorithm, "dataToSign")
+        assertNotNull(signedData)
+        signedData?.let {
+            assert(it.isNotEmpty())
+        }
+    }
+
+    @Test
+    fun signData_overwriteDefaults_shouldReturnData() {
+        val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
+        val algorithm = supportedAlgorithms[0]
+        KeystoreHelper.createKeyPair(keyName, algorithm)
+
+        val signedData = KeystoreHelper.signData(keyName, algorithm, "dataToSign", Base64.URL_SAFE)
+        assertNotNull(signedData)
+        signedData?.let {
+            assert(it.isNotEmpty())
+        }
+    }
+
+    @Test
+    fun signData_unknownKey_shouldReturnNull() {
+        val keyName = String.format("unknownKey-%s", UUID.randomUUID().toString())
+        val algorithm = supportedAlgorithms[0]
+
+        val signedData = KeystoreHelper.signData(keyName, algorithm, "dataToSign", Base64.URL_SAFE)
+        assertNull(signedData)
+    }
+}
