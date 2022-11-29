@@ -11,19 +11,21 @@ val moduleNameUrl = "https://github.com/ibm-security-verify/verify-sdk-android"
 val moduleLicenseName = "MIT License"
 val moduleLicenseUrl = "https://github.com/ibm-security-verify/verify-sdk-android/blob/main/LICENSE"
 val moduleScmConnection = "scm:git:git://github.com/ibm-security-verify/verify-sdk-android.git"
-val moduleScmDeveloperConnection =
-    "scm:git:ssh://github.com/ibm-security-verify/verify-sdk-android.git"
+val moduleScmDeveloperConnection = "scm:git:ssh://github.com/ibm-security-verify/verify-sdk-android.git"
 val moduleScmUrl = "https://github.com/ibm-security-verify/verify-sdk-android"
 
 dependencies {
-    implementation("androidx.lifecycle:lifecycle-process:2.4.1")
+    implementation("androidx.lifecycle:lifecycle-process:2.5.1")
     implementation("androidx.test:rules:1.4.0")
-    androidTestImplementation(files("libs/tas-release.aar"))
+    implementation("androidx.test.ext:junit-ktx:1.1.4")
     androidTestImplementation("com.github.kittinunf.fuel:fuel-android:2.3.1")
 }
 
 apply {
     from("../jacoco.gradle")
+}
+android {
+    namespace = "com.ibm.security.verifysdk.adaptive"
 }
 
 tasks {
@@ -36,6 +38,15 @@ tasks {
         archiveClassifier.set("sources")
         from(android.sourceSets.getByName("main").java.srcDirs)
     }
+    withType<Test> {
+        useJUnitPlatform()
+    }
+}
+
+// To-do: move to VerifySdkBuildPlugin
+configure<org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension> {
+    failOnError = false
+    skipConfigurations.add("lintClassPath")
 }
 
 configure<PublishingExtension> {

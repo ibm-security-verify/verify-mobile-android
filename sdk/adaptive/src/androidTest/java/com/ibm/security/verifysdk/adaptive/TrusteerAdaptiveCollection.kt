@@ -6,8 +6,8 @@ package com.ibm.security.verifysdk.adaptive
 
 // TODO: To run tests, import Trusteer SDK.
 import android.content.Context
-import com.trusteer.tas.TAS_CLIENT_INFO
-import com.trusteer.tas.tasWired.*
+//import com.trusteer.tas.TAS_CLIENT_INFO
+//import com.trusteer.tas.tasWired.*
 
 /**
  * A structure storing the vendor ID, client ID, and client key of a Trusteer client used to
@@ -35,33 +35,33 @@ class TrusteerAdaptiveCollection(
     override val clientKey: String
 ) : AdaptiveCollectionService {
     override fun start(context: Context, sessionId: String) {
-        val clientInfo = TAS_CLIENT_INFO()
-        clientInfo.vendorId = this.vendorId
-        clientInfo.clientId = this.clientId
-        clientInfo.clientKey = this.clientKey
-        println(clientInfo.toString())
-
-        val result = TasStart(context, clientInfo, TAS_INIT_NO_OPT, null, sessionId)
-        if (result != TAS_RESULT_SUCCESS) {
-            throw TrusteerOperationException(result)
-        }
+//        val clientInfo = TAS_CLIENT_INFO()
+//        clientInfo.vendorId = this.vendorId
+//        clientInfo.clientId = this.clientId
+//        clientInfo.clientKey = this.clientKey
+//        println(clientInfo.toString())
+//
+//        val result = TasStart(context, clientInfo, TAS_INIT_NO_OPT, null, sessionId)
+//        if (result != TAS_RESULT_SUCCESS) {
+//            throw TrusteerOperationException(result)
+//        }
         println("Trusteer start status: Success")
     }
 
     override fun stop() {
-        val result = TasStop()
-
-        if (result != TAS_RESULT_SUCCESS) {
-            throw TrusteerOperationException(result)
-        }
+//        val result = TasStop()
+//
+//        if (result != TAS_RESULT_SUCCESS) {
+//            throw TrusteerOperationException(result)
+//        }
     }
 
     override fun reset(sessionId: String) {
-        val result = TasResetSession(sessionId)
-
-        if (result != TAS_RESULT_SUCCESS) {
-            throw TrusteerOperationException(result)
-        }
+//        val result = TasResetSession(sessionId)
+//
+//        if (result != TAS_RESULT_SUCCESS) {
+//            throw TrusteerOperationException(result)
+//        }
     }
 }
 
@@ -158,24 +158,24 @@ enum class TrusteerOperationError {
          */
         fun from(value: Int): TrusteerOperationError {
             return when (value) {
-                TAS_RESULT_GENERAL_ERROR -> GENERAL_ERROR
-                TAS_RESULT_INTERNAL_ERROR -> INTERNAL_ERROR
-                TAS_RESULT_WRONG_ARGUMENTS -> INCORRECT_ARGUMENTS
-                TAS_RESULT_DRA_ITEM_NOT_FOUND -> NOT_FOUND
-                TAS_RESULT_NO_POLLING -> NO_POLLING
-                TAS_RESULT_TIMEOUT -> TIME_OUT
-                TAS_RESULT_NOT_INITIALIZED -> NOT_INITIALIZED
-                TAS_RESULT_UNAUTHORIZED -> LICENCE_NOT_AUTHORIZED
-                TAS_RESULT_ALREADY_INITIALIZED -> ALREADY_INITIALIZED
-                TAS_RESULT_ARCH_NOT_SUPPORTED -> ARCHITECTURE_NOT_SUPPORTED
-                TAS_RESULT_INCORRECT_SETUP -> INCORRECT_SETUP
-                TAS_RESULT_INTERNAL_EXCEPTION -> INTERNAL_EXCEPTION
-                TAS_RESULT_INSUFFICIENT_PERMISSIONS -> INSUFFICIENT_PERMISSIONS
-                TAS_RESULT_MISSING_PERMISSIONS_IN_FOLDER -> MISSING_PERMISSION_IN_FOLDER
-                TAS_RESULT_DISABLED_BY_CONFIGURATION -> DISABLED_BY_CONFIGURATION
-                TAS_RESULT_NETWORK_ERROR -> NETWORK_ERROR
-                TAS_RESULT_CONNECTION_INTERNAL_TIMEOUT -> INTERNAL_CONNECTION_TIMEOUT
-                TAS_RESULT_PINPOINT_CERTIFICATE_PROBLEM -> CERTIFICATE_ERROR
+//                TAS_RESULT_GENERAL_ERROR -> GENERAL_ERROR
+//                TAS_RESULT_INTERNAL_ERROR -> INTERNAL_ERROR
+//                TAS_RESULT_WRONG_ARGUMENTS -> INCORRECT_ARGUMENTS
+//                TAS_RESULT_DRA_ITEM_NOT_FOUND -> NOT_FOUND
+//                TAS_RESULT_NO_POLLING -> NO_POLLING
+//                TAS_RESULT_TIMEOUT -> TIME_OUT
+//                TAS_RESULT_NOT_INITIALIZED -> NOT_INITIALIZED
+//                TAS_RESULT_UNAUTHORIZED -> LICENCE_NOT_AUTHORIZED
+//                TAS_RESULT_ALREADY_INITIALIZED -> ALREADY_INITIALIZED
+//                TAS_RESULT_ARCH_NOT_SUPPORTED -> ARCHITECTURE_NOT_SUPPORTED
+//                TAS_RESULT_INCORRECT_SETUP -> INCORRECT_SETUP
+//                TAS_RESULT_INTERNAL_EXCEPTION -> INTERNAL_EXCEPTION
+//                TAS_RESULT_INSUFFICIENT_PERMISSIONS -> INSUFFICIENT_PERMISSIONS
+//                TAS_RESULT_MISSING_PERMISSIONS_IN_FOLDER -> MISSING_PERMISSION_IN_FOLDER
+//                TAS_RESULT_DISABLED_BY_CONFIGURATION -> DISABLED_BY_CONFIGURATION
+//                TAS_RESULT_NETWORK_ERROR -> NETWORK_ERROR
+//                TAS_RESULT_CONNECTION_INTERNAL_TIMEOUT -> INTERNAL_CONNECTION_TIMEOUT
+//                TAS_RESULT_PINPOINT_CERTIFICATE_PROBLEM -> CERTIFICATE_ERROR
                 else -> GENERAL_ERROR
             }
         }

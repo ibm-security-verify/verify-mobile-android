@@ -14,7 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 
-
+    
 /**
  * Instrumented test, which will execute on an Android device.
  *

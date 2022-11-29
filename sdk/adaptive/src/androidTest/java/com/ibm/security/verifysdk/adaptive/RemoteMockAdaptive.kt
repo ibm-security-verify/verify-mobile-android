@@ -162,8 +162,7 @@ class RemoteMockAdaptive : AdaptiveDelegate {
                                         val allowedFactors =
                                             List(factorsJson.length()) { factorString ->
                                                 val factorType = Factor.from(
-                                                    factorsJson.getJSONObject(factorString)
-                                                        .get("type")
+                                                    factorsJson.getJSONObject(factorString).get("type")
                                                         .toString()
                                                 )
                                                 AllowedFactor(type = factorType)
@@ -180,16 +179,13 @@ class RemoteMockAdaptive : AdaptiveDelegate {
                                             responseJson.get("enrolledFactors") as JSONArray
                                         val allowedFactors =
                                             List(factorsJson.length()) { factorString ->
-                                                val enrollment =
-                                                    factorsJson.getJSONObject(factorString)
+                                                val enrollment = factorsJson.getJSONObject(factorString)
 
-                                                val factor =
-                                                    Factor.from(enrollment.getString("type"))
+                                                val factor = Factor.from(enrollment.getString("type"))
                                                 val id = enrollment.getString("id")
                                                 val validated = enrollment.getBoolean("validated")
                                                 val enabled = enrollment.getBoolean("enabled")
-                                                val attributes =
-                                                    enrollment.getJSONObject("attributes")
+                                                val attributes = enrollment.getJSONObject("attributes")
                                                 val attributesMap = attributes.keys().asSequence()
                                                     .associateWith { key ->
                                                         attributes[key] as String

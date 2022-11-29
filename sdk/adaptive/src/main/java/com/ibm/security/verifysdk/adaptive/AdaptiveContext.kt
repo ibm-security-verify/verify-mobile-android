@@ -35,7 +35,7 @@ object AdaptiveContext : LifecycleObserver {
      * This is updated whenever a new session ID is generated after the application is opened from
      * the background.
      */
-    private var renewSessionIdTimestamp: Date = Date()
+    var renewSessionIdTimestamp: Date = Date()
 
     /** An instance of `AdaptiveCollection` implementation. */
     var collectionService: AdaptiveCollectionService? = null
