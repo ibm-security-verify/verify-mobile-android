@@ -1,0 +1,286 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: IBM Security Verify SDK release
+
+on: 
+  pull_request:
+    types: [closed]
+  push:
+    branches:
+    - main
+    - develop
+    - dev
+
+jobs:    
+  setup_environment:
+    name: Setup environment
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v3
+
+      - name: Extract version
+        id: set-vars
+        run: |
+          code="$(grep -o 'versionCode\s\+=\s\+[0-9]\+' ./sdk//buildSrc/src/main/kotlin/com/ibm/security/verifysdk/plugin/VerifySdkBuildPlugin.kt | awk '{ print $3 }')"
+          echo "VersionCode=$code" >> $GITHUB_OUTPUT
+          name="$(grep -o 'versionName[^0-9]\+[0-9\.]\+' ./sdk/buildSrc/src/main/kotlin/com/ibm/security/verifysdk/plugin/VerifySdkBuildPlugin.kt | awk '{ print $3 }' | cut -c 2-)"      
+          echo "VersionName=$name" >> $GITHUB_OUTPUT
+          date="$(date +'%Y%m%d-%H%M%S')"
+          echo "Date=$date" >> $GITHUB_OUTPUT
+      - name: Set release title
+        id: set-title
+        run: |
+          echo "ReleaseTitle=${{ steps.set-vars.outputs.VersionName }}-${{ steps.set-vars.outputs.VersionCode }}" >> $GITHUB_OUTPUT
+    outputs:
+      VERIFY_SDK_DATE: ${{ steps.set-vars.outputs.Date }}
+      VERIFY_SDK_VERSION_CODE: ${{ steps.set-vars.outputs.VersionCode }}
+      VERIFY_SDK_VERSION_NAME: ${{ steps.set-vars.outputs.VersionName }}    
+      VERIFY_SDK_RELEASE_TITLE: ${{ steps.set-title.outputs.ReleaseTitle }}
+          
+  build_and_test:
+    name: Build, unit test
+    runs-on: ubuntu-latest
+    needs: setup_environment
+
+    steps:  
+      - name: Code checkout
+        uses: actions/checkout@v3
+
+      - name: Install Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Load cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}      
+   
+      - name: Build SDKs
+        working-directory: ./sdk
+        run: ./gradlew --no-daemon assembleRelease
+
+      - name: Publish SDKs to Maven local
+        working-directory: ./sdk
+        run: ./gradlew --no-daemon publishToMavenLocal
+
+      - name: Generate SDK documentation
+        working-directory: ./sdk
+        run: ./gradlew --no-daemon dokkaJavadoc 
+
+      - name: Run unit tests
+        working-directory: ./sdk
+        run: ./gradlew --no-daemon test
+
+      - name: Store build and test artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-and-test
+          path: |
+            ./sdk/**/build/outputs/
+            ./sdk/**/build/reports/
+
+      - name: Store documentation
+        uses: actions/upload-artifact@v3
+        with:
+          name: documentation
+          path: ./sdk/**/build/dokka/       
+
+      - name: Store Maven files
+        uses: actions/upload-artifact@v3
+        with:
+          name: maven-local
+          path: ~/.m2/repository/com/ibm/security
+
+  owasp_scan:
+    name: Run OWASP depedency scan
+    runs-on: ubuntu-latest
+    needs: setup_environment
+
+    steps:  
+      - name: Code checkout
+        uses: actions/checkout@v3
+
+      - name: Install Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Load cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}      
+   
+      - name: Run OWASP dependency scan
+        working-directory: ./sdk
+        run: ./gradlew --no-daemon dependencyCheckAnalyze
+
+      - name: Store OWASP dependency scan reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: owasp-test
+          path: ./sdk/**/build/reports/dependency-check-report.html
+
+  coverage_report:
+    name: Generate code coverage report
+    runs-on: ubuntu-latest
+    needs: setup_environment
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v3
+
+      - name: Install Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Load cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}      
+   
+      - name: Run instrumentation Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          working-directory: ./sdk
+          api-level: 28
+          target: default
+          arch: x86
+          profile: Nexus 6
+          script: ./gradlew --no-daemon jacocoDebugCoverageReport
+
+      - name: Store code coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-coverage
+          path: ./sdk/app/build/reports/jacoco/jacocoDebugCoverageReport/
+
+  publish:
+    name: Publish SDK, reports and documentation
+    runs-on: ubuntu-latest
+    needs: [setup_environment, coverage_report, build_and_test, owasp_scan]
+
+    steps:
+      - name: Verify release title
+        run: |
+          echo "Version code:" ${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_CODE}}
+          echo "Version name:" ${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}
+          echo "Timestamp" ${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}
+          echo "Release title" ${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}
+
+      - name: Create SDK directory
+        run: mkdir -p ./sdk
+
+      - name: Collect alle artificats
+        uses: actions/download-artifact@v3
+        with:
+          name: build-and-test
+          path: ./sdk
+
+      - name: Collect documentation artificats
+        uses: actions/download-artifact@v3
+        with:
+          name: documentation
+          path: ./sdk     
+
+      - name: Collect maven-local artificats
+        uses: actions/download-artifact@v3
+        with:
+          name: maven-local
+          path: ~/.m2/repository/com/ibm/security
+
+      - name: Collect owasp-scan result
+        uses: actions/download-artifact@v3
+        with:
+          name: owasp-test
+          path: ./sdk
+
+      - name: Collect code coverate result
+        uses: actions/download-artifact@v3
+        with:
+          name: code-coverage
+          path: ./sdk
+    
+      - name: Rename release files
+        run: |
+          mv ./sdk/core/build/outputs/aar/core-release.aar ./sdk/core/build/outputs/aar/IBM-Verify-SDK_core_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
+          mv ./sdk/adaptive/build/outputs/aar/adaptive-release.aar ./sdk/adaptive/build/outputs/aar/IBM-Verify-SDK_adaptive_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
+          mv ./sdk/authentication/build/outputs/aar/authentication-release.aar ./sdk/authentication/build/outputs/aar/IBM-Verify-SDK_authentication_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
+
+      - name: Rename dependency scan files
+        run: |
+          mv ./sdk/core/build/reports/dependency-check-report.html ./sdk/core/build/reports/IBM-Verify-SDK_core_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_dependency-check-report.html
+          mv ./sdk/adaptive/build/reports/dependency-check-report.html ./sdk/adaptive/build/reports/IBM-Verify-SDK_adaptive_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_dependency-check-report.html
+          mv ./sdk/authentication/build/reports/dependency-check-report.html ./sdk/authentication/build/reports/IBM-Verify-SDK_authentication_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_dependency-check-report.html
+          
+      - name: Move maven files to accessible folder
+        run: |
+          mkdir -p ./sdk/maven 
+          mv ~/.m2/repository/com/ibm/security/verifysdk/core/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/* ./sdk/maven/
+          mv ~/.m2/repository/com/ibm/security/verifysdk/adaptive/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
+          mv ~/.m2/repository/com/ibm/security/verifysdk/authentication/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
+
+      - name: Update documentation folder structure for GitHub commit
+        run: |
+          mkdir -p ./sdk/documentation/android/core/docs
+          mkdir -p ./sdk/documentation/android/adaptive/docs
+          mkdir -p ./sdk/documentation/android/authentication/docs
+          mv ./sdk/core/build/dokka/javadoc/* ./sdk/documentation/android/core/docs/
+          mv ./sdk/adaptive/build/dokka/javadoc/* ./sdk/documentation/android/adaptive/docs/
+          mv ./sdk/authentication/build/dokka/javadoc/* ./sdk/documentation/android/authentication/docs/
+
+      - name: Zip code coverage report
+        run: cd ./sdk/html && zip -r ../IBM-Verify-SDK_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_code-coverage-report.zip *
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: v${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}
+          tag_name: ${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}
+          draft: true
+          files: |
+            ./sdk/maven/*.*
+            ./sdk/core/build/outputs/aar/*.aar
+            ./sdk/core/build/reports/*.html
+            ./sdk/adaptive/build/outputs/aar/*.aar
+            ./sdk/adaptive/build/reports/*.html
+            ./sdk/authentication/build/outputs/aar/*.aar
+            ./sdk/authentication/build/reports/*.html
+            ./sdk/IBM-Verify-SDK_*_code-coverage-report.zip
+
+      - name: Upload documentation to GitHub.io repo
+        if: github.ref == 'refs/heads/main'      
+        uses: cpina/github-action-push-to-another-repository@main
+        env: 
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with: 
+          source-directory: './sdk/documentation/android'
+          destination-github-username: 'ibm-security-verify'
+          destination-repository-name: 'ibm-security-verify.github.io'
+          user-email: chageman@au1.ibm.com
+          target-branch: android_sdk_v3
+          target-directory: 'android'
