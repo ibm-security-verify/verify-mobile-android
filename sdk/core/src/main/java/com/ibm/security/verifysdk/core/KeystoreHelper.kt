@@ -13,6 +13,13 @@ import org.slf4j.LoggerFactory
 import java.security.*
 import java.security.spec.RSAKeyGenParameterSpec
 
+/**
+ * Helper class to perform key management and signing operations.
+ *
+ * https://developer.android.com/training/articles/keystore
+ *
+ */
+@Suppress("BooleanMethodIsAlwaysInverted")
 object KeystoreHelper {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -75,16 +82,12 @@ object KeystoreHelper {
 
             if (keyStore.containsAlias(keyName)) keyStore.deleteEntry(keyName)
 
-            digest = when (algorithm) {
-                "SHA1withRSA" -> {
-                    KeyProperties.DIGEST_SHA1
-                }
-                "SHA256withRSA" -> {
-                    KeyProperties.DIGEST_SHA256
-                }
-                else -> {    // == SHA512withRSA
-                    KeyProperties.DIGEST_SHA512
-                }
+            if (algorithm == "SHA1withRSA") {
+                digest = KeyProperties.DIGEST_SHA1
+            } else if (algorithm == "SHA256withRSA") {
+                digest = KeyProperties.DIGEST_SHA256
+            } else {    // == SHA512withRSA
+                digest = KeyProperties.DIGEST_SHA512
             }
 
             val keyGenParameterBuilder = KeyGenParameterSpec.Builder(
@@ -158,17 +161,18 @@ object KeystoreHelper {
         log.entering()
 
         try {
+            var key: String? = null
             KeyStore.getInstance(keystoreType).let { keyStore ->
                 keyStore.load(null)
                 keyStore.getCertificate(keyName)?.let { certificate ->
-                    return Base64.encodeToString(
+                    key = Base64.encodeToString(
                         certificate.publicKey.encoded,
                         base64EncodingOption
                     )
                 }
             }
 
-            return null
+            return key
         } finally {
             log.exiting()
         }
@@ -209,14 +213,15 @@ object KeystoreHelper {
         log.entering()
 
         try {
+            var key: PrivateKey? = null
             KeyStore.getInstance(keystoreType).let { keyStore ->
                 keyStore.load(null)
-                keyStore.getKey(keyName, null)?.let { key ->
-                    return key as PrivateKey
+                keyStore.getKey(keyName, null)?.let {
+                    key = it as PrivateKey
                 }
             }
 
-            return null
+            return key
         } finally {
             log.exiting()
         }
@@ -228,7 +233,6 @@ object KeystoreHelper {
      * @param keyName  the unique identifier of the key pair
      * @param algorithm  the standard string name of the algorithm used to create the signature
      * @param dataToSign  the string to encrypt
-     * @param base64EncodingOption  the encoding option to be used (optional)
      *
      * @return <ul><li>the base64 signed data or
      *          <li>null if the value can not be signed</ul>
@@ -243,16 +247,17 @@ object KeystoreHelper {
         log.entering()
 
         try {
+            var signedData: String? = null
             Signature.getInstance(algorithm).let { signature ->
                 getPrivateKey(keyName)?.let { privateKey ->
                     signature.initSign(privateKey)
                     signature.update(dataToSign.toByteArray())
 
-                    return Base64.encodeToString(signature.sign(), base64EncodingOption)
+                    signedData = Base64.encodeToString(signature.sign(), base64EncodingOption)
                 }
             }
 
-            return null
+            return signedData
         } finally {
             log.exiting()
         }

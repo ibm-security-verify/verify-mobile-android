@@ -18,6 +18,9 @@ val moduleScmUrl = "https://github.com/ibm-security-verify/verify-sdk-android"
 apply {
     from("../jacoco.gradle")
 }
+android {
+    namespace = "com.ibm.security.verifysdk.core"
+}
 
 tasks {
     register("androidJavadocJar", Jar::class) {
@@ -29,6 +32,15 @@ tasks {
         archiveClassifier.set("sources")
         from(android.sourceSets.getByName("main").java.srcDirs)
     }
+    withType<Test> {
+        useJUnitPlatform()
+    }
+}
+
+// To-do: move to VerifySdkBuildPlugin
+configure<org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension> {
+    failOnError = false
+    skipConfigurations.add("lintClassPath")
 }
 
 configure<PublishingExtension> {

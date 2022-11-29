@@ -17,6 +17,7 @@ private const val unsupportedLevelMessage =
  *
  * @param level  The log level for the message. See https://developer.android.com/reference/android/util/Log#summary
  * for the supported range.
+ *
  * @since 3.0.0
  */
 fun Logger.entering(level: Int = Log.INFO) {
