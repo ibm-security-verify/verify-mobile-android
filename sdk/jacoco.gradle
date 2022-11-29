@@ -4,7 +4,7 @@
 apply plugin: 'jacoco'
 
 jacoco {
-    toolVersion = "0.8.7"
+    toolVersion = "0.8.8"
 }
 
 tasks.withType(Test) {
@@ -28,7 +28,9 @@ project.afterEvaluate {
                     ":core:testDebugUnitTest",
                     ":core:connectedDebugAndroidTest",
                     ":adaptive:testDebugUnitTest",
-                    ":adaptive:connectedDebugAndroidTest"
+                    ":adaptive:connectedDebugAndroidTest",
+                    ":authentication:testDebugUnitTest",
+                    ":authentication:connectedDebugAndroidTest",
             ]) {
                 group = "Reporting"
                 description = "Generate Jacoco coverage reports for the ${variantName.capitalize()} build"
@@ -71,6 +73,7 @@ project.afterEvaluate {
                         '**/*_Factory*.*',
                         '**/*_Provide*Factory*.*',
                         '**/*Extensions*.*',
+                        "**/*serializer*.*",
                         // sealed and data classes
                         '**/*$Result.*',
                         '**/*$Result$*.*'
@@ -82,12 +85,14 @@ project.afterEvaluate {
                         fileTree(dir: "${buildDir}/tmp/kotlin-classes/${variantName}", excludes: excludes),
                         fileTree(dir: "$project.rootDir/core/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
                         fileTree(dir: "$project.rootDir/adaptive/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
+                        fileTree(dir: "$project.rootDir/authentication/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
                         javaClasses
                 ]))
 
                 def coverageSourceDirs = [
                         "$project.rootDir/core/src/main/java",
-                        "$project.rootDir/adaptive/src/main/java"
+                        "$project.rootDir/adaptive/src/main/java",
+                        "$project.rootDir/authentication/src/main/java"
                 ]
 
                 sourceDirectories.setFrom(project.files(coverageSourceDirs))
@@ -95,8 +100,10 @@ project.afterEvaluate {
                 executionData(files([
                         "$project.rootDir/core/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
                         "$project.rootDir/adaptive/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                        "$project.rootDir/authentication/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
                         fileTree(dir: "$project.rootDir/core/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"]),
                         fileTree(dir: "$project.rootDir/adaptive/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"]),
+                        fileTree(dir: "$project.rootDir/authentication/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"])
                 ]))
             }
         }

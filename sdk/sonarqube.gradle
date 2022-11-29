@@ -15,19 +15,23 @@ sonarqube {
         property "sonar.sourceEncoding", "UTF-8"
         property "sonar.coverage.jacoco.xmlReportPaths", [
                 "core/build/reports/jacoco/jacocoDebugCoverageReport/jacocoDebugCoverageReport.xml",
-                "adaptive/build/reports/jacoco/jacocoDebugCoverageReport/jacocoDebugCoverageReport.xml"
+                "adaptive/build/reports/jacoco/jacocoDebugCoverageReport/jacocoDebugCoverageReport.xml",
+                "authentication/build/reports/jacoco/jacocoDebugCoverageReport/jacocoDebugCoverageReport.xml"
                 ]
 
         property "sonar.sources", [
                 "core/src/main",
-                "adaptive/src/main"
+                "adaptive/src/main",
+                "authentication/src/main"
         ]
 
         property "sonar.test", [
                 "core/src/test/java",
                 "core/src/androidTest/java",
                 "adaptive/src/test/java",
-                "adaptive/src/androidTest/java"
+                "adaptive/src/androidTest/java",
+                "authentication/src/test/java",
+                "authentication/src/androidTest/java"
         ]
 
         property "sonar.exclusions", "app/**/*"

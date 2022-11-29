@@ -85,3 +85,6 @@ lint/tmp/
 # lint/reports/
 **/documentation/**
 .DS_Store
+sdk/.idea/deploymentTargetDropDown.xml
+sdk/.idea/misc.xml
+sdk/.idea/androidTestResultsUserPreferences.xml

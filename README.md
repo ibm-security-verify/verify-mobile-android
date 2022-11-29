@@ -3,7 +3,7 @@
 This repository is for active development of the IBM Security Verify Software Development Kit for Android.
 
 ## Getting started
-Each Software Development Kit (SDK) is seperate for you to choose from instead of one large IBM Security Verify package. To get started with a specific SDK, see the README.md file located in the specific project folder.
+Each Software Development Kit (SDK) is separate for you to choose from instead of one large IBM Security Verify SDK package. To get started with a specific SDK, see the README.md file located in the specific project folder.
 
 ## Prerequisites
 * The SDK is written in Kotlin.
@@ -14,17 +14,30 @@ The following SDKs are currently offered in the package:
 
 | SDK  |  Description | 
 |---|---|
-|  [Core](/sdk/core) | The core SDK provides supporting functionality to other SDK, such as logging, Keystore services, abstract error structures and utility functions.  |
-|  [Adaptive](/sdk/adaptive) |  The adaptive SDK provides device assessment. Based on cloud risk policies, authentication and authorization challenges can be evaluated. |  
+|  [Core](/sdk/core) | The IBM Security Verify Core SDK provides supporting functionality to other SDK, such as logging, Keystore services, abstract error structures and utility functions.  |
+|  [Authentication](/sdk/authentication) | The IBM Security Verify Authentication SDK is an implementation of OAuth 2.0 and OIDC targeting mobile use cases.  |
+|  [Adaptive](/sdk/adaptive) |  The IBM Security Verify Adaptive SDK provides device assessment. Based on cloud risk policies, authentication and authorization challenges can be evaluated. |  
 
 
 ## Download
-Snapshots of the development version are available [here](/releases).
+SDK artifacts are available [here](/releases).
 
-### Maven Central 
+### Maven 
+Store the files in your local maven repository. This is usually located at `~/.m2/repository/`.
+
+Add `mavenLocal` at the top of your list of repositories:
+
+```
+buildscript {
+    repositories {
+        mavenLocal()
+    }
+}
+```
+
 Add this line for each SDK to your `build.gradle` file (app level):
     
-    implementation 'com.github.ibm-security-verify:verify-sdk-android:core:3.0.0'
+    implementation 'com.github.ibm-security-verify:verify-sdk-android:<module>:<version>'
 
 
 ### Jitpack
@@ -36,7 +49,7 @@ In your project-level build.gradle file and add JitPack as a repository:
             }
         }
 
-Then for each SDK, add the foloowing line into your module-level build.gradle file:
+Then for each SDK, add the following line into your module-level build.gradle file:
 
     implementation 'com.github.ibm-security-verify:verify-sdk-android:core:v3.0.0'
 
@@ -45,4 +58,4 @@ Replace the particular SDK - `core` in this example - with the name of the SDKs 
 You can then use the JitPack website https://jitpack.io/ to generate a compile statement, based on the SDK’s GitHub url.
 
 ### Manually from GitHub release
-Download the relevant files from https://github.com/ibm-security-verify/verify-sdk-android/releases, copy and past them into the lib folder and sync your project.
+Download the required SDK files from https://github.com/ibm-security-verify/verify-sdk-android/releases/latest,  store them into the lib folder and sync your project.
