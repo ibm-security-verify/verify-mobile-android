@@ -1,0 +1,10 @@
+{
+  "access_token": "<ACCESS_TOKEN>" ,
+  "refresh_token": "<REFRESH_TOKEN>" ,
+  "scope": "<SCOPE>" ,
+  "authenticator_id": "<AUTHENTICATOR_ID>" ,
+  "ISV_push_enabled": "<ISV_PUSH_ENABLED>" ,
+  "token_type": "<TOKEN_TYPE>" ,
+  "display_name": "<DISPLAY_NAME>" ,
+  "expires_in": "<EXPIRES_IN>"
+}
