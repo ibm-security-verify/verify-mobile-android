@@ -10,6 +10,7 @@ on:
     - main
     - develop
     - dev
+    - '**'
 
 jobs:    
   setup_environment:
