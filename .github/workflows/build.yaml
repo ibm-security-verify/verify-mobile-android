@@ -179,10 +179,44 @@ jobs:
           name: code-coverage
           path: ./sdk/app/build/reports/jacoco/jacocoDebugCoverageReport/
 
+  mend_scan:
+    name: Mend scan
+    runs-on: ubuntu-latest
+    needs: setup_environment
+    env: 
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      WS_APIKEY: ${{ secrets.WS_APIKEY }}
+      WS_USERKEY: ${{ secrets.WS_USERKEY }}
+      WS_PRODUCTNAME: ${{ secrets.WS_PRODUCTNAME }}
+      WS_PROJECTNAME: ${{ secrets.WS_PROJECTNAME }}
+      WS_WSS_URL: ${{ secrets.WS_WSS_URL }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Install Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+  
+      - name: Download the mend scan jar
+        run: |
+          curl -LJO https://unified-agent.s3.amazonaws.com/wss-unified-agent.jar
+    
+      - name: Run the mend scan jar
+        working-directory: ./sdk
+        run: |
+          java -jar ../wss-unified-agent.jar -d ${{ github.workspace }}  
+
+
   publish:
     name: Publish SDK, reports and documentation
     runs-on: ubuntu-latest
-    needs: [setup_environment, coverage_report, build_and_test, owasp_scan]
+    needs: [setup_environment, coverage_report, build_and_test, owasp_scan, mend_scan]
 
     steps:
       - name: Verify release title

@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.ibm.security.verifysdk.core.AuthenticationException
 import com.ibm.security.verifysdk.core.AuthorizationException
 import com.ibm.security.verifysdk.core.NetworkHelper
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -96,6 +97,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
      * @return  [Result] with the `code` to be used in the subsequent authorization request or
      *                  with `Throwable` in case of an error.
      */
+    @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun authorizeWithBrowser(
         url: URL,
         redirectUrl: String,
