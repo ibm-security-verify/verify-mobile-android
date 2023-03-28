@@ -2,8 +2,6 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
 
@@ -37,18 +35,6 @@ fun String.isNonStable(): Boolean {
     val regex = "^[0-9,.v-]+(-r)?$".toRegex()
     val isStable = stableKeyword || regex.matches(this)
     return isStable.not()
-}
-
-tasks.withType<DependencyUpdatesTask> {
-    rejectVersionIf {
-        candidate.version.isNonStable()
-        candidate.version.isNonStable() && !currentVersion.isNonStable()
-    }
-
-    checkForGradleUpdate = true
-    outputFormatter = "html,json,plain"
-    outputDir = "build/dependencyUpdates"
-    reportfileName = "report"
 }
 
 tasks {
