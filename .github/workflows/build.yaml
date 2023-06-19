@@ -59,7 +59,7 @@ jobs:
         uses: android-actions/setup-android@v2
 
       - name: Load cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -121,7 +121,7 @@ jobs:
         uses: android-actions/setup-android@v2
 
       - name: Load cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -157,7 +157,7 @@ jobs:
         uses: android-actions/setup-android@v2
 
       - name: Load cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
