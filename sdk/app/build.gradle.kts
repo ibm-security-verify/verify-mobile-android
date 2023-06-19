@@ -17,3 +17,6 @@ dependencies {
     implementation(project(":adaptive"))
     implementation(project(":authentication"))
 }
+android {
+    namespace = "com.ibm.security.verifysdk"
+}

@@ -17,12 +17,12 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:7.4.2")
+        classpath("com.android.tools.build:gradle:8.0.2")
         classpath("org.jetbrains.dokka:dokka-gradle-plugin:$kotlinVersion")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
         classpath("org.owasp:dependency-check-gradle:8.2.1")
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
-        classpath("gradle.plugin.com.hcl.security:appscan-gradle-plugin:1.0.5")
+        classpath("gradle.plugin.com.hcl.security:appscan-gradle-plugin:1.0.8")
         classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
 
         // NOTE: Do not place your application dependencies here; they belong

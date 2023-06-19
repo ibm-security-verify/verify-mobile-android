@@ -26,6 +26,7 @@ apply {
 }
 android {
     namespace = "com.ibm.security.verifysdk.adaptive"
+    testNamespace = "com.ibm.security.verifysdk.adaptive.test"
 }
 
 tasks {

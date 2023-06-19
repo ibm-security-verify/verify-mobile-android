@@ -22,6 +22,7 @@ apply {
 }
 android {
     namespace = "com.ibm.security.verifysdk.authentication"
+    testNamespace = "com.ibm.security.verifysdk.authentication.test"
 }
 
 dependencies {
