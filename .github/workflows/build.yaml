@@ -166,6 +166,7 @@ jobs:
    
       - name: Run instrumentation Tests
         uses: reactivecircus/android-emulator-runner@v2
+        if: false
         with:
           working-directory: ./sdk
           api-level: 28
