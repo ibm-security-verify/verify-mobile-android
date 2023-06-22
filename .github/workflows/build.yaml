@@ -257,6 +257,7 @@ jobs:
 
       - name: Collect code coverate result
         uses: actions/download-artifact@v3
+        if: false
         with:
           name: code-coverage
           path: ./sdk
@@ -290,6 +291,7 @@ jobs:
           mv ./sdk/authentication/build/dokka/javadoc/* ./sdk/documentation/android/authentication/docs/
 
       - name: Zip code coverage report
+        if: false
         run: cd ./sdk/html && zip -r ../IBM-Verify-SDK_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_code-coverage-report.zip *
 
       - name: Create GitHub release
@@ -306,7 +308,7 @@ jobs:
             ./sdk/adaptive/build/reports/*.html
             ./sdk/authentication/build/outputs/aar/*.aar
             ./sdk/authentication/build/reports/*.html
-            ./sdk/IBM-Verify-SDK_*_code-coverage-report.zip
+            # ./sdk/IBM-Verify-SDK_*_code-coverage-report.zip
 
       - name: Upload documentation to GitHub.io repo
         if: github.ref == 'refs/heads/main'      
