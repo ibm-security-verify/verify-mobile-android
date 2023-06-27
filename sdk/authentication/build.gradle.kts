@@ -22,12 +22,13 @@ apply {
 }
 android {
     namespace = "com.ibm.security.verifysdk.authentication"
+    testNamespace = "com.ibm.security.verifysdk.authentication.test"
 }
 
 dependencies {
     implementation(project(":core"))
-    implementation("androidx.appcompat:appcompat:1.5.1")
-    implementation("com.google.android.material:material:1.7.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.8.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 }
 

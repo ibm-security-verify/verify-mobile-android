@@ -2,11 +2,24 @@
  * Copyright contributors to the IBM Security Verify Adaptive SDK for Android project
  */
 
-package com.ibm.security.verifysdk.adaptive
+package com.ibm.security.verifysdk.adaptive.test
 
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.failure
 import com.github.kittinunf.result.success
+import com.ibm.security.verifysdk.adaptive.AdaptiveContext
+import com.ibm.security.verifysdk.adaptive.AdaptiveDelegate
+import com.ibm.security.verifysdk.adaptive.AdaptiveResult
+import com.ibm.security.verifysdk.adaptive.AllowAssessmentResult
+import com.ibm.security.verifysdk.adaptive.AllowedFactor
+import com.ibm.security.verifysdk.adaptive.AssessmentStatusType
+import com.ibm.security.verifysdk.adaptive.DenyAssessmentResult
+import com.ibm.security.verifysdk.adaptive.EnrolledFactor
+import com.ibm.security.verifysdk.adaptive.Factor
+import com.ibm.security.verifysdk.adaptive.FactorEvaluation
+import com.ibm.security.verifysdk.adaptive.GenerateResult
+import com.ibm.security.verifysdk.adaptive.PasswordEvaluation
+import com.ibm.security.verifysdk.adaptive.RequiresAssessmentResult
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -162,7 +175,8 @@ class RemoteMockAdaptive : AdaptiveDelegate {
                                         val allowedFactors =
                                             List(factorsJson.length()) { factorString ->
                                                 val factorType = Factor.from(
-                                                    factorsJson.getJSONObject(factorString).get("type")
+                                                    factorsJson.getJSONObject(factorString)
+                                                        .get("type")
                                                         .toString()
                                                 )
                                                 AllowedFactor(type = factorType)
@@ -181,7 +195,8 @@ class RemoteMockAdaptive : AdaptiveDelegate {
                                             List(factorsJson.length()) { factorString ->
                                                 val enrollment = factorsJson.getJSONObject(factorString)
 
-                                                val factor = Factor.from(enrollment.getString("type"))
+                                                val factor =
+                                                    Factor.from(enrollment.getString("type"))
                                                 val id = enrollment.getString("id")
                                                 val validated = enrollment.getBoolean("validated")
                                                 val enabled = enrollment.getBoolean("enabled")

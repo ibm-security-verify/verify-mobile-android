@@ -2,9 +2,10 @@
  * Copyright contributors to the IBM Security Verify Adaptive SDK for Android project
  */
 
-package com.ibm.security.verifysdk.adaptive
+package com.ibm.security.verifysdk.adaptive.test
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ibm.security.verifysdk.adaptive.AdaptiveContext
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
