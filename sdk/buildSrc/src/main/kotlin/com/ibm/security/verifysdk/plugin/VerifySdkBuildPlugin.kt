@@ -21,6 +21,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
         project.plugins.apply("maven-publish")
         project.plugins.apply("org.jetbrains.dokka")
         project.plugins.apply("org.owasp.dependencycheck")
+        project.plugins.apply("com.github.ben-manes.versions")
 
         val androidExtension = project.extensions.getByName("android")
         if (androidExtension is BaseExtension) {

@@ -14,6 +14,7 @@ buildscript {
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
+        gradlePluginPortal()
     }
 
     dependencies {
@@ -24,17 +25,11 @@ buildscript {
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
         classpath("gradle.plugin.com.hcl.security:appscan-gradle-plugin:1.0.8")
         classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
+        classpath("com.github.ben-manes:gradle-versions-plugin:0.47.0")
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
-}
-
-fun String.isNonStable(): Boolean {
-    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { toUpperCase().contains(it) }
-    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
-    val isStable = stableKeyword || regex.matches(this)
-    return isStable.not()
 }
 
 tasks {

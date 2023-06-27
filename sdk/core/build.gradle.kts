@@ -1,3 +1,5 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+
 plugins {
     id("com.android.library")
     id("ibm-verifysdk-plugin")
@@ -41,6 +43,24 @@ tasks {
 configure<org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension> {
     failOnError = false
     skipConfigurations.add("lintClassPath")
+}
+
+// To-do: move to VerifySdkBuildPlugin
+tasks.withType<DependencyUpdatesTask>().configureEach {
+    outputFormatter = "html"
+    outputDir = "build/dependencyUpdates"
+    reportfileName = "dependencyUpdatesTask"
+
+    rejectVersionIf {
+        isNonStable(candidate.version)
+    }
+}
+
+fun isNonStable(version: String): Boolean {
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
+    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    val isStable = stableKeyword || regex.matches(version)
+    return isStable.not()
 }
 
 configure<PublishingExtension> {
