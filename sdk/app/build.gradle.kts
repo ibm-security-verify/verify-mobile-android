@@ -10,7 +10,7 @@ apply {
 
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.8.0")
+    implementation("com.google.android.material:material:1.9.0")
     implementation("org.slf4j:slf4j-jdk14:2.0.7")
 
     implementation(project(":core"))

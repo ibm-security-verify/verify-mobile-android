@@ -34,9 +34,6 @@ tasks {
         archiveClassifier.set("sources")
         from(android.sourceSets.getByName("main").java.srcDirs)
     }
-    withType<Test> {
-        useJUnitPlatform()
-    }
 }
 
 // To-do: move to VerifySdkBuildPlugin

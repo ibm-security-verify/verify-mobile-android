@@ -4,8 +4,8 @@
 
 package com.ibm.security.verifysdk.core
 
-import android.util.Log
 import org.slf4j.Logger
+import org.slf4j.event.Level
 
 private const val unsupportedLevelMessage =
     "Log level {} is not supported. See https://developer.android.com/reference/android/util/Log#summary"
@@ -15,12 +15,11 @@ private const val unsupportedLevelMessage =
  *
  *      Entry class={} method={}
  *
- * @param level  The log level for the message. See https://developer.android.com/reference/android/util/Log#summary
- * for the supported range.
+ * @param level  The log level for the message. Default is `Level.INFO`.
  *
  * @since 3.0.0
  */
-fun Logger.entering(level: Int = Log.INFO) {
+fun Logger.entering(level: Level = Level.INFO) {
 
     val message = "Entry class={} method={}"
     var ste: StackTraceElement = Thread.currentThread().stackTrace[4]
@@ -33,12 +32,11 @@ fun Logger.entering(level: Int = Log.INFO) {
     }
 
     when (level) {
-        Log.VERBOSE -> trace(message, ste.className, ste.methodName)
-        Log.DEBUG -> debug(message, ste.className, ste.methodName)
-        Log.INFO -> info(message, ste.className, ste.methodName)
-        Log.WARN -> warn(message, ste.className, ste.methodName)
-        Log.ERROR -> error(message, ste.className, ste.methodName)
-        Log.ASSERT -> error(message, ste.className, ste.methodName)
+        Level.TRACE -> trace(message, ste.className, ste.methodName)
+        Level.DEBUG -> debug(message, ste.className, ste.methodName)
+        Level.INFO -> info(message, ste.className, ste.methodName)
+        Level.WARN -> warn(message, ste.className, ste.methodName)
+        Level.ERROR -> error(message, ste.className, ste.methodName)
         else -> warn(unsupportedLevelMessage, level)
     }
 }
@@ -48,11 +46,11 @@ fun Logger.entering(level: Int = Log.INFO) {
  *
  *      Exit class={} method={}
  *
- * @param level  The log level for the message. See https://developer.android.com/reference/android/util/Log#summary
- * for the supported range.
+ * @param level  The log level for the message. Default is `Level.INFO`.
+ *
  * @since 3.0.0
  */
-fun Logger.exiting(level: Int = Log.INFO) {
+fun Logger.exiting(level: Level = Level.INFO) {
 
     val message = "Exit class={} method={}"
     var ste: StackTraceElement = Thread.currentThread().stackTrace[4]
@@ -65,12 +63,11 @@ fun Logger.exiting(level: Int = Log.INFO) {
     }
 
     when (level) {
-        Log.VERBOSE -> trace(message, ste.className, ste.methodName)
-        Log.DEBUG -> debug(message, ste.className, ste.methodName)
-        Log.INFO -> info(message, ste.className, ste.methodName)
-        Log.WARN -> warn(message, ste.className, ste.methodName)
-        Log.ERROR -> error(message, ste.className, ste.methodName)
-        Log.ASSERT -> error(message, ste.className, ste.methodName)
+        Level.TRACE -> trace(message, ste.className, ste.methodName)
+        Level.DEBUG -> debug(message, ste.className, ste.methodName)
+        Level.INFO -> info(message, ste.className, ste.methodName)
+        Level.WARN -> warn(message, ste.className, ste.methodName)
+        Level.ERROR -> error(message, ste.className, ste.methodName)
         else -> warn(unsupportedLevelMessage, level)
     }
 }
@@ -78,24 +75,21 @@ fun Logger.exiting(level: Int = Log.INFO) {
 /**
  * Creates a log message with the name and ID of the current thread.
  *
- * See https://developer.android.com/reference/android/util/Log#summary for the supported range
- * of the `level`
+ * @param level  The log level for the message. Default is `Level.INFO`.
  *
- * @param level  The log level for the message.
  * @since 3.0.0
  */
-fun Logger.threadInfo(level: Int = Log.INFO) {
+fun Logger.threadInfo(level: Level = Level.INFO) {
 
     val message =
         String.format("threadName=${Thread.currentThread().name}; threadId=${Thread.currentThread().id};")
 
     when (level) {
-        Log.VERBOSE -> trace(message)
-        Log.DEBUG -> debug(message)
-        Log.INFO -> info(message)
-        Log.WARN -> warn(message)
-        Log.ERROR -> error(message)
-        Log.ASSERT -> error(message)
+        Level.TRACE -> trace(message)
+        Level.DEBUG -> debug(message)
+        Level.INFO -> info(message)
+        Level.WARN -> warn(message)
+        Level.ERROR -> error(message)
         else -> warn(unsupportedLevelMessage, level)
     }
 }
