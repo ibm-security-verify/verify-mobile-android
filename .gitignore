@@ -88,3 +88,4 @@ lint/tmp/
 sdk/.idea/deploymentTargetDropDown.xml
 sdk/.idea/misc.xml
 sdk/.idea/androidTestResultsUserPreferences.xml
+wss-unified-agent.jar
