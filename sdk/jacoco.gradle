@@ -31,6 +31,8 @@ project.afterEvaluate {
                     ":adaptive:connectedDebugAndroidTest",
                     ":authentication:testDebugUnitTest",
                     ":authentication:connectedDebugAndroidTest",
+                    ":mfa:testDebugUnitTest",
+                    ":mfa:connectedDebugAndroidTest",
             ]) {
                 group = "Reporting"
                 description = "Generate Jacoco coverage reports for the ${variantName.capitalize()} build"
@@ -86,6 +88,7 @@ project.afterEvaluate {
                         fileTree(dir: "$project.rootDir/core/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
                         fileTree(dir: "$project.rootDir/adaptive/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
                         fileTree(dir: "$project.rootDir/authentication/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
+                        fileTree(dir: "$project.rootDir/mfa/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
                         javaClasses
                 ]))
 
@@ -101,9 +104,11 @@ project.afterEvaluate {
                         "$project.rootDir/core/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
                         "$project.rootDir/adaptive/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
                         "$project.rootDir/authentication/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                        "$project.rootDir/mfa/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
                         fileTree(dir: "$project.rootDir/core/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"]),
                         fileTree(dir: "$project.rootDir/adaptive/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"]),
-                        fileTree(dir: "$project.rootDir/authentication/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"])
+                        fileTree(dir: "$project.rootDir/authentication/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"]),
+                        fileTree(dir: "$project.rootDir/mfa/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"])
                 ]))
             }
         }
