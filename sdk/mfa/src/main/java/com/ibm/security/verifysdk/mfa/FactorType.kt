@@ -8,8 +8,6 @@ import java.util.UUID
 
 sealed class FactorType {
 
-    abstract val value: FactorValue
-
     val id: UUID
         get() = when (this) {
             is FactorType.Totp -> value.id
@@ -28,10 +26,20 @@ sealed class FactorType {
             is FactorType.UserPresence -> value.displayName
         }
 
-    data class Totp(override val value: FactorValue.Totp) : FactorType()
-    data class Hotp(override val value: FactorValue.Hotp) : FactorType()
-    data class Face(override val value: FactorValue.Face) : FactorType()
-    data class Fingerprint(override val value: FactorValue.Fingerprint) : FactorType()
-    data class UserPresence(override val value: FactorValue.UserPresence) : FactorType()
+    data class Totp(val value: TOTPFactorInfo) : FactorType()
+    data class Hotp(val value: HOTPFactorInfo) : FactorType()
+    data class Face(val value: FaceFactorInfo) : FactorType()
+    data class Fingerprint(val value: FingerprintFactorInfo) : FactorType()
+    data class UserPresence(val value: UserPresenceFactorInfo) : FactorType()
 
+}
+
+fun FactorType.valueType(): Factor {
+    return when (this) {
+        is FactorType.Totp -> this.value
+        is FactorType.Hotp -> this.value
+        is FactorType.Face -> this.value
+        is FactorType.Fingerprint -> this.value
+        is FactorType.UserPresence -> this.value
+    }
 }
