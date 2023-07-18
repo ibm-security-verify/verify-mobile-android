@@ -100,7 +100,7 @@ internal fun sign(
     keyName: String,
     algorithm: String,
     dataToSign: String,
-    base64EncodingOptions: Int
+    base64EncodingOptions: Int = Base64.DEFAULT
 ): String {
 
     val keyStore = KeyStore.getInstance("AndroidKeyStore")

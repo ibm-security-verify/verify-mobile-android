@@ -4,30 +4,37 @@
 
 package com.ibm.security.verifysdk.mfa
 
-class MFAServiceController {
-}
+class MFAServiceController(private val authenticator: MFAAuthenticatorDescriptor) {
 
-sealed class MFAServiceError : Error() {
-
-    class InvalidSigningHash : MFAServiceError()
-    class InvalidPendingTransaction : MFAServiceError()
-    class SerializationFailed : MFAServiceError()
-    class InvalidDataResponse : MFAServiceError()
-    class DecodingFailed : MFAServiceError()
-    class UnableToCreateTransaction : MFAServiceError()
-    data class General(override val message: String) : MFAServiceError()
-
-    val errorDescription: String?
-        get() = localizedDescription
-
-    private val localizedDescription: String
-        get() = when (this) {
-            is InvalidSigningHash -> "The signing hash algorithm was invalid."
-            is InvalidPendingTransaction -> "No pending transaction was available to complete."
-            is SerializationFailed -> "Serialization conversion failed."
-            is InvalidDataResponse -> "The response data was invalid."
-            is DecodingFailed -> "The JSON decoding operation failed."
-            is UnableToCreateTransaction -> "Unable to create the pending transaction."
-            is General -> message
+    init {
+        require(authenticator is OnPremiseAuthenticator || authenticator is CloudAuthenticator) {
+            "Invalid authenticator type. Only OnPremiseAuthenticator or CloudAuthenticator is allowed."
         }
+    }
+
+    fun initiate(): MFAServiceDescriptor {
+
+        if (authenticator is OnPremiseAuthenticator) {
+            if (certificateTrust == null && authenticator.ignoreSSLCertificate) {
+                certificateTrust = SelfSignedCertificateDelegate()
+            }
+
+            return OnPremiseAuthenticatorService(
+                accessToken = authenticator.token.accessToken,
+                refreshUri = authenticator.refreshUri,
+                transactionUri = authenticator.transactionUri,
+                clientId = authenticator.clientId,
+                authenticatorId = authenticator.id,
+                certificateTrust = certificateTrust
+            )
+        }
+
+        return CloudAuthenticatorService(
+            accessToken = authenticator.token.accessToken,
+            refreshUri = authenticator.refreshUri,
+            transactionUri = authenticator.transactionUri,
+            authenticatorId = authenticator.id,
+            certificateTrust = certificateTrust
+        )
+    }
 }
