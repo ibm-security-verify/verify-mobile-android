@@ -28,6 +28,7 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.scottyab:rootbeer-lib:0.1.0")
     implementation(project(mapOf("path" to ":authentication")))
     implementation(project(mapOf("path" to ":authentication")))
 }

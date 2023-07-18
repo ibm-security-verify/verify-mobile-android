@@ -4,9 +4,11 @@
 
 package com.ibm.security.verifysdk.plugin
 
+import com.android.build.api.variant.BuildConfigField
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
+import com.android.builder.model.ClassField
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -27,6 +29,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
         if (androidExtension is BaseExtension) {
             androidExtension.apply {
                 compileSdkVersion(33)
+                buildFeatures.buildConfig = true
                 defaultConfig {
                     targetSdk = 30
                     minSdk = 26
@@ -36,6 +39,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
                     manifestPlaceholders["auth_redirect_scheme"] = "verifysdk"
                     manifestPlaceholders["auth_redirect_host"] = "callback"
                     manifestPlaceholders["auth_redirect_path"] = ""
+                    buildConfigField("String", "VERSION_NAME", "\"3.0.1\"")
                 }
 
                 packagingOptions {

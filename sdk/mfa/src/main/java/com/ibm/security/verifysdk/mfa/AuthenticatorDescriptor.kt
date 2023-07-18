@@ -18,7 +18,7 @@ interface AuthenticatorDescriptor {
     val id: String
     val serviceName: String
     var accountName: String
-    val allowedFactors: Array<FactorType>
+    val allowedFactors: List<FactorType>
 }
 
 internal fun factorNameAndAlgorithm(factorType: FactorType): Pair<String, HashAlgorithmType>? {

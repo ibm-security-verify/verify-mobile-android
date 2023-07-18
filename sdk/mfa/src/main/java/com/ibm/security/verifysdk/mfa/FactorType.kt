@@ -4,8 +4,10 @@
 
 package com.ibm.security.verifysdk.mfa
 
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
+@Serializable
 sealed class FactorType {
 
     val id: UUID
