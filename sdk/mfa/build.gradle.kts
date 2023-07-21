@@ -31,6 +31,7 @@ dependencies {
     implementation("com.scottyab:rootbeer-lib:0.1.0")
     implementation(project(mapOf("path" to ":authentication")))
     implementation(project(mapOf("path" to ":authentication")))
+    implementation("androidx.core:core-ktx:1.10.1")
 }
 
 tasks {

@@ -16,6 +16,9 @@ import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.HostnameVerifier
+import javax.net.ssl.SSLContext
+import javax.net.ssl.X509TrustManager
 
 /**
  * A singleton to configures the network object that handles the calls.
@@ -27,9 +30,8 @@ object NetworkHelper {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    var retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("http://localhost")
-        .build()
+    private var networkApi: NetworkApi = recreate().create(NetworkApi::class.java)
+    private var networkApiCustomSSL: NetworkApi = recreateCustomSSL().create(NetworkApi::class.java)
 
     /**
      * Indicates whether redirects should be followed. Default is `true`.
@@ -37,7 +39,8 @@ object NetworkHelper {
     var followSslRedirects = true
         set(value) {
             field = value
-            recreate()
+            networkApi = recreate().create(NetworkApi::class.java)
+            networkApiCustomSSL = recreateCustomSSL().create(NetworkApi::class.java)
         }
 
     /**
@@ -47,7 +50,8 @@ object NetworkHelper {
     var customLoggingInterceptor: HttpLoggingInterceptor? = null
         set(value) {
             field = value
-            recreate()
+            networkApi = recreate().create(NetworkApi::class.java)
+            networkApiCustomSSL = recreateCustomSSL().create(NetworkApi::class.java)
         }
 
     /**
@@ -57,7 +61,8 @@ object NetworkHelper {
     var customInterceptor: Interceptor? = null
         set(value) {
             field = value
-            recreate()
+            networkApi = recreate().create(NetworkApi::class.java)
+            networkApiCustomSSL = recreateCustomSSL().create(NetworkApi::class.java)
         }
 
     /**
@@ -66,7 +71,8 @@ object NetworkHelper {
     var certificatePinner: CertificatePinner? = null
         set(value) {
             field = value
-            recreate()
+            networkApi = recreate().create(NetworkApi::class.java)
+            networkApiCustomSSL = recreateCustomSSL().create(NetworkApi::class.java)
         }
 
     /**
@@ -75,7 +81,8 @@ object NetworkHelper {
     var readTimeOut = 30
         set(value) {
             field = value
-            recreate()
+            networkApi = recreate().create(NetworkApi::class.java)
+            networkApiCustomSSL = recreateCustomSSL().create(NetworkApi::class.java)
         }
 
     /**
@@ -84,14 +91,40 @@ object NetworkHelper {
     var connectionTimeOut = 30
         set(value) {
             field = value
-            recreate()
+            networkApi = recreate().create(NetworkApi::class.java)
+            networkApiCustomSSL = recreateCustomSSL().create(NetworkApi::class.java)
         }
 
-    val networkApi: NetworkApi by lazy {
-        retrofit.create(NetworkApi::class.java)
+    var sslContext: SSLContext? = null
+        set(value) {
+            field = value
+            networkApi = recreate().create(NetworkApi::class.java)
+            networkApiCustomSSL = recreateCustomSSL().create(NetworkApi::class.java)
+        }
+
+    var hostnameVerifier: HostnameVerifier? = null
+        set(value) {
+            field = value
+            networkApi = recreate().create(NetworkApi::class.java)
+            networkApiCustomSSL = recreateCustomSSL().create(NetworkApi::class.java)
+        }
+
+    var trustManager: X509TrustManager? = null
+        set(value) {
+            field = value
+            networkApi = recreate().create(NetworkApi::class.java)
+            networkApiCustomSSL = recreateCustomSSL().create(NetworkApi::class.java)
+        }
+
+    fun networkApi(useCustomSSL: Boolean = false): NetworkApi {
+        return when (useCustomSSL) {
+            true -> networkApi
+            false -> networkApiCustomSSL
+        }
     }
 
-    private fun recreate() {
+
+    private fun recreate(): Retrofit {
 
         val okHttpClientBuilder = OkHttpClient.Builder()
 
@@ -99,22 +132,40 @@ object NetworkHelper {
         okHttpClientBuilder.readTimeout(readTimeOut.toLong(), TimeUnit.SECONDS)
         okHttpClientBuilder.followSslRedirects(followSslRedirects)
 
-        certificatePinner?.let {
-            okHttpClientBuilder.certificatePinner(it)
-        }
+        certificatePinner?.let { okHttpClientBuilder.certificatePinner(it) }
+        customLoggingInterceptor?.let { okHttpClientBuilder.addInterceptor(it) }
+        customInterceptor?.let { okHttpClientBuilder.addInterceptor(it) }
 
-        customLoggingInterceptor?.let {
-            okHttpClientBuilder.addInterceptor(it)
-        }
-
-        customInterceptor?.let {
-            okHttpClientBuilder.addInterceptor(it)
-        }
-
-        retrofit = Retrofit.Builder()
+        return Retrofit.Builder()
             .client(okHttpClientBuilder.build())
             .baseUrl("http://localhost")
             .build()
+    }
+
+    private fun recreateCustomSSL(): Retrofit {
+
+        val okHttpClientBuilder = OkHttpClient.Builder()
+
+        okHttpClientBuilder.connectTimeout(connectionTimeOut.toLong(), TimeUnit.SECONDS)
+        okHttpClientBuilder.readTimeout(readTimeOut.toLong(), TimeUnit.SECONDS)
+        okHttpClientBuilder.followSslRedirects(followSslRedirects)
+
+        sslContext?.let { sslContext ->
+            trustManager?.let { trustManager ->
+                okHttpClientBuilder.sslSocketFactory(sslContext.socketFactory, trustManager)
+            }
+        }
+
+        hostnameVerifier?.let { okHttpClientBuilder.hostnameVerifier(it) }
+        certificatePinner?.let { okHttpClientBuilder.certificatePinner(it) }
+        customLoggingInterceptor?.let { okHttpClientBuilder.addInterceptor(it) }
+        customInterceptor?.let { okHttpClientBuilder.addInterceptor(it) }
+
+        return Retrofit.Builder()
+            .client(okHttpClientBuilder.build())
+            .baseUrl("http://localhost")
+            .build()
+
     }
 
     /**

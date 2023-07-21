@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("ibm-verifysdk-plugin")
+    id("org.jetbrains.kotlin.android")
 }
 
 apply {
@@ -17,6 +18,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":adaptive"))
     implementation(project(":authentication"))
+    implementation("androidx.core:core-ktx:1.10.1")
 }
 android {
     namespace = "com.ibm.security.verifysdk"

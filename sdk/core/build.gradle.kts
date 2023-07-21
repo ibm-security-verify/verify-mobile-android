@@ -3,6 +3,7 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 plugins {
     id("com.android.library")
     id("ibm-verifysdk-plugin")
+    id("org.jetbrains.kotlin.android")
 }
 
 val moduleArtifactId = "core"
@@ -22,6 +23,9 @@ apply {
 }
 android {
     namespace = "com.ibm.security.verifysdk.core"
+}
+dependencies {
+    implementation("androidx.core:core-ktx:+")
 }
 
 tasks {

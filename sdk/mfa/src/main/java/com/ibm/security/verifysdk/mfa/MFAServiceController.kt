@@ -14,27 +14,21 @@ class MFAServiceController(private val authenticator: MFAAuthenticatorDescriptor
 
     fun initiate(): MFAServiceDescriptor {
 
-        if (authenticator is OnPremiseAuthenticator) {
-            if (certificateTrust == null && authenticator.ignoreSSLCertificate) {
-                certificateTrust = SelfSignedCertificateDelegate()
-            }
-
-            return OnPremiseAuthenticatorService(
+        when (authenticator) {
+            is OnPremiseAuthenticator -> return OnPremiseAuthenticatorService(
                 accessToken = authenticator.token.accessToken,
                 refreshUri = authenticator.refreshUri,
                 transactionUri = authenticator.transactionUri,
                 clientId = authenticator.clientId,
-                authenticatorId = authenticator.id,
-                certificateTrust = certificateTrust
+                authenticatorId = authenticator.id
+            )
+
+            else -> return CloudAuthenticatorService(
+                accessToken = authenticator.token.accessToken,
+                refreshUri = authenticator.refreshUri,
+                transactionUri = authenticator.transactionUri,
+                authenticatorId = authenticator.id
             )
         }
-
-        return CloudAuthenticatorService(
-            accessToken = authenticator.token.accessToken,
-            refreshUri = authenticator.refreshUri,
-            transactionUri = authenticator.transactionUri,
-            authenticatorId = authenticator.id,
-            certificateTrust = certificateTrust
-        )
     }
 }

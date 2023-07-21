@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     id("ibm-verifysdk-plugin")
+    id("org.jetbrains.kotlin.android")
 }
 
 val moduleArtifactId = "adaptive"
@@ -18,6 +19,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-process:2.6.1")
     implementation("androidx.test:rules:1.5.0")
     implementation("androidx.test.ext:junit-ktx:1.1.5")
+    implementation("androidx.core:core-ktx:1.10.1")
     androidTestImplementation("com.github.kittinunf.fuel:fuel-android:2.3.1")
 }
 

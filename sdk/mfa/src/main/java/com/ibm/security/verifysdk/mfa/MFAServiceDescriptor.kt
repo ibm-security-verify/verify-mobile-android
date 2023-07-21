@@ -37,7 +37,7 @@ suspend fun MFAServiceDescriptor.login(loginUri: URL, code: String): Result<Unit
 
     return try {
         NetworkHelper.handleApi(
-            NetworkHelper.networkApi.login(
+            NetworkHelper.networkApi().login(
                 loginUri.toString(),
                 accessToken,
                 body
@@ -58,6 +58,8 @@ suspend fun MFAServiceDescriptor.completeTransaction(
     val value = factorNameAndAlgorithm(factor)
         ?: throw MFAServiceError.General("Invalid factor to perform signing.")
     var signedData = ""
+
+    // TODO: check whether this is correct - it does not seem to provide the right key name
 
     if (userAction == UserAction.VERIFY) {
         signedData = sign(
