@@ -12,11 +12,13 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.net.URL
 import kotlin.io.encoding.Base64
 
-interface MFAServiceDescriptor : Actor {
-    var accessToken: String
-    var refreshUri: URL
-    var transactionUri: URL
-    var currentPendingTransaction: PendingTransactionInfo?
+interface MFAServiceDescriptor {
+    val accessToken: String
+    val refreshUri: URL
+    val transactionUri: URL
+    val currentPendingTransaction: PendingTransactionInfo?
+
+    fun setCurrentPendingTransaction(value: PendingTransactionInfo?)
 
     suspend fun refreshToken(
         refreshToken: String,

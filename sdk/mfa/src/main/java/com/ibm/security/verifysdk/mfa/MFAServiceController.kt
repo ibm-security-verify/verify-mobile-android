@@ -23,12 +23,14 @@ class MFAServiceController(private val authenticator: MFAAuthenticatorDescriptor
                 authenticatorId = authenticator.id
             )
 
-            else -> return CloudAuthenticatorService(
+            is CloudAuthenticator -> return CloudAuthenticatorService(
                 accessToken = authenticator.token.accessToken,
                 refreshUri = authenticator.refreshUri,
                 transactionUri = authenticator.transactionUri,
                 authenticatorId = authenticator.id
             )
+
+            else -> throw MFARegistrationError.InvalidFormat
         }
     }
 }

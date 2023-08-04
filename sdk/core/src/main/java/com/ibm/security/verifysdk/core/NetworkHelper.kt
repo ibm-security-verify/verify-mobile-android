@@ -71,7 +71,6 @@ object NetworkHelper {
     var certificatePinner: CertificatePinner? = null
         set(value) {
             field = value
-            networkApi = recreate().create(NetworkApi::class.java)
             networkApiCustomSSL = recreateCustomSSL().create(NetworkApi::class.java)
         }
 
@@ -98,21 +97,18 @@ object NetworkHelper {
     var sslContext: SSLContext? = null
         set(value) {
             field = value
-            networkApi = recreate().create(NetworkApi::class.java)
             networkApiCustomSSL = recreateCustomSSL().create(NetworkApi::class.java)
         }
 
     var hostnameVerifier: HostnameVerifier? = null
         set(value) {
             field = value
-            networkApi = recreate().create(NetworkApi::class.java)
             networkApiCustomSSL = recreateCustomSSL().create(NetworkApi::class.java)
         }
 
     var trustManager: X509TrustManager? = null
         set(value) {
             field = value
-            networkApi = recreate().create(NetworkApi::class.java)
             networkApiCustomSSL = recreateCustomSSL().create(NetworkApi::class.java)
         }
 

@@ -15,8 +15,9 @@ object MFAAttributeInfo {
 
     private lateinit var applicationContext: Context
 
-    fun init(application: Application) {
-        this.applicationContext = application
+    fun init(context: Context): MFAAttributeInfo {
+        this.applicationContext = context
+        return this
     }
 
     private val name: String

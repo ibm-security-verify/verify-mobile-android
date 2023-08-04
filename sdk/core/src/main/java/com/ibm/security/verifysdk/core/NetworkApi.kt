@@ -51,15 +51,36 @@ interface NetworkApi {
     @POST
     @FormUrlEncoded
     @Headers("Accept: application/json", "Content-Type: application/json")
-    suspend fun refresh(
+    suspend fun refresh(    // OnPrem
         @HeaderMap headers: Map<String, String>,
         @Url url: String,
-        @Field("client_id") clientId: String,
-        @Field("client_secret") clientSecret: String,
         @Field("refresh_token") refreshToken: String,
         @Field("grant_type") grantType: String,
-        @Field("scope") scope: String,
+        @Field("scope") scope: Array<String>,
         @FieldMap additionalParameters: Map<String, String>
+    ): Response<ResponseBody>
+
+    @POST
+    @Headers("Accept: application/json", "Content-Type: application/json")
+    suspend fun refresh(    // Cloud
+        @Url url: String,
+        @Query("metadataInResponse") metadataInResponse: Boolean,
+        @Body body: RequestBody
+    ): Response<ResponseBody>
+
+    @GET
+    @Headers("Accept: application/json", "Content-Type: application/json")
+    suspend fun transaction(    // Cloud
+        @Url url: String,
+        @Header("Authorization") token: String
+    ): Response<ResponseBody>
+
+    @GET
+    @Headers("Accept: application/json", "Content-Type: application/json")
+    suspend fun completeTransaction(    // Cloud
+        @Url url: String,
+        @Header("Authorization") token: String,
+        @Body body: RequestBody
     ): Response<ResponseBody>
 
     @POST
