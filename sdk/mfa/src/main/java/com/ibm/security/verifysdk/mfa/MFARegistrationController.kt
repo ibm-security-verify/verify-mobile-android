@@ -4,39 +4,43 @@
 
 package com.ibm.security.verifysdk.mfa
 
-import org.json.JSONException
+import com.ibm.security.verifysdk.mfa.cloud.CloudRegistrationProvider
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 import org.json.JSONObject
 
-class MFARegistrationController(json: String) {
+class MFARegistrationController(private var data: String) {
 
     var ignoreSSLCertificate: Boolean = false
         private set
 
     init {
-        JSONObject(json).let {jsonObject ->
-            jsonObject.has("options")?.let {
-                this.ignoreSSLCertificate = jsonObject.getString("options").contains("ignoreSslCerts=true")
+
+        val json = Json { ignoreUnknownKeys = true }
+        val jsonObject: JsonObject = json.parseToJsonElement(data).jsonObject
+
+        jsonObject.let {
+            it.contains("options").let {
+                this.ignoreSSLCertificate =
+                    jsonObject["options"].toString().filter { c -> !c.isWhitespace() } == "ignoreSslCerts=true"
             }
 
         }
     }
 
-    suspend fun initiate(accountName: String, skipTotpEnrollment: Boolean = true, pushToken: String? = "", additionalData: Map<String, Any>? = null): MFARegistrationDescriptor {
-        return when {
-            try {
-                CloudRegistrationProvider(json).initiate(accountName, skipTotpEnrollment, pushToken)
-                true
-            } catch (e: MFARegistrationError) {
-                false
-            }
-
-            try {
-                OnPremiseRegistrationProvider(json).initiate(accountName, skipTotpEnrollment, pushToken, additionalData)
-                true
-            } catch (e: MFARegistrationError) {
-                false
-            }
-            else -> throw MFARegistrationError.InvalidFormat
+    suspend fun initiate(
+        accountName: String,
+        skipTotpEnrollment: Boolean = true,
+        pushToken: String? = "",
+        additionalData: Map<String, Any>? = null
+    ): Result<MFARegistrationDescriptor<MFAAuthenticatorDescriptor>> {
+        val cloudRegistrationProvider = CloudRegistrationProvider(data)
+        cloudRegistrationProvider.let {
+            it.initiate(accountName, skipTotpEnrollment, pushToken)
+            return Result.success(it)
         }
+
+        return Result.failure(MFARegistrationError.InvalidFormat)
     }
 }

@@ -2,11 +2,18 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.mfa
+package com.ibm.security.verifysdk.mfa.cloud
 
-import android.app.Application
 import com.ibm.security.verifysdk.authentication.TokenInfo
 import com.ibm.security.verifysdk.core.NetworkHelper
+import com.ibm.security.verifysdk.mfa.MFAAttributeInfo
+import com.ibm.security.verifysdk.mfa.MFAServiceDescriptor
+import com.ibm.security.verifysdk.mfa.MFAServiceError
+import com.ibm.security.verifysdk.mfa.NextTransactionInfo
+import com.ibm.security.verifysdk.mfa.PendingTransactionInfo
+import com.ibm.security.verifysdk.mfa.TransactionAttribute
+import com.ibm.security.verifysdk.mfa.TransactionResult
+import com.ibm.security.verifysdk.mfa.UserAction
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -45,10 +52,6 @@ class CloudAuthenticatorService(
         PENDING_BY_IDENTIFIER("?filter=id,creationTime,transactionData,authenticationMethods&search=state=\\u{22}PENDING\\u{22}&id=\\u{22}%@\\u{22}")
     }
 
-    override fun setCurrentPendingTransaction(value: PendingTransactionInfo?) {
-        _currentPendingTransaction = value
-    }
-
     override suspend fun refreshToken(
         refreshToken: String,
         accountName: String?,
@@ -58,7 +61,7 @@ class CloudAuthenticatorService(
 
         return try {
             val attributes = mutableMapOf<String, Any>().apply {
-                putAll(MFAAttributeInfo.init(Application().applicationContext).dictionary())
+                putAll(MFAAttributeInfo.dictionary())
                 remove("applicationName")
             }
 
@@ -136,36 +139,32 @@ class CloudAuthenticatorService(
 
     private fun parsePendingTransaction(response: Result<String>): Result<NextTransactionInfo> {
 
-        response.onSuccess { responseBody ->
-            val decoder = Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-            }
+        return response.fold(
+            onSuccess = { responseBody ->
+                val decoder = Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                }
 
-            val result: TransactionResult = try {
-                decoder.decodeFromString(responseBody)
-            } catch (e: Exception) {
-                return Result.failure(MFAServiceError.DecodingFailed())
-            }
+                val result: TransactionResult = try {
+                    decoder.decodeFromString(responseBody)
+                } catch (e: Exception) {
+                    return@fold Result.failure(MFAServiceError.DecodingFailed())
+                }
 
-            // Check if there are no verifications, return a null.
-            if (result.count == 0) {
-                Result.success(NextTransactionInfo(null, 0))
-            }
+                if (result.count == 0) {
+                    return@fold Result.success(NextTransactionInfo(null, 0))
+                }
 
-            // Create the pending transaction.
-            val pendingTransaction: PendingTransactionInfo? = createPendingTransaction(result)
+                createPendingTransaction(result)?.let {
+                    return@fold Result.success(NextTransactionInfo(it, result.count))
+                }
 
-            return if (pendingTransaction != null) {
-                Result.success(NextTransactionInfo(pendingTransaction, result.count))
-            } else {
-                Result.failure(MFAServiceError.UnableToCreateTransaction())
-            }
-        }
+                return@fold Result.failure(MFAServiceError.UnableToCreateTransaction())
+            },
 
-        response.onFailure {
-            Result.failure(MFAServiceError.InvalidDataResponse())
-        }
+            onFailure = { return@fold Result.failure(MFAServiceError.InvalidDataResponse()) }
+        )
     }
 
     private fun createPendingTransaction(result: TransactionResult): PendingTransactionInfo? {

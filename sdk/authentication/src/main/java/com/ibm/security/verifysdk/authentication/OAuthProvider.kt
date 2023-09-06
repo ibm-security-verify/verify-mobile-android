@@ -15,6 +15,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import retrofit2.http.Field
+import retrofit2.http.FieldMap
+import retrofit2.http.HeaderMap
+import retrofit2.http.Url
 import java.net.MalformedURLException
 import java.net.URL
 import kotlin.coroutines.resume
@@ -72,7 +76,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
             if (url.path.endsWith(".well-known/openid-configuration", ignoreCase = true).not()) {
                 Result.failure(MalformedURLException("The URL does not end with the .well-known/openid-configuration path component."))
             } else {
-                NetworkHelper.handleApi(NetworkHelper.networkApi.discover(url.toString()))
+                NetworkHelper.handleApi(NetworkHelper.networkApi().discover(url.toString()))
             }
         } catch (e: Throwable) {
             Result.failure(e)
@@ -201,7 +205,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
         return try {
 
             NetworkHelper.handleApi(
-                NetworkHelper.networkApi.authorizeWithAuthCode(
+                NetworkHelper.networkApi().authorizeWithAuthCode(
                     additionalHeaders,
                     url.toString(),
                     clientId,
@@ -239,7 +243,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
     ): Result<TokenInfo> {
         return try {
             NetworkHelper.handleApi(
-                NetworkHelper.networkApi.authorizeWithROPC(
+                NetworkHelper.networkApi().authorizeWithROPC(
                     additionalHeaders,
                     url.toString(),
                     clientId,
@@ -279,11 +283,9 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
     ): Result<TokenInfo> {
         return try {
             NetworkHelper.handleApi(
-                NetworkHelper.networkApi.refresh(
+                NetworkHelper.networkApi().refresh(
                     additionalHeaders,
                     url.toString(),
-                    clientId,
-                    clientSecret ?: "",
                     refreshToken,
                     "refresh_token",
                     scope?.joinToString(" ") ?: "",

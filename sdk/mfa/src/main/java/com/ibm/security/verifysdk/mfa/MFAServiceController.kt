@@ -4,6 +4,9 @@
 
 package com.ibm.security.verifysdk.mfa
 
+import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticator
+import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticatorService
+
 class MFAServiceController(private val authenticator: MFAAuthenticatorDescriptor) {
 
     init {
@@ -24,9 +27,9 @@ class MFAServiceController(private val authenticator: MFAAuthenticatorDescriptor
             )
 
             is CloudAuthenticator -> return CloudAuthenticatorService(
-                accessToken = authenticator.token.accessToken,
-                refreshUri = authenticator.refreshUri,
-                transactionUri = authenticator.transactionUri,
+                _accessToken = authenticator.token.accessToken,
+                _refreshUri = authenticator.refreshUri,
+                _transactionUri = authenticator.transactionUri,
                 authenticatorId = authenticator.id
             )
 

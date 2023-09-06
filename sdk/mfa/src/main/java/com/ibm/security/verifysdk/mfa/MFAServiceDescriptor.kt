@@ -18,8 +18,6 @@ interface MFAServiceDescriptor {
     val transactionUri: URL
     val currentPendingTransaction: PendingTransactionInfo?
 
-    fun setCurrentPendingTransaction(value: PendingTransactionInfo?)
-
     suspend fun refreshToken(
         refreshToken: String,
         accountName: String?,

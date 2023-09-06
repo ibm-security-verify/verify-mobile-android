@@ -73,16 +73,12 @@ object MFAAttributeInfo {
 
     private val applicationName: String
         get() {
-            @Suppress("DEPRECATION")
-            return applicationContext.packageManager.getApplicationInfo(
-                applicationContext.packageName,
-                0
-            ).name
+            val applicationInfo = applicationContext.packageManager.getApplicationInfo(applicationContext.packageName, 0)
+            return applicationContext.packageManager.getApplicationLabel(applicationInfo).toString()
         }
 
     private val applicationVersion: String
         get() {
-            @Suppress("DEPRECATION")
             return applicationContext.packageManager.getPackageInfo(
                 applicationContext.packageName,
                 0

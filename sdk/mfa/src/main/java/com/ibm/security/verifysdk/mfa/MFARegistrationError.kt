@@ -6,7 +6,7 @@ package com.ibm.security.verifysdk.mfa
 
 sealed class MFARegistrationError : Error() {
 
-    class FailedToParse : MFARegistrationError()
+    object FailedToParse : MFARegistrationError()
     object InvalidFormat : MFARegistrationError()
     object NoEnrollableFactors : MFARegistrationError()
     object EnrollmentFailed : MFARegistrationError()

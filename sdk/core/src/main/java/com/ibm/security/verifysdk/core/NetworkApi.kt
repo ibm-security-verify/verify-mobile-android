@@ -56,7 +56,7 @@ interface NetworkApi {
         @Url url: String,
         @Field("refresh_token") refreshToken: String,
         @Field("grant_type") grantType: String,
-        @Field("scope") scope: Array<String>,
+        @Field("scope") scope: String,
         @FieldMap additionalParameters: Map<String, String>
     ): Response<ResponseBody>
 

@@ -2,8 +2,10 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.mfa
+package com.ibm.security.verifysdk.mfa.cloud
 
+import com.ibm.security.verifysdk.mfa.EnrollableFactor
+import com.ibm.security.verifysdk.mfa.EnrollableType
 import java.net.URL
 
 internal data class CloudTOTPEnrollableFactor(

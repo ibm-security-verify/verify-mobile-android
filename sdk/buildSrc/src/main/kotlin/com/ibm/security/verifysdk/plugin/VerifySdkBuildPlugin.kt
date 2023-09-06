@@ -28,7 +28,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
         val androidExtension = project.extensions.getByName("android")
         if (androidExtension is BaseExtension) {
             androidExtension.apply {
-                compileSdkVersion(33)
+                compileSdkVersion(34)
                 buildFeatures.buildConfig = true
                 defaultConfig {
                     targetSdk = 30
