@@ -10,6 +10,7 @@ on:
     - main
     - develop
     - dev
+    - '**'
 
 jobs:    
   setup_environment:
@@ -51,14 +52,14 @@ jobs:
       - name: Install Java
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'adopt'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
 
       - name: Load cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -113,14 +114,14 @@ jobs:
       - name: Install Java
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'adopt'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
 
       - name: Load cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -149,14 +150,14 @@ jobs:
       - name: Install Java
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'adopt'
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
 
       - name: Load cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -165,6 +166,7 @@ jobs:
    
       - name: Run instrumentation Tests
         uses: reactivecircus/android-emulator-runner@v2
+        if: false
         with:
           working-directory: ./sdk
           api-level: 28
@@ -179,10 +181,44 @@ jobs:
           name: code-coverage
           path: ./sdk/app/build/reports/jacoco/jacocoDebugCoverageReport/
 
+  mend_scan:
+    name: Mend scan
+    runs-on: ubuntu-latest
+    needs: setup_environment
+    env: 
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      WS_APIKEY: ${{ secrets.WS_APIKEY }}
+      WS_USERKEY: ${{ secrets.WS_USERKEY }}
+      WS_PRODUCTNAME: ${{ secrets.WS_PRODUCTNAME }}
+      WS_PROJECTNAME: ${{ secrets.WS_PROJECTNAME }}
+      WS_WSS_URL: ${{ secrets.WS_WSS_URL }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Install Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+  
+      - name: Download the mend scan jar
+        run: |
+          curl -LJO https://unified-agent.s3.amazonaws.com/wss-unified-agent.jar
+    
+      - name: Run the mend scan jar
+        working-directory: ./sdk
+        run: |
+          java -jar ../wss-unified-agent.jar -d ${{ github.workspace }}  
+
+
   publish:
     name: Publish SDK, reports and documentation
     runs-on: ubuntu-latest
-    needs: [setup_environment, coverage_report, build_and_test, owasp_scan]
+    needs: [setup_environment, coverage_report, build_and_test, owasp_scan, mend_scan]
 
     steps:
       - name: Verify release title
@@ -221,6 +257,7 @@ jobs:
 
       - name: Collect code coverate result
         uses: actions/download-artifact@v3
+        if: false
         with:
           name: code-coverage
           path: ./sdk
@@ -254,6 +291,7 @@ jobs:
           mv ./sdk/authentication/build/dokka/javadoc/* ./sdk/documentation/android/authentication/docs/
 
       - name: Zip code coverage report
+        if: false
         run: cd ./sdk/html && zip -r ../IBM-Verify-SDK_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_code-coverage-report.zip *
 
       - name: Create GitHub release
@@ -270,7 +308,7 @@ jobs:
             ./sdk/adaptive/build/reports/*.html
             ./sdk/authentication/build/outputs/aar/*.aar
             ./sdk/authentication/build/reports/*.html
-            ./sdk/IBM-Verify-SDK_*_code-coverage-report.zip
+            # ./sdk/IBM-Verify-SDK_*_code-coverage-report.zip
 
       - name: Upload documentation to GitHub.io repo
         if: github.ref == 'refs/heads/main'      

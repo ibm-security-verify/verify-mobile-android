@@ -1,7 +1,8 @@
-package com.ibm.security.verifysdk.authentication
+package com.ibm.security.verifysdk.authentication.test
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import com.ibm.security.verifysdk.authentication.PKCEHelper
 import org.junit.Test
 import org.junit.runner.RunWith
 

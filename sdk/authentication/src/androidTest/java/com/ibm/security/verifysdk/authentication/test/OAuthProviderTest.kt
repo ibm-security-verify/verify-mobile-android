@@ -1,6 +1,7 @@
-package com.ibm.security.verifysdk.authentication
+package com.ibm.security.verifysdk.authentication.test
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ibm.security.verifysdk.authentication.OAuthProvider
 import com.ibm.security.verifysdk.core.AuthenticationException
 import com.ibm.security.verifysdk.core.NetworkHelper
 import kotlinx.coroutines.ExperimentalCoroutinesApi

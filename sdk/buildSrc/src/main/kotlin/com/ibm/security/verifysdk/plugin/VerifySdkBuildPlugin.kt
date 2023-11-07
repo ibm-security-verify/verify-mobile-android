@@ -21,18 +21,18 @@ class VerifySdkBuildPlugin : Plugin<Project> {
         project.plugins.apply("maven-publish")
         project.plugins.apply("org.jetbrains.dokka")
         project.plugins.apply("org.owasp.dependencycheck")
+        project.plugins.apply("com.github.ben-manes.versions")
 
         val androidExtension = project.extensions.getByName("android")
         if (androidExtension is BaseExtension) {
             androidExtension.apply {
-                compileSdkVersion(32)
+                compileSdkVersion(33)
                 defaultConfig {
                     targetSdk = 30
-                    minSdk = 23
-                    versionCode = 100
-                    versionName = "3.0.0"
+                    minSdk = 26
+                    versionCode = 101
+                    versionName = "3.0.1"
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
                     manifestPlaceholders["auth_redirect_scheme"] = "verifysdk"
                     manifestPlaceholders["auth_redirect_host"] = "callback"
                     manifestPlaceholders["auth_redirect_path"] = ""
@@ -45,6 +45,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
                 project.configurations.all {
                     resolutionStrategy.failOnVersionConflict()
                     resolutionStrategy.preferProjectModules()
+                    resolutionStrategy.force("com.fasterxml.woodstox:woodstox-core:6.4.0")
                 }
 
                 testOptions.unitTests {
@@ -57,6 +58,10 @@ class VerifySdkBuildPlugin : Plugin<Project> {
                     }
                 }
 
+                packagingOptions {
+                    resources.excludes.add("META-INF/DEPENDENCIES")
+                }
+
                 val proguardFile = "proguard-rules.pro"
                 when (this) {
                     is LibraryExtension -> defaultConfig {
@@ -66,6 +71,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
                         getByName("release") {
                             isMinifyEnabled = true
                             isShrinkResources = true
+                            isDebuggable = false
                             proguardFiles(
                                 getDefaultProguardFile("proguard-android-optimize.txt"),
                                 proguardFile
@@ -76,8 +82,8 @@ class VerifySdkBuildPlugin : Plugin<Project> {
 
                 compileOptions {
                     isCoreLibraryDesugaringEnabled = true
-                    sourceCompatibility = JavaVersion.VERSION_11
-                    targetCompatibility = JavaVersion.VERSION_11
+                    sourceCompatibility = JavaVersion.VERSION_17
+                    targetCompatibility = JavaVersion.VERSION_17
                 }
             }
         }
@@ -86,23 +92,22 @@ class VerifySdkBuildPlugin : Plugin<Project> {
         // Instrumentation tests: JUnit4
 
         project.dependencies {
-            add("androidTestImplementation", "androidx.test.ext:junit:1.1.1")
-            add("androidTestImplementation", "androidx.test:core:1.4.0")
-            add("androidTestImplementation", "androidx.test:rules:1.4.0")
-            add("androidTestImplementation", "androidx.test:runner:1.4.0")
-            add("androidTestImplementation", "androidx.test.espresso:espresso-core:3.4.0")
+            add("androidTestImplementation", "androidx.test.ext:junit:1.1.5")
+            add("androidTestImplementation", "androidx.test:core:1.5.0")
+            add("androidTestImplementation", "androidx.test:rules:1.5.0")
+            add("androidTestImplementation", "androidx.test:runner:1.5.0")
+            add("androidTestImplementation", "androidx.test.espresso:espresso-core:3.5.1")
             add("androidTestImplementation", "androidx.test.uiautomator:uiautomator:2.2.0")
             add("androidTestImplementation", "junit:junit:4.12")
             add("androidTestImplementation", "org.junit.jupiter:junit-jupiter")    // JUnit5
             add("androidTestImplementation", "org.mockito.kotlin:mockito-kotlin:4.0.0")
             add("androidTestImplementation", "com.squareup.okhttp3:mockwebserver:4.10.0")
             add("androidTestImplementation", "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1")
-            add("androidTestImplementation", "org.slf4j:slf4j-jdk14:1.7.32")
-            add(
-                "androidTestImplementation",
-                platform("org.junit:junit-bom:5.8.2")
-            )          // JUnit5
+            add("androidTestImplementation", platform("org.junit:junit-bom:5.8.2"))          // JUnit5
+            add("androidTestImplementation", "org.slf4j:slf4j-jdk14:2.0.7")
+
             add("coreLibraryDesugaring", "com.android.tools:desugar_jdk_libs:1.1.5")
+
             add("implementation", "androidx.core:core-ktx:1.7.0")
             add("implementation", "com.google.code.gson:gson:2.9.0")
             add("implementation", "org.jacoco:org.jacoco.core:0.8.8")
@@ -110,15 +115,16 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             add("implementation", "com.squareup.retrofit2:converter-gson:2.9.0")
             add("implementation", "com.squareup.okhttp3:okhttp:4.10.0")
             add("implementation", "com.squareup.okhttp3:logging-interceptor:4.10.0")
-            add("implementation", "org.jetbrains.kotlin:kotlin-stdlib:1.6.20")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1")
+            add("implementation", "org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.1")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.6.1")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-datetime:0.2.0")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
-            add("implementation", "org.slf4j:slf4j-api:1.7.32")
-            add("implementation", "androidx.browser:browser:1.4.0")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.6.4")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+            add("implementation", "org.slf4j:slf4j-api:2.0.7")
+            add("implementation", "androidx.browser:browser:1.5.0")
+
             add("testImplementation", "junit:junit:4.12") // JUnit4 for Adaptive SDK
 //            add("testImplementation", "org.json:json:20220320")             // Using json in unit tests
         }

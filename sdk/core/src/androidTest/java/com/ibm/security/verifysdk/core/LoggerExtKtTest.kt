@@ -4,22 +4,27 @@
 
 package com.ibm.security.verifysdk.core
 
-import android.util.Log
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
-
+import org.junit.runner.RunWith
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.slf4j.event.Level
 
-internal class LoggerTest {
+@MediumTest
+@RunWith(AndroidJUnit4::class)
+internal class LoggerExtKtTest {
 
     private lateinit var log: Logger
 
     @Before
-    fun setUp() {
+    fun setup() {
         log = LoggerFactory.getLogger(javaClass)
     }
+
 
     /**
      * Expected output:
@@ -59,7 +64,6 @@ internal class LoggerTest {
         val logcatMessage =
             TestHelper.getLogsAfterTestStart("log_validMessageWithVarArgs_shouldWriteToLogcat")
                 .toString()
-
         assert(
             logcatMessage.contains(
                 String.format(
@@ -80,7 +84,7 @@ internal class LoggerTest {
     @Test
     fun log_validMessageArgsNotNeeded_shouldWriteToLogcat() {
         log.warn(
-            Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE, null
+            /* msg = */ Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE, /* t = */ null
         )
         val logcatMessage =
             TestHelper.getLogsAfterTestStart("log_validMessageArgsNotNeeded_shouldWriteToLogcat")
@@ -116,10 +120,10 @@ internal class LoggerTest {
      *
      */
     @Test
-    fun logThreadInfo_defaultLogLevel_shouldWriteToLogcat() {
+    fun logThreadInfo_default_shouldWriteToLogcat() {
         log.threadInfo()
         val logcatMessage =
-            TestHelper.getLogsAfterTestStart("logThreadInfo_defaultLogLevel_shouldWriteToLogcat")
+            TestHelper.getLogsAfterTestStart("logThreadInfo_default_shouldWriteToLogcat")
                 .toString()
         assert(logcatMessage.contains(String.format("I %s:", javaClass.simpleName)))
         assert(logcatMessage.contains(Regex("threadName=[^;]*; threadId=[^0-9]*[0-9]+;")))
@@ -132,10 +136,10 @@ internal class LoggerTest {
      *
      */
     @Test
-    fun logThreadInfo_infoLogLevel_shouldWriteToLogcat() {
-        log.threadInfo(Log.INFO)
+    fun logThreadInfo_info_shouldWriteToLogcat() {
+        log.threadInfo(Level.INFO)
         val logcatMessage =
-            TestHelper.getLogsAfterTestStart("logThreadInfo_infoLogLevel_shouldWriteToLogcat")
+            TestHelper.getLogsAfterTestStart("logThreadInfo_info_shouldWriteToLogcat")
                 .toString()
         assert(logcatMessage.contains(String.format("I %s:", javaClass.simpleName)))
         assert(logcatMessage.contains(Regex("threadName=[^;]*; threadId=[^0-9]*[0-9]+;")))
@@ -148,10 +152,10 @@ internal class LoggerTest {
      *
      */
     @Test
-    fun logThreadInfo_warnLogLevel_shouldWriteToLogcat() {
-        log.threadInfo(Log.WARN)
+    fun logThreadInfo_warn_shouldWriteToLogcat() {
+        log.threadInfo(Level.WARN)
         val logcatMessage =
-            TestHelper.getLogsAfterTestStart("logThreadInfo_warnLogLevel_shouldWriteToLogcat")
+            TestHelper.getLogsAfterTestStart("logThreadInfo_warn_shouldWriteToLogcat")
                 .toString()
         assert(logcatMessage.contains(String.format("W %s:", javaClass.simpleName)))
         assert(logcatMessage.contains(Regex("threadName=[^;]*; threadId=[^0-9]*[0-9]+;")))
@@ -164,45 +168,20 @@ internal class LoggerTest {
      *
      */
     @Test
-    fun logThreadInfo_errorLogLevel_shouldWriteToLogcat() {
-        log.threadInfo(Log.ERROR)
-        val logcatMessage =
-            TestHelper.getLogsAfterTestStart("logThreadInfo_errorLogLevel_shouldWriteToLogcat")
-                .toString()
-        assert(logcatMessage.contains(String.format("E %s:", javaClass.simpleName)))
-        assert(logcatMessage.contains(Regex("threadName=[^;]*; threadId=[^0-9]*[0-9]+;")))
-    }
+    fun logThreadInfo_error_shouldWriteToLogcat() {
+        log.threadInfo(Level.ERROR)
 
-    /**
-     * Expected output:
-     *
-     *      `<Date/Time< <ThreadIDs> E LoggerTest: threadName=main; threadId=123456;
-     *
-     */
-    @Test
-    fun logThreadInfo_assertLogLevel_shouldWriteToLogcat() {
-        log.threadInfo(Log.ASSERT)
         val logcatMessage =
-            TestHelper.getLogsAfterTestStart("logThreadInfo_errorLogLevel_shouldWriteToLogcat")
+            TestHelper.getLogsAfterTestStart("logThreadInfo_error_shouldWriteToLogcat")
                 .toString()
-        assert(logcatMessage.contains(String.format("E %s:", javaClass.simpleName)))
+        assert(logcatMessage.contains(String.format("E %s", javaClass.simpleName)))
         assert(logcatMessage.contains(Regex("threadName=[^;]*; threadId=[^0-9]*[0-9]+;")))
     }
 
     @Test
-    fun logThreadInfo_invalidLogLevel_shouldWriteToLogcat() {
-        log.threadInfo(10)
-        val logcatMessage =
-            TestHelper.getLogsAfterTestStart("logThreadInfo_invalidLogLevel_shouldWriteToLogcat")
-                .toString()
-        assert(
-            logcatMessage.contains(
-                String.format(
-                    "W %s: Log level 10 is not supported",
-                    javaClass.simpleName
-                )
-            )
-        )
+        (expected = IllegalArgumentException::class)
+    fun logThreadInfo_invalid_shouldThrowException() {
+        log.threadInfo(Level.intToLevel(50))
     }
 
     /**
@@ -212,15 +191,14 @@ internal class LoggerTest {
      *
      */
     @Test
-    fun logThreadInfo_debugLogLevel_shouldWriteToLogcat() {
-        log.threadInfo(Log.DEBUG)
-
-//        TODO: enable debug logging
-//        val logcatMessage =
-//            TestHelper.getLogsAfterTestStart("logThreadInfo_debugLogLevel_shouldWriteToLogcat")
-//                .toString()
-//        assert(logcatMessage.contains(String.format("D %s:", javaClass.simpleName)))
-//        assert(logcatMessage.contains(Regex("threadName=[^;]*; threadId=[^0-9]*[0-9]+;")))
+    @Ignore("Configuration required")
+    fun logThreadInfo_debug_shouldWriteToLogcat() {
+        log.threadInfo(Level.DEBUG)
+        val logcatMessage =
+            TestHelper.getLogsAfterTestStart("logThreadInfo_debug_shouldWriteToLogcat")
+                .toString()
+        assert(logcatMessage.contains(String.format("D %s:", javaClass.simpleName)))
+        assert(logcatMessage.contains(Regex("threadName=[^;]*; threadId=[^0-9]*[0-9]+;")))
     }
 
     /**
@@ -230,15 +208,14 @@ internal class LoggerTest {
      *
      */
     @Test
-    fun logThreadInfo_verboseLogLevel_shouldWriteToLogcat() {
-        log.threadInfo(Log.VERBOSE)
-
-//        TODO: enable debug logging
-//        val logcatMessage =
-//            TestHelper.getLogsAfterTestStart("logThreadInfo_verboseLogLevel_shouldWriteToLogcat")
-//                .toString()
-//        assert(logcatMessage.contains(String.format("D %s:", javaClass.simpleName)))
-//        assert(logcatMessage.contains(Regex("threadName=[^;]*; threadId=[^0-9]*[0-9]+;")))
+    @Ignore("Configuration required")
+    fun logThreadInfo_trace_shouldWriteToLogcat() {
+        log.threadInfo(Level.TRACE)
+        val logcatMessage =
+            TestHelper.getLogsAfterTestStart("logThreadInfo_trace_shouldWriteToLogcat")
+                .toString()
+        assert(logcatMessage.contains(String.format("D %s:", javaClass.simpleName)))
+        assert(logcatMessage.contains(Regex("threadName=[^;]*; threadId=[^0-9]*[0-9]+;")))
     }
 
     /**
@@ -246,14 +223,11 @@ internal class LoggerTest {
      */
     @Test
     fun log_validMessageButLogLevelInsufficient_shouldNotWriteToLog() {
-
         log.debug(Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE)
         log.trace(Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE)
-
         val logcatMessage =
             TestHelper.getLogsAfterTestStart("log_validMessageButLogLevelInsufficient_shouldNotWriteToLog")
                 .toString()
-
         assert(logcatMessage.contains(Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE).not())
     }
 
@@ -262,15 +236,12 @@ internal class LoggerTest {
      */
     @Test
     fun log_validMessageAndLogLevelSufficient_shouldWriteToLog() {
-
         log.info(Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE)
         log.warn(Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE)
         log.error(Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE)
-
         val logcatMessage =
             TestHelper.getLogsAfterTestStart("log_validMessageAndLogLevelSufficient_shouldWriteToLog")
                 .toString()
-
         assert(logcatMessage.contains(Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE))
     }
 
@@ -279,7 +250,6 @@ internal class LoggerTest {
      */
     @Test
     fun log_validMessageWithException_shouldWriteToLog() {
-
         log.info(
             Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE,
             IllegalArgumentException(Constants.LOGGER_TEST_EXCEPTION_TEXT)
@@ -294,7 +264,6 @@ internal class LoggerTest {
 
     @Test
     fun log_enteringWithDefaultLevel_shouldWriteToLog() {
-
         log.entering()
         log_entryOrExit_shouldWriteToLog(
             Constants.LOGGER_ENTRY,
@@ -304,8 +273,7 @@ internal class LoggerTest {
 
     @Test
     fun log_enteringWithInfoLevel_shouldWriteToLog() {
-
-        log.entering(Log.INFO)
+        log.entering(Level.INFO)
         log_entryOrExit_shouldWriteToLog(
             Constants.LOGGER_ENTRY,
             "log_enteringWithInfoLevel_shouldWriteToLog"
@@ -313,40 +281,28 @@ internal class LoggerTest {
     }
 
     @Test
-    fun log_enteringWithVerboseLevel_shouldWriteToLog() {
-
-        log.entering(Log.VERBOSE)
-
-//        TODO: enable verbose logging
-//        log_entryOrExit_shouldWriteToLog(Constants.LOGGER_ENTRY,
-//            "log_enteringWithVerboseLevel_shouldWriteToLog")
-    }
-
-    @Test
-    fun log_enteringWithDebugLevel_shouldWriteToLog() {
-
-        log.entering(Log.DEBUG)
-
-//        TODO: enable Debug logging
-//        log_entryOrExit_shouldWriteToLog(Constants.LOGGER_ENTRY,
-//            "log_enteringWithDebugLevel_shouldWriteToLog")
-    }
-
-    @Test
-    @Ignore("Fails - fix build first")
-    fun log_enteringWithAssertLevel_shouldWriteToLog() {
-
-        log.entering(Log.ASSERT)
+    @Ignore("Configuration required")
+    fun log_enteringWithTraceLevel_shouldWriteToLog() {
+        log.entering(Level.TRACE)
         log_entryOrExit_shouldWriteToLog(
             Constants.LOGGER_ENTRY,
-            "log_enteringWithAssertLevel_shouldWriteToLog"
+            "log_enteringWithVerboseLevel_shouldWriteToLog"
+        )
+    }
+
+    @Test
+    @Ignore("Configuration required")
+    fun log_enteringWithDebugLevel_shouldWriteToLog() {
+        log.entering(Level.DEBUG)
+        log_entryOrExit_shouldWriteToLog(
+            Constants.LOGGER_ENTRY,
+            "log_enteringWithDebugLevel_shouldWriteToLog"
         )
     }
 
     @Test
     fun log_enteringWithWarnLevel_shouldWriteToLog() {
-
-        log.entering(Log.WARN)
+        log.entering(Level.WARN)
         log_entryOrExit_shouldWriteToLog(
             Constants.LOGGER_ENTRY,
             "log_enteringWithWarnLevel_shouldWriteToLog"
@@ -354,10 +310,8 @@ internal class LoggerTest {
     }
 
     @Test
-    @Ignore("Fails - fix build first")
     fun log_enteringWitErrorLevel_shouldWriteToLog() {
-
-        log.entering(Log.ERROR)
+        log.entering(Level.ERROR)
         log_entryOrExit_shouldWriteToLog(
             Constants.LOGGER_ENTRY,
             "log_enteringWitErrorLevel_shouldWriteToLog"
@@ -365,26 +319,13 @@ internal class LoggerTest {
     }
 
     @Test
-    fun log_enteringWithInvalidLevel_shouldWriteToLog() {
-
-        log.entering(10)
-        val logcatMessage =
-            TestHelper.getLogsAfterTestStart("log_enteringWithInvalidLevel_shouldWriteToLog")
-                .toString()
-
-        assert(
-            logcatMessage.contains(
-                String.format(
-                    "W %s: Log level 10 is not supported",
-                    javaClass.simpleName
-                )
-            )
-        )
+        (expected = IllegalArgumentException::class)
+    fun log_enteringWithInvalidLevel_shouldThrowException() {
+        log.entering(Level.intToLevel(50))
     }
 
     @Test
     fun log_exitingWithDefaultLevel_shouldWriteToLog() {
-
         log.exiting()
         log_entryOrExit_shouldWriteToLog(
             Constants.LOGGER_EXIT,
@@ -394,8 +335,7 @@ internal class LoggerTest {
 
     @Test
     fun log_exitingWithInfoLevel_shouldWriteToLog() {
-
-        log.exiting(Log.INFO)
+        log.exiting(Level.INFO)
         log_entryOrExit_shouldWriteToLog(
             Constants.LOGGER_EXIT,
             "log_exitingWithInfoLevel_shouldWriteToLog"
@@ -403,40 +343,28 @@ internal class LoggerTest {
     }
 
     @Test
-    fun log_exitingWithVerboseLevel_shouldWriteToLog() {
-
-        log.exiting(Log.VERBOSE)
-
-//        TODO: enable verbose logging
-//        log_entryOrExit_shouldWriteToLog(Constants.LOGGER_EXIT,
-//            "log_exitingWithVerboseLevel_shouldWriteToLog")
-    }
-
-    @Test
-    fun log_exitingWithDebugLevel_shouldWriteToLog() {
-
-        log.exiting(Log.DEBUG)
-
-//        TODO: enable verbose logging
-//        log_entryOrExit_shouldWriteToLog(Constants.LOGGER_EXIT,
-//            "log_exitingWithDebugLevel_shouldWriteToLog")
-    }
-
-    @Test
-    fun log_exitingWithAssertLevel_shouldWriteToLog() {
-
-        log.exiting(Log.ASSERT)
+    @Ignore("Configuration required")
+    fun log_exitingWithTraceLevel_shouldWriteToLog() {
+        log.exiting(Level.TRACE)
         log_entryOrExit_shouldWriteToLog(
             Constants.LOGGER_EXIT,
-            "log_exitingWithAssertLevel_shouldWriteToLog"
+            "log_exitingWithVerboseLevel_shouldWriteToLog"
         )
     }
 
     @Test
-    @Ignore("Fails - fix build first")
-    fun log_exitingWithWarnLevel_shouldWriteToLog() {
+    @Ignore("Configuration required")
+    fun log_exitingWithDebugLevel_shouldWriteToLog() {
+        log.exiting(Level.DEBUG)
+        log_entryOrExit_shouldWriteToLog(
+            Constants.LOGGER_EXIT,
+            "log_exitingWithDebugLevel_shouldWriteToLog"
+        )
+    }
 
-        log.exiting(Log.WARN)
+    @Test
+    fun log_exitingWithWarnLevel_shouldWriteToLog() {
+        log.exiting(Level.WARN)
         log_entryOrExit_shouldWriteToLog(
             Constants.LOGGER_EXIT,
             "log_exitingWithWarnLevel_shouldWriteToLog"
@@ -445,8 +373,7 @@ internal class LoggerTest {
 
     @Test
     fun log_exitingWithErrorLevel_shouldWriteToLog() {
-
-        log.exiting(Log.ERROR)
+        log.exiting(Level.ERROR)
         log_entryOrExit_shouldWriteToLog(
             Constants.LOGGER_EXIT,
             "log_exitingWithErrorLevel_shouldWriteToLog"
@@ -454,22 +381,9 @@ internal class LoggerTest {
     }
 
     @Test
-    @Ignore("Fails - fix build first")
-    fun log_exitingWithInvalidLevel_shouldWriteToLog() {
-
-        log.exiting(10)
-        val logcatMessage =
-            TestHelper.getLogsAfterTestStart("log_exitingWithInvalidLevel_shouldWriteToLog")
-                .toString()
-
-        assert(
-            logcatMessage.contains(
-                String.format(
-                    "W %s: Log level 10 is not supported",
-                    javaClass.simpleName
-                )
-            )
-        )
+        (expected = IllegalArgumentException::class)
+    fun log_exitingWithInvalidLevel_shouldThrowException() {
+        log.exiting(Level.intToLevel(50))
     }
 
     private fun log_entryOrExit_shouldWriteToLog(entryOrExit: String, methodName: String) {

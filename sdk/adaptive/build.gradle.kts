@@ -15,9 +15,9 @@ val moduleScmDeveloperConnection = "scm:git:ssh://github.com/ibm-security-verify
 val moduleScmUrl = "https://github.com/ibm-security-verify/verify-sdk-android"
 
 dependencies {
-    implementation("androidx.lifecycle:lifecycle-process:2.5.1")
-    implementation("androidx.test:rules:1.4.0")
-    implementation("androidx.test.ext:junit-ktx:1.1.4")
+    implementation("androidx.lifecycle:lifecycle-process:2.6.1")
+    implementation("androidx.test:rules:1.5.0")
+    implementation("androidx.test.ext:junit-ktx:1.1.5")
     androidTestImplementation("com.github.kittinunf.fuel:fuel-android:2.3.1")
 }
 
@@ -26,6 +26,7 @@ apply {
 }
 android {
     namespace = "com.ibm.security.verifysdk.adaptive"
+    testNamespace = "com.ibm.security.verifysdk.adaptive.test"
 }
 
 tasks {
@@ -47,6 +48,24 @@ tasks {
 configure<org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension> {
     failOnError = false
     skipConfigurations.add("lintClassPath")
+}
+
+// To-do: move to VerifySdkBuildPlugin
+tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>().configureEach {
+    outputFormatter = "html"
+    outputDir = "build/dependencyUpdates"
+    reportfileName = "dependencyUpdatesTask"
+
+    rejectVersionIf {
+        isNonStable(candidate.version)
+    }
+}
+
+fun isNonStable(version: String): Boolean {
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
+    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    val isStable = stableKeyword || regex.matches(version)
+    return isStable.not()
 }
 
 configure<PublishingExtension> {

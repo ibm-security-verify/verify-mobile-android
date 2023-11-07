@@ -2,8 +2,20 @@
  * Copyright contributors to the IBM Security Verify Adaptive SDK for Android project
  */
 
-package com.ibm.security.verifysdk.adaptive
+package com.ibm.security.verifysdk.adaptive.test
 
+import com.ibm.security.verifysdk.adaptive.AdaptiveDelegate
+import com.ibm.security.verifysdk.adaptive.AdaptiveResult
+import com.ibm.security.verifysdk.adaptive.AllowAssessmentResult
+import com.ibm.security.verifysdk.adaptive.AllowedFactor
+import com.ibm.security.verifysdk.adaptive.AssessmentStatusType
+import com.ibm.security.verifysdk.adaptive.DenyAssessmentResult
+import com.ibm.security.verifysdk.adaptive.EnrolledFactor
+import com.ibm.security.verifysdk.adaptive.Factor
+import com.ibm.security.verifysdk.adaptive.FactorEvaluation
+import com.ibm.security.verifysdk.adaptive.GenerateResult
+import com.ibm.security.verifysdk.adaptive.OtpGenerateResult
+import com.ibm.security.verifysdk.adaptive.RequiresAssessmentResult
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject

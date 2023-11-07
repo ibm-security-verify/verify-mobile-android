@@ -2,10 +2,12 @@
  * Copyright contributors to the IBM Security Verify Adaptive SDK for Android project
  */
 
-package com.ibm.security.verifysdk.adaptive
+package com.ibm.security.verifysdk.adaptive.test
 
 // TODO: To run tests, import Trusteer SDK.
 import android.content.Context
+import com.ibm.security.verifysdk.adaptive.AdaptiveCollectionService
+
 //import com.trusteer.tas.TAS_CLIENT_INFO
 //import com.trusteer.tas.tasWired.*
 

@@ -2,7 +2,9 @@
  * Copyright contributors to the IBM Security Verify Adaptive SDK for Android project
  */
 
-package com.ibm.security.verifysdk.adaptive
+package com.ibm.security.verifysdk.adaptive.test
+
+import com.ibm.security.verifysdk.adaptive.RequiresAssessmentResult
 
 object MockHelpers {
     /** A [RequiresAssessmentResult] instance to keep track of state between requests. */

@@ -22,12 +22,13 @@ apply {
 }
 android {
     namespace = "com.ibm.security.verifysdk.authentication"
+    testNamespace = "com.ibm.security.verifysdk.authentication.test"
 }
 
 dependencies {
     implementation(project(":core"))
-    implementation("androidx.appcompat:appcompat:1.5.1")
-    implementation("com.google.android.material:material:1.7.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.8.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 }
 
@@ -50,6 +51,24 @@ tasks {
 configure<org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension> {
     failOnError = false
     skipConfigurations.add("lintClassPath")
+}
+
+// To-do: move to VerifySdkBuildPlugin
+tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>().configureEach {
+    outputFormatter = "html"
+    outputDir = "build/dependencyUpdates"
+    reportfileName = "dependencyUpdatesTask"
+
+    rejectVersionIf {
+        isNonStable(candidate.version)
+    }
+}
+
+fun isNonStable(version: String): Boolean {
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
+    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+    val isStable = stableKeyword || regex.matches(version)
+    return isStable.not()
 }
 
 configure<PublishingExtension> {
