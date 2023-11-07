@@ -27,3 +27,6 @@ dependencies {
 android {
     namespace = "com.ibm.security.verifysdk"
 }
+android {
+    namespace = "com.ibm.security.verifysdk"
+}
