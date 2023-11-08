@@ -31,7 +31,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
                 compileSdkVersion(34)
                 buildFeatures.buildConfig = true
                 defaultConfig {
-                    targetSdk = 30
+                    targetSdk = 34
                     minSdk = 26
                     versionCode = 101
                     versionName = "3.0.1"
@@ -95,6 +95,12 @@ class VerifySdkBuildPlugin : Plugin<Project> {
         // Unit tests: JUnit5
         // Instrumentation tests: JUnit4
 
+        project.configurations.all {
+            resolutionStrategy {
+                force("com.squareup.okio:okio-jvm:3.4.0")
+            }
+        }
+
         project.dependencies {
             add("androidTestImplementation", "androidx.test.ext:junit:1.1.5")
             add("androidTestImplementation", "androidx.test:core:1.5.0")
@@ -102,7 +108,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             add("androidTestImplementation", "androidx.test:runner:1.5.0")
             add("androidTestImplementation", "androidx.test.espresso:espresso-core:3.5.1")
             add("androidTestImplementation", "androidx.test.uiautomator:uiautomator:2.2.0")
-            add("androidTestImplementation", "junit:junit:4.12")
+            add("androidTestImplementation", "junit:junit:4.13.1")
             add("androidTestImplementation", "org.junit.jupiter:junit-jupiter")    // JUnit5
             add("androidTestImplementation", "org.mockito.kotlin:mockito-kotlin:4.0.0")
             add("androidTestImplementation", "com.squareup.okhttp3:mockwebserver:4.10.0")
@@ -113,10 +119,10 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             add("coreLibraryDesugaring", "com.android.tools:desugar_jdk_libs:1.1.5")
 
             add("implementation", "androidx.core:core-ktx:1.7.0")
-            add("implementation", "com.google.code.gson:gson:2.9.0")
+//            add("implementation", "com.google.code.gson:gson:2.9.0")
             add("implementation", "org.jacoco:org.jacoco.core:0.8.8")
             add("implementation", "com.squareup.retrofit2:retrofit:2.9.0")
-            add("implementation", "com.squareup.retrofit2:converter-gson:2.9.0")
+//            add("implementation", "com.squareup.retrofit2:converter-gson:2.9.0")
             add("implementation", "com.squareup.okhttp3:okhttp:4.10.0")
             add("implementation", "com.squareup.okhttp3:logging-interceptor:4.10.0")
             add("implementation", "org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
@@ -129,7 +135,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             add("implementation", "org.slf4j:slf4j-api:2.0.7")
             add("implementation", "androidx.browser:browser:1.5.0")
 
-            add("testImplementation", "junit:junit:4.12") // JUnit4 for Adaptive SDK
+            add("testImplementation", "junit:junit:4.13.1") // JUnit4 for Adaptive SDK
 //            add("testImplementation", "org.json:json:20220320")             // Using json in unit tests
         }
     }
