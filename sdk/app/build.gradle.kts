@@ -8,6 +8,12 @@ apply {
     from("../jacoco.gradle")
 }
 
+configurations.all {
+    resolutionStrategy {
+        force("com.squareup.okio:okio-jvm:3.4.0")
+    }
+}
+
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")

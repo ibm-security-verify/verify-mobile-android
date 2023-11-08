@@ -90,6 +90,12 @@ class VerifySdkBuildPlugin : Plugin<Project> {
 
         // Unit tests: JUnit5
         // Instrumentation tests: JUnit4
+        
+        project.configurations.all {
+            resolutionStrategy {
+                force("com.squareup.okio:okio-jvm:3.4.0")
+            }
+        }
 
         project.dependencies {
             add("androidTestImplementation", "androidx.test.ext:junit:1.1.5")
@@ -98,7 +104,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             add("androidTestImplementation", "androidx.test:runner:1.5.0")
             add("androidTestImplementation", "androidx.test.espresso:espresso-core:3.5.1")
             add("androidTestImplementation", "androidx.test.uiautomator:uiautomator:2.2.0")
-            add("androidTestImplementation", "junit:junit:4.12")
+            add("androidTestImplementation", "junit:junit:4.13.1")
             add("androidTestImplementation", "org.junit.jupiter:junit-jupiter")    // JUnit5
             add("androidTestImplementation", "org.mockito.kotlin:mockito-kotlin:4.0.0")
             add("androidTestImplementation", "com.squareup.okhttp3:mockwebserver:4.10.0")
@@ -125,7 +131,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             add("implementation", "org.slf4j:slf4j-api:2.0.7")
             add("implementation", "androidx.browser:browser:1.5.0")
 
-            add("testImplementation", "junit:junit:4.12") // JUnit4 for Adaptive SDK
+            add("testImplementation", "junit:junit:4.13.1") // JUnit4 for Adaptive SDK
 //            add("testImplementation", "org.json:json:20220320")             // Using json in unit tests
         }
     }
