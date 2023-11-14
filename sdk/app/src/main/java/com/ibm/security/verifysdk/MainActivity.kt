@@ -64,23 +64,6 @@ class MainActivity : AppCompatActivity() {
         log.trace("XXX TRACE")
         log.trace("XXX TRACE")
 
-//        val decoder = Json {
-//            ignoreUnknownKeys = true
-//            isLenient = true
-//        }
-//
-//        val s = """{"expiresIn":3600,
-//"id":"f3937799-c5ed-4396-a0b7-fad7c69a470f",
-//"accessToken":"g87PDMRv7qahVrYsbFAsdqzga7WtHwCe7pgJP0EK",
-//"refreshToken":"ONFZnk8Cpcv4Y9jmFWDoU0Ur7T8VkIUKXWovvMKwCwuv4wK5Yd",
-//"version":{"number":"1.0.0","platform":"com.ibm.security.access.verify"}
-//}""".trimIndent().replace("\n", "").replace("\\W+", "")
-//
-//
-//        var tokenInfo : TokenInfo = decoder.decodeFromString<TokenInfo>(s)
-//
-//        log.info("XXX", tokenInfo.accessToken)
-
         requestCamera()
     }
 
