@@ -9,10 +9,10 @@ import java.util.Locale
 
 @Serializable
 enum class HashAlgorithmType(private val rawValue: String) {
-    SHA1("SHA1"),
-    SHA256("SHA256"),
-    SHA384("SHA384"),
-    SHA512("SHA512");
+    SHA1("HmacSHA1"),
+    SHA256("HmacSHA256"),
+    SHA384("HmacSHA384"),
+    SHA512("HmacSHA512");
 
     override fun toString(): String {
         return rawValue
@@ -25,13 +25,13 @@ enum class HashAlgorithmType(private val rawValue: String) {
          * support Google's Key Uri Format
          * (https://github.com/google/google-authenticator/wiki/Key-Uri-Format#algorithm).
          */
-        fun fromString(rawValue: String): HashAlgorithmType? {
+        fun fromString(rawValue: String): HashAlgorithmType {
             return when (rawValue.uppercase(Locale.ROOT)) {
                 "SHA1", "HMACSHA1", "RSASHA1", "SHA1WITHRSA" -> SHA1
                 "SHA256", "HMACSHA256", "RSASHA256", "SHA256WITHRSA" -> SHA256
                 "SHA384", "HMACSHA384", "RSASHA384", "SHA384WITHRSA" -> SHA384
                 "SHA512", "HMACSHA512", "RSASHA512", "SHA512WITHRSA" -> SHA512
-                else -> null
+                else -> throw HashAlgorithmError.InvalidHash
             }
         }
     }

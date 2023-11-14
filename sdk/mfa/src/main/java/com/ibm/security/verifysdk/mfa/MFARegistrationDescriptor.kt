@@ -8,6 +8,9 @@ interface MFARegistrationDescriptor<out Authenticator : MFAAuthenticatorDescript
 
     var pushToken: String
     var accountName: String
+    var authenticationRequired: Boolean
+    var invalidatedByBiometricEnrollment: Boolean
+
     val countOfAvailableEnrollments: Int
 
     @Throws
@@ -20,5 +23,5 @@ interface MFARegistrationDescriptor<out Authenticator : MFAAuthenticatorDescript
     suspend fun enroll(name: String, publicKey: String, signedData: String)
 
     @Throws
-    suspend fun finalize(): Authenticator
+    suspend fun finalize(): Result<MFAAuthenticatorDescriptor>
 }

@@ -4,12 +4,12 @@
 
 package com.ibm.security.verifysdk.mfa
 
-import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import com.scottyab.rootbeer.RootBeer
-import java.util.*
+import java.util.Locale
+import java.util.UUID
 
 object MFAAttributeInfo {
 
@@ -94,9 +94,7 @@ object MFAAttributeInfo {
             (if (snakeCaseKey) "applicationName".toSnakeCase() else "applicationName") to applicationName,
             (if (snakeCaseKey) "applicationVersion".toSnakeCase() else "applicationVersion") to applicationVersion,
             (if (snakeCaseKey) "deviceName".toSnakeCase() else "deviceName") to name,
-            (if (snakeCaseKey) "platformType".toSnakeCase() else "platformType") to operatingSystem.uppercase(
-                Locale.getDefault()
-            ),
+            (if (snakeCaseKey) "platformType".toSnakeCase() else "platformType") to operatingSystem,
             (if (snakeCaseKey) "deviceType".toSnakeCase() else "deviceType") to model,
             (if (snakeCaseKey) "deviceId".toSnakeCase() else "deviceId") to deviceID,
             (if (snakeCaseKey) "osVersion".toSnakeCase() else "osVersion") to operatingSystemVersion,

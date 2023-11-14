@@ -6,21 +6,39 @@ package com.ibm.security.verifysdk.mfa.cloud
 
 import com.ibm.security.verifysdk.authentication.TokenInfo
 import com.ibm.security.verifysdk.core.ContextHelper
+import com.ibm.security.verifysdk.core.KeystoreHelper
 import com.ibm.security.verifysdk.core.NetworkHelper
+import com.ibm.security.verifysdk.core.camelToSnakeCase
 import com.ibm.security.verifysdk.mfa.EnrollableSignature
+import com.ibm.security.verifysdk.mfa.EnrollableType
+import com.ibm.security.verifysdk.mfa.FaceFactorInfo
 import com.ibm.security.verifysdk.mfa.FactorType
+import com.ibm.security.verifysdk.mfa.FingerprintFactorInfo
+import com.ibm.security.verifysdk.mfa.HashAlgorithmType
 import com.ibm.security.verifysdk.mfa.InitializationInfo
 import com.ibm.security.verifysdk.mfa.MFAAttributeInfo
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
 import com.ibm.security.verifysdk.mfa.MFARegistrationDescriptor
 import com.ibm.security.verifysdk.mfa.MFARegistrationError
 import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
+import com.ibm.security.verifysdk.mfa.TOTPFactorInfo
+import com.ibm.security.verifysdk.mfa.UserPresenceFactorInfo
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.addJsonObject
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
+import org.json.JSONObject
 import java.net.URL
+import java.util.UUID
 
-class CloudRegistrationProvider(data: String) : MFARegistrationDescriptor<MFAAuthenticatorDescriptor> {
+class CloudRegistrationProvider(data: String) :
+    MFARegistrationDescriptor<MFAAuthenticatorDescriptor> {
 
     private val decoder = Json {
         ignoreUnknownKeys = true
@@ -29,30 +47,16 @@ class CloudRegistrationProvider(data: String) : MFARegistrationDescriptor<MFAAut
 
     private val initializationInfo: InitializationInfo
 
-    private var registration: Registration? = null
-    private var token: TokenInfo? = null
+    private lateinit var tokenInfo: TokenInfo
+    private lateinit var metaData: Metadata
+    private lateinit var currentFactor: SignatureEnrollableFactor
     private var factors: MutableList<FactorType> = mutableListOf()
-    private var currentFactor: SignatureEnrollableFactor? = null
 
     override var pushToken: String = ""
     override var accountName: String = ""
     override val countOfAvailableEnrollments: Int = 0
-
-    override fun nextEnrollment(): EnrollableSignature? {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun enroll() {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun enroll(name: String, publicKey: String, signedData: String) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun finalize(): MFAAuthenticatorDescriptor {
-        TODO("Not yet implemented")
-    }
+    override var authenticationRequired: Boolean = false
+    override var invalidatedByBiometricEnrollment: Boolean = false
 
     init {
         initializationInfo = decoder.decodeFromString(data)
@@ -60,23 +64,256 @@ class CloudRegistrationProvider(data: String) : MFARegistrationDescriptor<MFAAut
         pushToken = ""
     }
 
-    internal fun initiate(accountName: String, skipTotpEnrollment: Boolean = true, pushToken: String?) {
+    internal suspend fun initiate(
+        accountName: String,
+        skipTotpEnrollment: Boolean = true,
+        pushToken: String?
+    ): Result<CloudRegistrationProviderResultData> {
         this.accountName = accountName
         this.pushToken = pushToken.orEmpty()
 
-        val attributes = MFAAttributeInfo.init(ContextHelper.context).dictionary().toMutableMap()
+        return try {
+            val registrationUrl =
+                URL("${initializationInfo.uri}?skipTotpEnrollment=${skipTotpEnrollment}")
+
+            val response =
+                NetworkHelper.networkApi()
+                    .register(registrationUrl.toString(), constructRequestBody("code"))
+            if (response.isSuccessful) {
+                val body = response.body()?.string()
+                body?.let { responseBodyData ->
+                    tokenInfo = decoder.decodeFromString(responseBodyData)
+                    val registration: Registration = decoder.decodeFromString(responseBodyData)
+
+                    registration.metadataContainer.let {
+                        metaData = Metadata(
+                            id = registration.id,
+                            registrationUri = it.registrationUri,
+                            serviceName = it.serviceName,
+                            transactionUri = it.transactionUri,
+                            features = it.features,
+                            custom = it.custom,
+                            theme = it.theme,
+                            availableFactors = registration.availableFactor
+                        )
+                    }
+
+                    registration.availableFactor.stream()
+                        .filter { factor -> factor.type == EnrollableType.TOTP }.findFirst()
+                        .ifPresent { factor ->
+                            (factor as? CloudTOTPEnrollableFactor)?.let { cloudTotpEnrollableFactor ->
+                                if (skipTotpEnrollment.not()) {
+                                    factors.add(
+                                        FactorType.Totp(
+                                            TOTPFactorInfo(
+                                                secret = cloudTotpEnrollableFactor.secret,
+                                                algorithm = HashAlgorithmType.fromString(
+                                                    cloudTotpEnrollableFactor.algorithm
+                                                ),
+                                                digits = cloudTotpEnrollableFactor.digits,
+                                                period = cloudTotpEnrollableFactor.period
+                                            )
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    registration.availableFactor.removeAll { factor -> factor.type == EnrollableType.TOTP }
+
+                    return@initiate Result.success(
+                        CloudRegistrationProviderResultData(
+                            tokenInfo,
+                            metaData
+                        )
+                    )
+                }
+                Result.failure(MFARegistrationError.FailedToParse)
+            } else {
+                response.errorBody()?.let {
+                    return@initiate Result.failure(MFARegistrationError.UnderlyingError(Error(it.string())))
+                }
+                Result.failure(MFARegistrationError.FailedToParse)
+            }
+        } catch (e: Throwable) {
+            Result.failure(e)
+        }
+    }
+
+    override fun nextEnrollment(): EnrollableSignature? {
+
+        if (metaData.availableFactors.isEmpty()) {
+            return null
+        }
+
+        metaData.availableFactors.first().let { enrollableFactor ->
+            (enrollableFactor as SignatureEnrollableFactor).let { signatureEnrollableFactor ->
+                currentFactor = signatureEnrollableFactor
+                metaData.availableFactors.removeAll { enrollableFactor.type == it.type }
+            }
+        }
+
+        val algorithm = HashAlgorithmType.fromString(currentFactor.algorithm)
+        val biometricAuthentication = (currentFactor.type == EnrollableType.USER_PRESENCE).not()
+
+        return EnrollableSignature(biometricAuthentication, algorithm, metaData.id)
+    }
+
+    override suspend fun enroll() {
+        val keyName = "${metaData.id}.${currentFactor.type.name}"
+        KeystoreHelper.createKeyPair(
+            keyName,
+            currentFactor.algorithm ?: "",
+            authenticationRequired,
+            invalidatedByBiometricEnrollment
+        )
+
+        KeystoreHelper.exportPublicKey(keyName)?.let { publicKey ->
+            KeystoreHelper.signData(keyName, currentFactor.algorithm ?: "", metaData.id)
+                ?.let { signedData ->
+                    enroll(keyName, publicKey, signedData)
+                }
+        }
+    }
+
+    override suspend fun enroll(name: String, publicKey: String, signedData: String) {
+
+        val algorithm = HashAlgorithmType.fromString(currentFactor.algorithm)
+
+        val requestBody: RequestBody = buildJsonArray {
+            addJsonObject {
+                put("subType", currentFactor.type.name)
+                put("enabled", true)
+                put("attributes", buildJsonObject {
+                    put("signedData", signedData)
+                    put("publicKey", publicKey)
+                    put(
+                        "deviceSecurity",
+                        currentFactor.type == EnrollableType.FACE || currentFactor.type == EnrollableType.FINGERPRINT
+                    )
+                    put("algorithm", currentFactor.algorithm)
+                    put("additionalData", buildJsonArray {
+                        addJsonObject {
+                            put("name", "name")
+                            put("value", name)
+                        }
+                    })
+                })
+            }
+        }.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+
+        NetworkHelper.networkApi()
+            .enroll(currentFactor.uri.toString(), tokenInfo.accessToken, requestBody)
+            .let { response ->
+                if (response.isSuccessful) {
+                    val body = response.body()?.string()
+                    body?.let { responseBodyData ->
+                        val enrollments = JSONArray(responseBodyData)
+
+                        for (i in 0 until enrollments.length()) {
+                            (enrollments[i] as JSONObject).let { enrollment ->
+                                val subType = enrollment["subType"] as String
+                                val type = EnrollableType.valueOf(subType.camelToSnakeCase())
+                                val id = enrollment["id"] as String
+                                val uuid = UUID.fromString(id)
+
+                                if (type == currentFactor.type) {
+                                    when (currentFactor.type) {
+                                        EnrollableType.FACE -> factors.add(
+                                            FactorType.Face(FaceFactorInfo(
+                                                id = uuid,
+                                                displayName = name,
+                                                algorithm = algorithm
+                                            ))
+                                        )
+
+                                        EnrollableType.FINGERPRINT -> factors.add(
+                                            FactorType.Fingerprint(
+                                                FingerprintFactorInfo(
+                                                    id = uuid,
+                                                    displayName = name,
+                                                    algorithm = algorithm
+                                                )
+                                            )
+                                        )
+
+                                        else -> factors.add(
+                                            FactorType.UserPresence(
+                                                UserPresenceFactorInfo(
+                                                    id = uuid,
+                                                    displayName = name,
+                                                    algorithm = algorithm
+                                                )
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    response.errorBody()?.let {
+                        throw MFARegistrationError.UnderlyingError(Error(it.string()))
+                    }
+                    throw MFARegistrationError.DataInitializationFailed
+                }
+            }
+    }
+
+    override suspend fun finalize(): Result<MFAAuthenticatorDescriptor> {
+
+        return try {
+
+            val registrationUrl =
+                URL("${initializationInfo.uri}?metadataInResponse=false")
+
+            // Refresh the token, which sets the authenticator state from ENROLLING to ACTIVE.
+            val response =
+                NetworkHelper.networkApi()
+                    .register(registrationUrl.toString(), constructRequestBody("refreshToken"))
+
+            if (response.isSuccessful) {
+                val body = response.body()?.string()
+                body?.let { responseBodyData ->
+                    tokenInfo = decoder.decodeFromString(responseBodyData)
+                }
+            }
+            Result.success(
+                CloudAuthenticator(
+                    refreshUri = metaData.registrationUri,
+                    transactionUri = metaData.registrationUri,
+                    theme = metaData.theme,
+                    token = tokenInfo,
+                    id = metaData.id,
+                    serviceName = metaData.serviceName,
+                    accountName = accountName,
+                    allowedFactors = factors,
+                    customAttributes = metaData.custom
+                )
+            )
+        } catch (e: Throwable) {
+            Result.failure(e)
+        }
+    }
+
+    private fun constructRequestBody(additionalData: String): RequestBody {
+
+        val attributes =
+            MFAAttributeInfo.init(ContextHelper.context).dictionary().toMutableMap()
         attributes["accountName"] = this.accountName
         attributes["pushToken"] = this.pushToken
         attributes.remove("applicationName")
 
-        val data: HashMap<String, Any> = HashMap<String, Any>()
-        data["code"] = initializationInfo.code
+        val data: MutableMap<String, Any> = HashMap()
+        data["refreshToken"] = tokenInfo.refreshToken
         data["attributes"] = attributes
 
-        val body = decoder.encodeToString(data)
-        val registrationUrl = URL("${initializationInfo.uri}?skipTotpEnrollment=${skipTotpEnrollment}")
+        when (additionalData) {
+            "refreshToken" -> data["refreshToken"] = tokenInfo.refreshToken
+            "code" -> initializationInfo.code
+        }
 
-
-
+        return (data as Map<*, *>).let {
+            JSONObject(it).toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        }
     }
 }

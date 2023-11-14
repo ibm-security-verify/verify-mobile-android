@@ -23,6 +23,6 @@ data class CloudAuthenticator(
     override val serviceName: String,
     override var accountName: String,
     override val allowedFactors: List<FactorType>,
-    override var publicKeyCertificate: String?,
+    override var publicKeyCertificate: String? = null,
     val customAttributes: Map<String, String>
 ) : MFAAuthenticatorDescriptor

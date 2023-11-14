@@ -12,12 +12,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
+import com.ibm.security.verifysdk.authentication.TokenInfo
 import com.ibm.security.verifysdk.core.ContextHelper
+import com.ibm.security.verifysdk.core.NetworkHelper
 import com.ibm.security.verifysdk.mfa.MFARegistrationController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import okhttp3.logging.HttpLoggingInterceptor
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
@@ -47,6 +52,8 @@ class MainActivity : AppCompatActivity() {
         ContextHelper.init(applicationContext)
         setContentView(R.layout.activity_main)
 
+        NetworkHelper.customLoggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+
 //        val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
         log.atLevel(Level.DEBUG).log("XXX DEBUG2")
 
@@ -56,6 +63,23 @@ class MainActivity : AppCompatActivity() {
         log.info("XXX INFO")
         log.trace("XXX TRACE")
         log.trace("XXX TRACE")
+
+//        val decoder = Json {
+//            ignoreUnknownKeys = true
+//            isLenient = true
+//        }
+//
+//        val s = """{"expiresIn":3600,
+//"id":"f3937799-c5ed-4396-a0b7-fad7c69a470f",
+//"accessToken":"g87PDMRv7qahVrYsbFAsdqzga7WtHwCe7pgJP0EK",
+//"refreshToken":"ONFZnk8Cpcv4Y9jmFWDoU0Ur7T8VkIUKXWovvMKwCwuv4wK5Yd",
+//"version":{"number":"1.0.0","platform":"com.ibm.security.access.verify"}
+//}""".trimIndent().replace("\n", "").replace("\\W+", "")
+//
+//
+//        var tokenInfo : TokenInfo = decoder.decodeFromString<TokenInfo>(s)
+//
+//        log.info("XXX", tokenInfo.accessToken)
 
         requestCamera()
     }
@@ -128,8 +152,14 @@ class MainActivity : AppCompatActivity() {
                 mfaRegistrationController.initiate("Carsten's Test account")
                     .onSuccess {
                         val cloudRegistrationProvider = it
+                        cloudRegistrationProvider.accountName = ""
                     }
-                    .onFailure {  }
+                    .onFailure {
+                        val error = it
+                        if (error.toString().isNotEmpty()) {
+                            log.info("XXX")
+                        }
+                    }
             }
 
         }

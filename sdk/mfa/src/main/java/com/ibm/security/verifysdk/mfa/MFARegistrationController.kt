@@ -8,7 +8,6 @@ import com.ibm.security.verifysdk.mfa.cloud.CloudRegistrationProvider
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
-import org.json.JSONObject
 
 class MFARegistrationController(private var data: String) {
 
@@ -23,7 +22,8 @@ class MFARegistrationController(private var data: String) {
         jsonObject.let {
             it.contains("options").let {
                 this.ignoreSSLCertificate =
-                    jsonObject["options"].toString().filter { c -> !c.isWhitespace() } == "ignoreSslCerts=true"
+                    jsonObject["options"].toString()
+                        .filter { c -> !c.isWhitespace() } == "ignoreSslCerts=true"
             }
 
         }
@@ -36,10 +36,15 @@ class MFARegistrationController(private var data: String) {
         additionalData: Map<String, Any>? = null
     ): Result<MFARegistrationDescriptor<MFAAuthenticatorDescriptor>> {
         val cloudRegistrationProvider = CloudRegistrationProvider(data)
-        cloudRegistrationProvider.let {
-            it.initiate(accountName, skipTotpEnrollment, pushToken)
-            return Result.success(it)
-        }
+        cloudRegistrationProvider.initiate(accountName, skipTotpEnrollment, pushToken)
+            .let { resultInitiate ->
+                resultInitiate.onSuccess {
+                    return Result.success(cloudRegistrationProvider)
+                }
+                resultInitiate.onFailure {
+                    return Result.failure(it)
+                }
+            }
 
         return Result.failure(MFARegistrationError.InvalidFormat)
     }

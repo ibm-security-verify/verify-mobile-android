@@ -2,9 +2,13 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.mfa
+package com.ibm.security.verifysdk.mfa.onprem
 
 import com.ibm.security.verifysdk.authentication.TokenInfo
+import com.ibm.security.verifysdk.mfa.MFAServiceDescriptor
+import com.ibm.security.verifysdk.mfa.NextTransactionInfo
+import com.ibm.security.verifysdk.mfa.PendingTransactionInfo
+import com.ibm.security.verifysdk.mfa.UserAction
 import java.net.URL
 
 class OnPremiseAuthenticatorService(

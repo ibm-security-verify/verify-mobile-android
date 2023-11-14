@@ -1,7 +1,9 @@
 package com.ibm.security.verifysdk.core
 
+import kotlinx.serialization.json.JsonObject
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
+import org.json.JSONObject
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -13,9 +15,23 @@ import retrofit2.http.*
  */
 interface NetworkApi {
 
+    @POST
+    @Headers("Accept: application/json", "Content-Type: application/json")
+    suspend fun register(
+        @Url url: String,
+        @Body body: RequestBody
+    ): Response<ResponseBody>
+
+    @POST
+    @Headers("Accept: application/json", "Content-Type: application/json")
+    suspend fun enroll(
+        @Url url: String,
+        @Header("Authorization") token: String,
+        @Body body: RequestBody
+    ): Response<ResponseBody>
+
     @GET
     suspend fun discover(@Url url: String): Response<ResponseBody>
-
 
     @POST
     @FormUrlEncoded

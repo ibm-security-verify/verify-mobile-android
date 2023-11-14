@@ -7,7 +7,6 @@ import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
-import com.ibm.security.verifysdk.core.NetworkHelper
 import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.MessageDigest
