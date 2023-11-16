@@ -4,12 +4,16 @@
 
 package com.ibm.security.verifysdk.mfa
 
+import com.ibm.security.verifysdk.core.threadInfo
 import com.ibm.security.verifysdk.mfa.cloud.CloudRegistrationProvider
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
+import org.slf4j.LoggerFactory
 
 class MFARegistrationController(private var data: String) {
+
+    private val log = LoggerFactory.getLogger(javaClass)
 
     var ignoreSSLCertificate: Boolean = false
         private set
@@ -25,7 +29,6 @@ class MFARegistrationController(private var data: String) {
                     jsonObject["options"].toString()
                         .filter { c -> !c.isWhitespace() } == "ignoreSslCerts=true"
             }
-
         }
     }
 
@@ -36,6 +39,9 @@ class MFARegistrationController(private var data: String) {
         additionalData: Map<String, Any>? = null
     ): Result<MFARegistrationDescriptor<MFAAuthenticatorDescriptor>> {
         val cloudRegistrationProvider = CloudRegistrationProvider(data)
+
+        log.threadInfo()
+
         cloudRegistrationProvider.initiate(accountName, skipTotpEnrollment, pushToken)
             .let { resultInitiate ->
                 resultInitiate.onSuccess {

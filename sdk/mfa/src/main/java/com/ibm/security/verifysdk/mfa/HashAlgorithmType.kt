@@ -34,5 +34,15 @@ enum class HashAlgorithmType(private val rawValue: String) {
                 else -> throw HashAlgorithmError.InvalidHash
             }
         }
+
+        internal fun toIsvFormat(value: HashAlgorithmType): String {
+            return when (value) {
+                SHA1 -> "RSASHA1"
+                SHA256 -> "RSASHA256"
+                SHA384 -> "RSASHA384"
+                SHA512 -> "RSASHA512"
+                else -> throw HashAlgorithmError.InvalidHash
+            }
+        }
     }
 }

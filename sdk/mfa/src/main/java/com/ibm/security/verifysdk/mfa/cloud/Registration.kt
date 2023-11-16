@@ -12,6 +12,7 @@ import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
 import com.ibm.security.verifysdk.mfa.URLSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonNames
 import java.net.URL
 
 @Serializable
@@ -19,6 +20,7 @@ internal data class Registration(
     val accessToken: String,
     val expiresIn: Int,
     val id: String,
+    @JsonNames("metadata")
     val metadataContainer: MetadataContainer,
     val refreshToken: String,
     val version: Version
@@ -86,8 +88,6 @@ internal data class MetadataContainer(
     @Serializable(with = URLSerializer::class)
     val registrationUri: URL,
     val serviceName: String,
-    @Serializable(with = URLSerializer::class)
-    val transactionUri: URL,
     @SerialName("featureFlags") val features: ArrayList<String> = ArrayList(),
     @SerialName("customAttributes") val custom: Map<String, String> = HashMap(),
     @SerialName("themeAttributes") val theme: Map<String, String> = HashMap(),

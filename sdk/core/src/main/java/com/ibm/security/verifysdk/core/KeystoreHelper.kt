@@ -11,7 +11,9 @@ import android.util.Base64
 import androidx.annotation.Nullable
 import org.slf4j.LoggerFactory
 import java.security.*
+import java.security.interfaces.RSAKey
 import java.security.spec.RSAKeyGenParameterSpec
+import java.util.Locale
 
 /**
  * Helper class to perform key management and signing operations.
@@ -32,10 +34,6 @@ object KeystoreHelper {
         }
 
     var keySize: Int = 2048
-
-    val supportedAlgorithms: ArrayList<String> =
-        arrayListOf("SHA1withRSA", "SHA256withRSA", "SHA512withRSA")
-
 
     /**
      * Generates a private and public key to sign data. An existing key pair with the same alias will
@@ -68,26 +66,22 @@ object KeystoreHelper {
         log.entering()
 
         try {
-            if ((algorithm in supportedAlgorithms).not()) {
-                throw UnsupportedOperationException(
-                    String.format(
-                        "Algorithm %s is not supported",
-                        algorithm
-                    )
-                )
-            }
-
             val keyStore = KeyStore.getInstance(keystoreType)
             keyStore.load(null)
 
             if (keyStore.containsAlias(keyName)) keyStore.deleteEntry(keyName)
 
-            if (algorithm == "SHA1withRSA") {
-                digest = KeyProperties.DIGEST_SHA1
-            } else if (algorithm == "SHA256withRSA") {
-                digest = KeyProperties.DIGEST_SHA256
-            } else {    // == SHA512withRSA
-                digest = KeyProperties.DIGEST_SHA512
+            digest = when (algorithm.uppercase(Locale.ROOT)) {
+                "SHA1", "HMACSHA1", "RSASHA1", "SHA1WITHRSA" -> KeyProperties.DIGEST_SHA1
+                "SHA256", "HMACSHA256", "RSASHA256", "SHA256WITHRSA" -> KeyProperties.DIGEST_SHA256
+                "SHA384", "HMACSHA384", "RSASHA384", "SHA384WITHRSA" -> KeyProperties.DIGEST_SHA384
+                "SHA512", "HMACSHA512", "RSASHA512", "SHA512WITHRSA" -> KeyProperties.DIGEST_SHA512
+                else -> throw UnsupportedOperationException(
+                    String.format(
+                        "Algorithm %s is not supported",
+                        algorithm
+                    )
+                )
             }
 
             val keyGenParameterBuilder = KeyGenParameterSpec.Builder(
@@ -105,10 +99,9 @@ object KeystoreHelper {
                 )
                 .setUserAuthenticationRequired(authenticationRequired)
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                keyGenParameterBuilder.setInvalidatedByBiometricEnrollment(
-                    invalidatedByBiometricEnrollment
-                )
+            keyGenParameterBuilder.setInvalidatedByBiometricEnrollment(
+                invalidatedByBiometricEnrollment
+            )
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
                 keyGenParameterBuilder.setUserAuthenticationParameters(
@@ -248,7 +241,21 @@ object KeystoreHelper {
 
         try {
             var signedData: String? = null
-            Signature.getInstance(algorithm).let { signature ->
+
+            val signatureAlgorithm = when (algorithm.uppercase(Locale.ROOT)) {
+                "SHA1", "HMACSHA1", "RSASHA1", "SHA1WITHRSA" -> "SHA1withRSA"
+                "SHA256", "HMACSHA256", "RSASHA256", "SHA256WITHRSA" -> "SHA256withRSA"
+                "SHA384", "HMACSHA384", "RSASHA384", "SHA384WITHRSA" -> "SHA384withRSA"
+                "SHA512", "HMACSHA512", "RSASHA512", "SHA512WITHRSA" -> "SHA512withRSA"
+                else -> throw UnsupportedOperationException(
+                    String.format(
+                        "Algorithm %s is not supported",
+                        algorithm
+                    )
+                )
+            }
+
+            Signature.getInstance(signatureAlgorithm).let { signature ->
                 getPrivateKey(keyName)?.let { privateKey ->
                     signature.initSign(privateKey)
                     signature.update(dataToSign.toByteArray())

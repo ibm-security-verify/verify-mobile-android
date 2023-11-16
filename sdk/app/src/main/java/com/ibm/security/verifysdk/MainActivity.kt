@@ -10,16 +10,24 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import com.ibm.security.verifysdk.authentication.TokenInfo
 import com.ibm.security.verifysdk.core.ContextHelper
 import com.ibm.security.verifysdk.core.NetworkHelper
+import com.ibm.security.verifysdk.core.threadInfo
+import com.ibm.security.verifysdk.core.toJsonElement
 import com.ibm.security.verifysdk.mfa.MFARegistrationController
+import com.ibm.security.verifysdk.mfa.MFARegistrationDescriptor
+import com.ibm.security.verifysdk.mfa.cloud.CloudRegistrationProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import okhttp3.logging.HttpLoggingInterceptor
@@ -32,7 +40,6 @@ class MainActivity : AppCompatActivity() {
 
     private val log: Logger = LoggerFactory.getLogger(javaClass.name)
     private val REQUESTCAMERAPERMISSIONCODE = 88
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private lateinit var mfaRegistrationController: MFARegistrationController
 
     private val requestPermissionLauncher =
@@ -113,7 +120,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun startQRCodeScanning() {
         val integrator = IntentIntegrator(this)
         integrator.setPrompt("Scan QR Code")
@@ -130,21 +136,36 @@ class MainActivity : AppCompatActivity() {
         if (result != null && result.contents != null) {
             val qrCode = result.contents
             log.error("data: $qrCode")
-            mfaRegistrationController = MFARegistrationController(qrCode)
-            coroutineScope.async {
-                mfaRegistrationController.initiate("Carsten's Test account")
-                    .onSuccess {
-                        val cloudRegistrationProvider = it
-                        cloudRegistrationProvider.accountName = ""
-                    }
-                    .onFailure {
-                        val error = it
-                        if (error.toString().isNotEmpty()) {
-                            log.info("XXX")
-                        }
-                    }
-            }
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    log.threadInfo()
+                    val result =
+                        MFARegistrationController(qrCode).initiate("Carsten's Test account")
+                            .onSuccess {
+                                val cloudRegistrationProvider = it
+                            }
+                            .onFailure {
+                                val error = it
+                            }
 
+                    val cloudRegistrationProvider = result.getOrNull()
+                    log.threadInfo()
+                    log.info("Counter " + cloudRegistrationProvider?.countOfAvailableEnrollments)
+                    cloudRegistrationProvider?.nextEnrollment()
+                    cloudRegistrationProvider?.enroll()
+                    cloudRegistrationProvider?.nextEnrollment()
+                    cloudRegistrationProvider?.enroll()
+                    cloudRegistrationProvider?.nextEnrollment()
+                    cloudRegistrationProvider?.enroll()
+                    cloudRegistrationProvider?.finalize()
+                        ?.onSuccess {
+                            log.info(it.toString())
+                        }
+                        ?.onFailure {
+                            log.error(it.toString())
+                        }
+                }
+            }
         }
     }
 }

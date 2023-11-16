@@ -56,14 +56,14 @@ object MFAAttributeInfo {
     private val hasFrontCamera: Boolean
         get() = applicationContext.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)
 
-    private val hasFaceID: Boolean
-        get() {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                applicationContext.packageManager.hasSystemFeature(PackageManager.FEATURE_FACE)
-            } else {
-                applicationContext.packageManager.hasSystemFeature("com.samsung.android.bio.face")
-            }
-        }
+    private val hasFaceID: Boolean = true
+//        get() {
+//            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//                applicationContext.packageManager.hasSystemFeature(PackageManager.FEATURE_FACE)
+//            } else {
+//                applicationContext.packageManager.hasSystemFeature("com.samsung.android.bio.face")
+//            }
+//        }
 
     private val hasTouchID: Boolean
         get() = applicationContext.packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)

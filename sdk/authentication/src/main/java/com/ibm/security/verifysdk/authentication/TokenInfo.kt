@@ -147,6 +147,16 @@ data class TokenInfo @OptIn(ExperimentalSerializationApi::class) constructor(
 
         return jsonString
     }
+
+    /**
+     *  Creates authorization header from token type and access token.  The authorization header
+     *  is used in subsequent HTTP requests.
+     *
+     *  @return an authorization header.  For example: `Bearer ABC123`.
+     */
+    fun authorizationHeader(): String {
+        return "$tokenType $accessToken"
+    }
 }
 
 /**
@@ -227,7 +237,7 @@ internal object TokenInfoSerializer : KSerializer<TokenInfo> {
 
         val tokenType = listOf(TOKEN_TYPE, "token_type").stream().map(decoderMap::get)
             .filter(Objects::nonNull)
-            .collect(Collectors.toList()).getOrNull(0)?.jsonPrimitive?.content.orEmpty()
+            .collect(Collectors.toList()).getOrNull(0)?.jsonPrimitive?.content.orEmpty().takeIf { it.isNotEmpty() } ?: "Bearer"
 
         val additionalData = decoderMap
             .filter { (key, _) -> !knownKeys.contains(key) }
