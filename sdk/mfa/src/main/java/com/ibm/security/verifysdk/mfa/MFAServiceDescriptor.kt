@@ -12,7 +12,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.net.URL
 
 interface MFAServiceDescriptor {
-    val accessToken: String
+    val authorizationHeader: String
     val refreshUri: URL
     val transactionUri: URL
     val currentPendingTransaction: PendingTransactionInfo?
@@ -24,7 +24,7 @@ interface MFAServiceDescriptor {
         additionalData: Map<String, Any>?
     ): Result<TokenInfo>
 
-    suspend fun nextTransaction(transactionID: String?): Result<NextTransactionInfo>
+    suspend fun nextTransaction(transactionID: String? = null): Result<NextTransactionInfo>
 
     suspend fun completeTransaction(userAction: UserAction, signedData: String): Result<Unit>
 }
@@ -38,7 +38,7 @@ suspend fun MFAServiceDescriptor.login(loginUri: URL, code: String): Result<Unit
         NetworkHelper.handleApi(
             NetworkHelper.networkApi().login(
                 loginUri.toString(),
-                accessToken,
+                authorizationHeader,
                 body
             )
         )

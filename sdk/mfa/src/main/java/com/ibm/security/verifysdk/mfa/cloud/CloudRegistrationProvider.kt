@@ -329,7 +329,10 @@ class CloudRegistrationProvider(data: String) :
             Result.success(
                 CloudAuthenticator(
                     refreshUri = metaData.registrationUri,
-                    transactionUri = metaData.registrationUri,
+                    transactionUri =  metaData.registrationUri.replace(
+                        "registration",
+                        "${metaData.id}/verifications"
+                    ),
                     theme = metaData.theme,
                     token = tokenInfo,
                     id = metaData.id,

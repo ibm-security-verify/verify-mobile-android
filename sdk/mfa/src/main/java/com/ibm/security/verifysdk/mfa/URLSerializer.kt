@@ -18,7 +18,7 @@ object URLSerializer : KSerializer<URL> {
         return URL(decoder.decodeString())
     }
 
-    override fun serialize(encoder: Encoder, obj: URL) {
-        encoder.encodeString(obj.toString())
+    override fun serialize(encoder: Encoder, value: URL) {
+        encoder.encodeString(value.toString())
     }
 }

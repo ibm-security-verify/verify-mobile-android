@@ -12,7 +12,7 @@ import com.ibm.security.verifysdk.mfa.UserAction
 import java.net.URL
 
 class OnPremiseAuthenticatorService(
-    override var accessToken: String,
+    override var authorizationHeader: String,
     override var refreshUri: URL,
     override var transactionUri: URL,
     override var currentPendingTransaction: PendingTransactionInfo? = null,

@@ -20,11 +20,17 @@ data class TOTPFactorInfo(
 ) : Factor, OTPDescriptor {
 
     init {
-        require(digits == 6 || digits == 8) { "Digits must be either 6 or 8." }
         require(period in 10..300) { "Period must be between 10 and 300 (inclusive)." }
     }
 
     fun generatePasscode(): String {
+        require(digits >= 6) { "Digits must be >= 6>" }
+        val timeInterval = Date().time / 1000
+        val value = (timeInterval / period).toULong()
+        return generatePasscode(value)
+    }
+
+    fun generateLowEntropyPasscode(): String {
         val timeInterval = Date().time / 1000
         val value = (timeInterval / period).toULong()
         return generatePasscode(value)

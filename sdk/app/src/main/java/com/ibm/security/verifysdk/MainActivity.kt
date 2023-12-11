@@ -7,19 +7,25 @@ package com.ibm.security.verifysdk
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
+import com.ibm.security.verifysdk.authentication.OAuthProvider
 import com.ibm.security.verifysdk.authentication.TokenInfo
 import com.ibm.security.verifysdk.core.ContextHelper
 import com.ibm.security.verifysdk.core.NetworkHelper
 import com.ibm.security.verifysdk.core.threadInfo
 import com.ibm.security.verifysdk.core.toJsonElement
+import com.ibm.security.verifysdk.mfa.AuthenticatorDescriptor
+import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
 import com.ibm.security.verifysdk.mfa.MFARegistrationController
 import com.ibm.security.verifysdk.mfa.MFARegistrationDescriptor
+import com.ibm.security.verifysdk.mfa.MFAServiceDescriptor
+import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticatorService
 import com.ibm.security.verifysdk.mfa.cloud.CloudRegistrationProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +46,7 @@ class MainActivity : AppCompatActivity() {
 
     private val log: Logger = LoggerFactory.getLogger(javaClass.name)
     private val REQUESTCAMERAPERMISSIONCODE = 88
-    private lateinit var mfaRegistrationController: MFARegistrationController
+    private lateinit var mfaAuthenticatorDescriptor: MFAAuthenticatorDescriptor
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -59,7 +65,8 @@ class MainActivity : AppCompatActivity() {
         ContextHelper.init(applicationContext)
         setContentView(R.layout.activity_main)
 
-        NetworkHelper.customLoggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+        NetworkHelper.customLoggingInterceptor =
+            HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
 
 //        val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
         log.atLevel(Level.DEBUG).log("XXX DEBUG2")
@@ -70,6 +77,10 @@ class MainActivity : AppCompatActivity() {
         log.info("XXX INFO")
         log.trace("XXX TRACE")
         log.trace("XXX TRACE")
+
+        findViewById<Button>(R.id.btn_check_transactions).setOnClickListener {
+            checkPendingTransaction()
+        }
 
         requestCamera()
     }
@@ -82,6 +93,7 @@ class MainActivity : AppCompatActivity() {
             ) -> {
                 startQRCodeScanning()
             }
+
             else -> {
                 // You can directly ask for the permission.
                 // The registered ActivityResultCallback gets the result of this request.
@@ -93,14 +105,17 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>, grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             REQUESTCAMERAPERMISSIONCODE -> {
                 // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() &&
-                            grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                            grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                ) {
                     startQRCodeScanning()
                 } else {
                     // Explain to the user that the feature is unavailable because
@@ -132,9 +147,10 @@ class MainActivity : AppCompatActivity() {
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val result: IntentResult? = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (result != null && result.contents != null) {
-            val qrCode = result.contents
+        val intentResult: IntentResult? =
+            IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+        if (intentResult != null && intentResult.contents != null) {
+            val qrCode = intentResult.contents
             log.error("data: $qrCode")
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
@@ -160,11 +176,35 @@ class MainActivity : AppCompatActivity() {
                     cloudRegistrationProvider?.finalize()
                         ?.onSuccess {
                             log.info(it.toString())
+                            mfaAuthenticatorDescriptor = it
                         }
                         ?.onFailure {
                             log.error(it.toString())
                         }
+
                 }
+            }
+        }
+    }
+
+    private fun checkPendingTransaction() {
+
+        val cloudAuthenticatorService = CloudAuthenticatorService(
+            mfaAuthenticatorDescriptor.token.authorizationHeader(),
+            mfaAuthenticatorDescriptor.refreshUri,
+            mfaAuthenticatorDescriptor.transactionUri,
+            mfaAuthenticatorDescriptor.id
+        )
+
+        lifecycleScope.launch {
+            withContext((Dispatchers.IO)) {
+                cloudAuthenticatorService.nextTransaction()
+                    .onSuccess {
+                        log.info("Success: $it")
+                    }
+                    .onFailure {
+                        log.info("Failure: $it")
+                    }
             }
         }
     }

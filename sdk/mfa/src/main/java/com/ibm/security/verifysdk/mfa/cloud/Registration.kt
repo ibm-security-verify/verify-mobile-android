@@ -10,13 +10,14 @@ import com.ibm.security.verifysdk.mfa.HashAlgorithmType
 import com.ibm.security.verifysdk.mfa.HashAlgorithmTypeSerializer
 import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
 import com.ibm.security.verifysdk.mfa.URLSerializer
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 import java.net.URL
 
 @Serializable
-internal data class Registration(
+internal data class Registration @OptIn(ExperimentalSerializationApi::class) constructor(
     val accessToken: String,
     val expiresIn: Int,
     val id: String,

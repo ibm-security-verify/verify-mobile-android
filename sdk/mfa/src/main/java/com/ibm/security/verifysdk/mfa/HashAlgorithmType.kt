@@ -41,7 +41,6 @@ enum class HashAlgorithmType(private val rawValue: String) {
                 SHA256 -> "RSASHA256"
                 SHA384 -> "RSASHA384"
                 SHA512 -> "RSASHA512"
-                else -> throw HashAlgorithmError.InvalidHash
             }
         }
     }

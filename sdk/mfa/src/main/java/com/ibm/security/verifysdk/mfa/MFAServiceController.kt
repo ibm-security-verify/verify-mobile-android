@@ -21,7 +21,7 @@ class MFAServiceController(private val authenticator: MFAAuthenticatorDescriptor
 
         when (authenticator) {
             is OnPremiseAuthenticator -> return OnPremiseAuthenticatorService(
-                accessToken = authenticator.token.accessToken,
+                authorizationHeader = authenticator.token.authorizationHeader(),
                 refreshUri = authenticator.refreshUri,
                 transactionUri = authenticator.transactionUri,
                 clientId = authenticator.clientId,
@@ -29,7 +29,7 @@ class MFAServiceController(private val authenticator: MFAAuthenticatorDescriptor
             )
 
             is CloudAuthenticator -> return CloudAuthenticatorService(
-                _accessToken = authenticator.token.accessToken,
+                _authorizationHeader = authenticator.token.authorizationHeader(),
                 _refreshUri = authenticator.refreshUri,
                 _transactionUri = authenticator.transactionUri,
                 authenticatorId = authenticator.id
