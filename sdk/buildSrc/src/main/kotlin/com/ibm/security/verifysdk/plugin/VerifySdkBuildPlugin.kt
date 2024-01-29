@@ -15,7 +15,6 @@ import org.gradle.kotlin.dsl.dependencies
 class VerifySdkBuildPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
-        project.plugins.apply("com.hcl.security.appscan")
         project.plugins.apply("kotlin-android")
         project.plugins.apply("kotlinx-serialization")
         project.plugins.apply("maven-publish")
@@ -29,7 +28,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
                 compileSdkVersion(33)
                 defaultConfig {
                     targetSdk = 30
-                    minSdk = 26
+                    minSdk = 29
                     versionCode = 101
                     versionName = "3.0.1"
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -114,14 +113,14 @@ class VerifySdkBuildPlugin : Plugin<Project> {
 
             add("coreLibraryDesugaring", "com.android.tools:desugar_jdk_libs:1.1.5")
 
-            add("implementation", "androidx.core:core-ktx:1.7.0")
+            add("implementation", "androidx.core:core-ktx:1.12.0")
             add("implementation", "com.google.code.gson:gson:2.9.0")
             add("implementation", "org.jacoco:org.jacoco.core:0.8.8")
             add("implementation", "com.squareup.retrofit2:retrofit:2.9.0")
             add("implementation", "com.squareup.retrofit2:converter-gson:2.9.0")
             add("implementation", "com.squareup.okhttp3:okhttp:4.10.0")
             add("implementation", "com.squareup.okhttp3:logging-interceptor:4.10.0")
-            add("implementation", "org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
+            add("implementation", "org.jetbrains.kotlin:kotlin-stdlib:1.9.10")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4")
@@ -130,6 +129,9 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             add("implementation", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
             add("implementation", "org.slf4j:slf4j-api:2.0.7")
             add("implementation", "androidx.browser:browser:1.5.0")
+            add("implementation", "com.fasterxml.jackson.core:jackson-core:2.16.1")
+            add("implementation", "com.fasterxml.jackson.core:jackson-databind:2.16.1")
+            add("implementation", "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.16.1")
 
             add("testImplementation", "junit:junit:4.13.1") // JUnit4 for Adaptive SDK
 //            add("testImplementation", "org.json:json:20220320")             // Using json in unit tests

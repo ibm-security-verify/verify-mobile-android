@@ -6,6 +6,7 @@ package com.ibm.security.verifysdk
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.ibm.security.verify.fido2.Fido2Api
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
@@ -29,5 +30,7 @@ class MainActivity : AppCompatActivity() {
         log.info("XXX INFO")
         log.trace("XXX TRACE")
         log.trace("XXX TRACE")
+
+        val fido2 = Fido2Api()
     }
 }

@@ -20,6 +20,7 @@ dependencies {
     implementation("org.slf4j:slf4j-jdk14:2.0.7")
 
     implementation(project(":core"))
+    implementation(project(":fido2"))
     implementation(project(":adaptive"))
     implementation(project(":authentication"))
 }
