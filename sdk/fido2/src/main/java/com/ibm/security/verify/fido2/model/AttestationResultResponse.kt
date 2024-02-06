@@ -6,9 +6,8 @@ package com.ibm.security.verify.fido2.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ClientDataJsonAttestation(
-    val type: String,
-    val challenge: String,
-    val origin: String,
-    val crossOrigin: Boolean
+data class AttestationResultResponse(
+    val error_code: String? = null,
+    val error_message: String? = null,
+    val status: String? = null
 )

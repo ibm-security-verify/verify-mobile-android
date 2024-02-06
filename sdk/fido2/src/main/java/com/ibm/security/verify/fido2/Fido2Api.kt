@@ -1,10 +1,17 @@
-@file:OptIn(ExperimentalStdlibApi::class)
-
+/*
+ *  Copyright contributors to the IBM Security Verify FIDO2 SDK for Android project
+ */
 package com.ibm.security.verify.fido2
 
+import android.security.keystore.KeyProperties
+import android.util.Base64
+import androidx.biometric.BiometricPrompt
+import androidx.biometric.BiometricPrompt.PromptInfo.Builder
+import androidx.fragment.app.FragmentActivity
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
 import com.ibm.security.verify.fido2.model.AssertionOptions
 import com.ibm.security.verify.fido2.model.AttestationOptions
+import com.ibm.security.verify.fido2.model.AttestationResultResponse
 import com.ibm.security.verify.fido2.model.AuthenticatorAssertionResponse
 import com.ibm.security.verify.fido2.model.AuthenticatorAttestationResponse
 import com.ibm.security.verify.fido2.model.ClientDataJsonAssertion
@@ -17,18 +24,28 @@ import com.ibm.security.verifysdk.core.KeystoreHelper
 import com.ibm.security.verifysdk.core.NetworkHelper
 import com.ibm.security.verifysdk.core.base64UrlEncode
 import com.ibm.security.verifysdk.core.sha256
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.security.PrivateKey
+import java.security.PublicKey
+import java.security.Security
+import java.security.Signature
 import java.security.interfaces.ECPublicKey
+import java.util.concurrent.Executor
+import javax.crypto.Cipher
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.math.max
 import kotlin.math.min
 
-@OptIn(ExperimentalUnsignedTypes::class)
+@OptIn(ExperimentalUnsignedTypes::class, ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
 class Fido2Api {
 
     private val json = Json {
@@ -36,9 +53,31 @@ class Fido2Api {
         ignoreUnknownKeys = true
     }
 
+    fun createKeyPair(
+        keyName: String,
+        authenticationRequired: Boolean = false,
+        invalidatedByBiometricEnrollment: Boolean = false
+    ): PublicKey {
+
+        return KeystoreHelper.createKeyPair(
+            keyName,
+            algorithm = KeyProperties.KEY_ALGORITHM_EC,
+            purpose = KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY,
+            authenticationRequired = authenticationRequired,
+            invalidatedByBiometricEnrollment = invalidatedByBiometricEnrollment
+        )
+    }
+
+    internal fun exportPublicKey(
+        keyName: String,
+        base64EncodingOption: Int = Base64.URL_SAFE
+    ): String? {
+        return KeystoreHelper.exportPublicKey(keyName, base64EncodingOption)
+    }
+
     suspend fun initiateAttestation(
         attestationOptionsUrl: String,
-        accessToken: String,
+        authorization: String,
         attestationOptions: AttestationOptions
     ): Result<PublicKeyCredentialCreationOptions> {
         return try {
@@ -46,8 +85,29 @@ class Fido2Api {
                 NetworkHelper.networkApi.attestationOptions(
                     HashMap(),
                     attestationOptionsUrl,
-                    accessToken,
-                    attestationOptions.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    authorization,
+                    Json.encodeToString(attestationOptions)
+                        .toRequestBody("application/json".toMediaType())
+                )
+            )
+        } catch (e: Throwable) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun sendAttestation(
+        attestationResultUrl: String,
+        authorization: String,
+        authenticatorAttestationResponse: AuthenticatorAttestationResponse
+    ): Result<AttestationResultResponse> {
+        return try {
+            NetworkHelper.handleApi<AttestationResultResponse>(
+                NetworkHelper.networkApi.attestationResult(
+                    HashMap(),
+                    attestationResultUrl,
+                    authorization,
+                    Json.encodeToString(authenticatorAttestationResponse)
+                        .toRequestBody("application/json".toMediaType())
                 )
             )
         } catch (e: Throwable) {
@@ -57,7 +117,7 @@ class Fido2Api {
 
     suspend fun initiateAssertion(
         assertionOptionsUrl: String,
-        accessToken: String,
+        authorization: String,
         assertionOptions: AssertionOptions
     ): Result<PublicKeyCredentialRequestOptions> {
         return try {
@@ -65,35 +125,14 @@ class Fido2Api {
                 NetworkHelper.networkApi.attestationOptions(
                     HashMap(),
                     assertionOptionsUrl,
-                    accessToken,
-                    assertionOptions.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                    authorization,
+                    Json.encodeToString(assertionOptions)
+                        .toRequestBody("application/json".toMediaType())
                 )
             )
         } catch (e: Throwable) {
             Result.failure(e)
         }
-    }
-
-    private fun buildAttestationStatement(
-        keyName: String,
-        clientDataString: String,
-        authenticatorData: ByteArray
-    ): Map<String, Any> {
-
-        val result = HashMap<String, Any>()
-        val dataToSign = mutableListOf<Byte>()
-        dataToSign.addAll(authenticatorData.toList())
-        dataToSign.addAll(clientDataString.sha256().hexToByteArray().toList())
-
-        val sig = KeystoreHelper.signData(
-            keyName,
-            "SHA256withECDSA",
-            dataToSign.toByteArray()
-        )
-
-        result["alg"] = -7
-        result["sig"] = sig!!
-        return result
     }
 
     private fun toUnsignedFixedLength(arr: ByteArray, fixedLength: Int): ByteArray {
@@ -112,13 +151,22 @@ class Fido2Api {
         return COSEKey(2, -7, 1, x, y)
     }
 
-    fun buildAuthenticatorAttestationResponse(
+    suspend fun buildAuthenticatorAttestationResponse(
+        activity: FragmentActivity,
+        executor: Executor,
+        promptInfoBuilder: Builder,
         aaGuid: String,
         keyName: String,
         flags: Byte,
-        clientDataJson: ClientDataJsonAttestation,
         options: PublicKeyCredentialCreationOptions
     ): AuthenticatorAttestationResponse {
+
+        val clientDataJson = ClientDataJsonAttestation(
+            "webauthn.create",
+            options.challenge,
+            "https://${options.rp.id!!}",
+            false,
+        )
 
         val id = keyName.sha256().hexToByteArray()
         val clientDataString = json.encodeToString(clientDataJson)
@@ -152,9 +200,12 @@ class Fido2Api {
         authenticatorDataParams.addAll(attestedCredentialData)
 
         val attestationStatement = buildAttestationStatement(
-            keyName,
-            clientDataString,
-            authenticatorDataParams.toByteArray()
+            activity = activity,
+            executor = executor,
+            promptInfoBuilder = promptInfoBuilder,
+            keyName = keyName,
+            clientDataString = clientDataString,
+            authenticatorData = authenticatorDataParams.toByteArray(),
         )
 
         val attestedObject = HashMap<String, Any>()
@@ -171,6 +222,93 @@ class Fido2Api {
             ),
             "public-key"
         )
+    }
+
+    private suspend fun buildAttestationStatement(
+        activity: FragmentActivity,
+        executor: Executor,
+        promptInfoBuilder: Builder,
+        keyName: String,
+        clientDataString: String,
+        authenticatorData: ByteArray
+    ): Map<String, Any> {
+
+        val result = HashMap<String, Any>()
+        result["alg"] = -7
+
+        val dataToSign = mutableListOf<Byte>()
+        dataToSign.addAll(authenticatorData.toList())
+        dataToSign.addAll(clientDataString.sha256().hexToByteArray().toList())
+
+        invokeBiometricAuthentication(
+            keyName = keyName,
+            activity = activity,
+            executor = executor,
+            promptInfoBuilder = promptInfoBuilder
+        ).let { authenticationResult ->
+            when (authenticationResult) {
+                is BiometricPromptResult.Success -> {
+                    authenticationResult.data.cryptoObject?.let { cryptoObject ->
+                        KeystoreHelper.signData(cryptoObject, dataToSign.toByteArray())
+                            ?.let { sig ->
+                                result["sig"] = sig
+                            }
+                    }
+                }
+
+                is BiometricPromptResult.Failure -> {
+                    println("Error: ${authenticationResult.errorCode} - ${authenticationResult.errorMessage}")
+                }
+            }
+        }
+        return result
+    }
+
+    private suspend fun invokeBiometricAuthentication(
+        activity: FragmentActivity,
+        executor: Executor,
+        promptInfoBuilder: Builder,
+        keyName: String
+    ): BiometricPromptResult<BiometricPrompt.AuthenticationResult> {
+        return suspendCancellableCoroutine { continuation ->
+            val biometricPrompt = BiometricPrompt(activity, executor,
+                object : BiometricPrompt.AuthenticationCallback() {
+
+                    override fun onAuthenticationSucceeded(
+                        result: BiometricPrompt.AuthenticationResult
+                    ) {
+                        super.onAuthenticationSucceeded(result)
+                        continuation.resume(BiometricPromptResult.Success(result), null)
+                    }
+
+                    override fun onAuthenticationError(
+                        errorCode: Int,
+                        errString: CharSequence
+                    ) {
+                        super.onAuthenticationError(errorCode, errString)
+                        continuation.resume(
+                            BiometricPromptResult.Failure(
+                                errString.toString(),
+                                errorCode
+                            )
+                        )
+                    }
+
+                    override fun onAuthenticationFailed() {
+                        super.onAuthenticationFailed()
+                        continuation.resumeWithException(BiometricAuthenticationException("Authentication failed"))
+
+                    }
+                })
+
+            val signature = Signature.getInstance("SHA256withECDSA")
+            val secretKey = KeystoreHelper.getPrivateKey(keyName = keyName)
+            signature.initSign(secretKey)
+            biometricPrompt.authenticate(
+                promptInfoBuilder.build(),
+                BiometricPrompt.CryptoObject(signature)
+            )
+        }
     }
 
     fun buildAuthenticatorAssertionResponse(
@@ -218,5 +356,11 @@ class Fido2Api {
             ),
             "public-key"
         )
+    }
+
+    internal sealed class BiometricPromptResult<out T> {
+        data class Success<out T>(val data: T) : BiometricPromptResult<T>()
+        data class Failure(val errorMessage: String, val errorCode: Int? = null) :
+            BiometricPromptResult<Nothing>()
     }
 }
