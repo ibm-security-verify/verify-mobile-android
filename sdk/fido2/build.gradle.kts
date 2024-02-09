@@ -21,7 +21,7 @@ apply {
     from("../jacoco.gradle")
 }
 android {
-    namespace = "com.ibm.security.verifysdk.core"
+    namespace = "com.ibm.security.verifysdk.fido2"
 }
 dependencies {
     implementation(project(":core"))

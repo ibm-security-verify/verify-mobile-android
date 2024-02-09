@@ -10,6 +10,7 @@ import androidx.biometric.BiometricPrompt.PromptInfo.Builder
 import androidx.fragment.app.FragmentActivity
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
 import com.ibm.security.verify.fido2.model.AssertionOptions
+import com.ibm.security.verify.fido2.model.AssertionResultResponse
 import com.ibm.security.verify.fido2.model.AttestationOptions
 import com.ibm.security.verify.fido2.model.AttestationResultResponse
 import com.ibm.security.verify.fido2.model.AuthenticatorAssertionResponse
@@ -33,19 +34,20 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.security.PrivateKey
 import java.security.PublicKey
-import java.security.Security
 import java.security.Signature
 import java.security.interfaces.ECPublicKey
 import java.util.concurrent.Executor
-import javax.crypto.Cipher
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.math.max
 import kotlin.math.min
 
-@OptIn(ExperimentalUnsignedTypes::class, ExperimentalCoroutinesApi::class, ExperimentalStdlibApi::class)
+@OptIn(
+    ExperimentalUnsignedTypes::class,
+    ExperimentalCoroutinesApi::class,
+    ExperimentalStdlibApi::class
+)
 class Fido2Api {
 
     private val json = Json {
@@ -82,7 +84,7 @@ class Fido2Api {
     ): Result<PublicKeyCredentialCreationOptions> {
         return try {
             NetworkHelper.handleApi<PublicKeyCredentialCreationOptions>(
-                NetworkHelper.networkApi.attestationOptions(
+                NetworkHelper.networkApi.postRequest(
                     HashMap(),
                     attestationOptionsUrl,
                     authorization,
@@ -102,11 +104,31 @@ class Fido2Api {
     ): Result<AttestationResultResponse> {
         return try {
             NetworkHelper.handleApi<AttestationResultResponse>(
-                NetworkHelper.networkApi.attestationResult(
+                NetworkHelper.networkApi.postRequest(
                     HashMap(),
                     attestationResultUrl,
                     authorization,
                     Json.encodeToString(authenticatorAttestationResponse)
+                        .toRequestBody("application/json".toMediaType())
+                )
+            )
+        } catch (e: Throwable) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun sendAssertion(
+        assertionResultUrl: String,
+        authorization: String,
+        authenticatorAssertionResponse: AuthenticatorAssertionResponse
+    ): Result<AssertionResultResponse> {
+        return try {
+            NetworkHelper.handleApi<AssertionResultResponse>(
+                NetworkHelper.networkApi.postRequest(
+                    HashMap(),
+                    assertionResultUrl,
+                    authorization,
+                    Json.encodeToString(authenticatorAssertionResponse)
                         .toRequestBody("application/json".toMediaType())
                 )
             )
@@ -122,7 +144,7 @@ class Fido2Api {
     ): Result<PublicKeyCredentialRequestOptions> {
         return try {
             NetworkHelper.handleApi<PublicKeyCredentialRequestOptions>(
-                NetworkHelper.networkApi.attestationOptions(
+                NetworkHelper.networkApi.postRequest(
                     HashMap(),
                     assertionOptionsUrl,
                     authorization,
@@ -158,7 +180,8 @@ class Fido2Api {
         aaGuid: String,
         keyName: String,
         flags: Byte,
-        options: PublicKeyCredentialCreationOptions
+        options: PublicKeyCredentialCreationOptions,
+        nickName: String
     ): AuthenticatorAttestationResponse {
 
         val clientDataJson = ClientDataJsonAttestation(
@@ -220,7 +243,8 @@ class Fido2Api {
                 clientDataString.base64UrlEncode(),
                 CBORMapper().writeValueAsBytes(attestedObject).toUByteArray().base64UrlEncode()
             ),
-            "public-key"
+            "public-key",
+            nickName
         )
     }
 
@@ -311,13 +335,22 @@ class Fido2Api {
         }
     }
 
-    fun buildAuthenticatorAssertionResponse(
-        options: PublicKeyCredentialRequestOptions,
-        clientDataJson: ClientDataJsonAssertion,
-        flags: Byte,
+
+    suspend fun buildAuthenticatorAssertionResponse(
+        activity: FragmentActivity,
+        executor: Executor,
+        promptInfoBuilder: Builder,
         keyName: String,
+        flags: Byte,
+        options: PublicKeyCredentialRequestOptions,
         message: String?
     ): AuthenticatorAssertionResponse {
+
+        val clientDataJson = ClientDataJsonAssertion(
+            "webauthn.get",
+            options.challenge,
+            "https://${options.rpId}"
+        )
 
         val id = keyName.sha256().hexToByteArray()
         val clientDataString = json.encodeToString(clientDataJson)
@@ -340,11 +373,27 @@ class Fido2Api {
         dataToSign.addAll(authenticatorDataParams.toList())
         dataToSign.addAll(clientDataString.sha256().hexToByteArray().toList())
 
-        val sig = KeystoreHelper.signData(
-            keyName,
-            "SHA256withECDSA",
-            dataToSign.toByteArray()
-        )!!.base64UrlEncode()
+        var sig = "".toByteArray()
+        invokeBiometricAuthentication(
+            keyName = keyName,
+            activity = activity,
+            executor = executor,
+            promptInfoBuilder = promptInfoBuilder
+        ).let { authenticationResult ->
+            when (authenticationResult) {
+                is BiometricPromptResult.Success -> {
+                    authenticationResult.data.cryptoObject?.let { cryptoObject ->
+                        KeystoreHelper.signData(cryptoObject, dataToSign.toByteArray())?.let {
+                            sig = it
+                        }
+                    }
+                }
+
+                is BiometricPromptResult.Failure -> {
+                    println("Error: ${authenticationResult.errorCode} - ${authenticationResult.errorMessage}")
+                }
+            }
+        }
 
         return AuthenticatorAssertionResponse(
             id.base64UrlEncode(),
@@ -352,7 +401,7 @@ class Fido2Api {
             ResponseAssertion(
                 clientDataString.base64UrlEncode(),
                 authenticatorDataParams.toByteArray().base64UrlEncode(),
-                sig
+                sig.base64UrlEncode()
             ),
             "public-key"
         )
