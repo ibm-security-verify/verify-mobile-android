@@ -25,3 +25,6 @@ include ':core'
 include ':adaptive'
 include ':authentication'
 include ':fido2'
+include ':fido2demo'
+
+project(':fido2demo').projectDir = new File('examples/fido2demo')
