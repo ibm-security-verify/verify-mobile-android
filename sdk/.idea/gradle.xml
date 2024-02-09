@@ -25,6 +25,7 @@
             <option value="$PROJECT_DIR$/authentication" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/examples/fido2demo" />
             <option value="$PROJECT_DIR$/fido2" />
           </set>
         </option>
