@@ -64,19 +64,10 @@ interface NetworkApi {
 
     @POST
     @Headers("Accept: application/json", "Content-Type: application/json")
-    suspend fun attestationOptions(
+    suspend fun postRequest(
         @HeaderMap headers: Map<String, String>,
         @Url url: String,
-        @Header("Authorization") token: String,
-        @Body body: RequestBody
-    ): Response<ResponseBody>
-
-    @POST
-    @Headers("Accept: application/json", "Content-Type: application/json")
-    suspend fun assertionOptions(
-        @HeaderMap headers: Map<String, String>,
-        @Url url: String,
-        @Header("Authorization") token: String,
+        @Header("Authorization") authorization: String,
         @Body body: RequestBody
     ): Response<ResponseBody>
 }

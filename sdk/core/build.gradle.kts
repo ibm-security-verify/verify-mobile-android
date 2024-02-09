@@ -24,6 +24,9 @@ android {
     namespace = "com.ibm.security.verifysdk.core"
 }
 
+dependencies {
+}
+
 tasks {
     register("androidJavadocJar", Jar::class) {
         archiveClassifier.set("javadoc")
