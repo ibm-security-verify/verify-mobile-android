@@ -1,3 +1,6 @@
+/*
+ *  Copyright contributors to the IBM Security Verify FIDO2 Sample App for Android project
+ */
 package com.ibm.security.verifysdk.fido2.demoapp
 
 import android.content.Context
@@ -44,7 +47,7 @@ class RegistrationActivity : AppCompatActivity() {
             val accessToken = getSharedPreferences(
                 application.packageName,
                 Context.MODE_PRIVATE
-            ).getString("accessToken", null) ?: "KtYBbhXUl76S8R2izvXnr9uFODFv3Z"
+            ).getString("accessToken", null) ?: "e4p6DwatfV4gtzOUXACIxtxVkyPFba"
 
             lifecycleScope.launch {
                 getWhoAmI(accessToken)

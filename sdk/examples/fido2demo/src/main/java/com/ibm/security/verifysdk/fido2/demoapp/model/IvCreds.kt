@@ -1,3 +1,7 @@
+/*
+ *  Copyright contributors to the IBM Security Verify FIDO2 Sample App for Android project
+ */
+
 package com.ibm.security.verifysdk.fido2.demoapp.model
 
 import kotlinx.serialization.Serializable
