@@ -260,14 +260,14 @@ class Fido2Api {
     }
 
     /**
-     * Retrieves a COSE (CBOR Object Signing and Encryption) key from the Android KeyStore.
+     * Retrieves an EC key in COSE (CBOR Object Signing and Encryption) format from the Android KeyStore.
      *
-     * This function retrieves a COSE key from the Android KeyStore using the provided key name.
+     * This function retrieves an EC key in COSE format from the Android KeyStore using the provided key name.
      * It fetches the public key, extracts its coordinates, and constructs a COSEKey object with
      * the appropriate attributes.
      *
      * @param keyName The name of the key in the Android KeyStore.
-     * @return The COSEKey instance representing the key retrieved from the KeyStore.
+     * @return The COSEKey instance representing the EC key retrieved from the KeyStore.
      */
     private fun getCoseKey(keyName: String): COSEKey {
         val ecPublicKey = KeystoreHelper.getPublicKey(keyName) as ECPublicKey
