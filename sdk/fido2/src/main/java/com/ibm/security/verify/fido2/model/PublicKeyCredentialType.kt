@@ -8,6 +8,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 
+/**
+ * An enum class representing the type of a public key credential.
+ *
+ * @property value The string value representing the public key credential type.
+ */
 @Serializable
 enum class PublicKeyCredentialType(val value: String) {
     @OptIn(ExperimentalSerializationApi::class)

@@ -7,6 +7,13 @@ import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the entity associated with a public key credential relying party (RP).
+ *
+ * @property id The identifier associated with the relying party. Can be null.
+ * @property name The name of the relying party.
+ * @property icon The icon URL of the relying party. Default is null.
+ */
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class PublicKeyCredentialRpEntity(

@@ -6,6 +6,7 @@
 buildscript {
 
     val kotlinVersion by extra { "1.9.10" }
+    val ktorVersion by extra { "2.3.7" }
 
     repositories {
         google()
@@ -24,7 +25,7 @@ buildscript {
         classpath("org.owasp:dependency-check-gradle:8.4.3")
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
         classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
-        classpath("com.github.ben-manes:gradle-versions-plugin:0.47.0")
+        classpath("com.github.ben-manes:gradle-versions-plugin:0.51.0")
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

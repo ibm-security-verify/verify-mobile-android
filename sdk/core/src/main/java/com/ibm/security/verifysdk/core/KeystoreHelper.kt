@@ -126,11 +126,6 @@ object KeystoreHelper {
                 keyGenParameterBuilder.setUserAuthenticationValidityDurationSeconds(-1)
             }
 
-            val keyPairGenerator = KeyPairGenerator.getInstance(
-                KeyProperties.KEY_ALGORITHM_EC,
-                keystoreType
-            )
-
             KeyPairGenerator.getInstance(
                 if (algorithm == "EC") KeyProperties.KEY_ALGORITHM_EC else KeyProperties.KEY_ALGORITHM_RSA,
                 keystoreType

@@ -43,6 +43,11 @@ import kotlin.coroutines.resumeWithException
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * A class providing methods for FIDO2 operations.
+ * This class contains functionalities related to key pair generation, attestation, and assertion
+ * processes using biometric authentication.
+ */
 @OptIn(
     ExperimentalUnsignedTypes::class,
     ExperimentalCoroutinesApi::class,
@@ -50,11 +55,38 @@ import kotlin.math.min
 )
 class Fido2Api {
 
+    /**
+     * JSON configuration for parsing and serializing JSON data.
+     *
+     * This configuration object allows for customization of JSON parsing
+     * and serialization behavior. It includes options to set leniency and
+     * ignore unknown keys during JSON parsing.
+     *
+     * @property isLenient A flag indicating whether lenient parsing is enabled.
+     *                     Lenient parsing allows parsing of malformed JSON by ignoring
+     *                     unexpected tokens.
+     * @property ignoreUnknownKeys A flag indicating whether unknown keys encountered
+     *                              during parsing should be ignored.
+     */
     private val json = Json {
         isLenient = true
         ignoreUnknownKeys = true
     }
 
+    /**
+     * Creates a new key pair in the Android KeyStore.
+     *
+     * This method generates a new key pair in the Android KeyStore with the specified
+     * attributes and options.
+     *
+     * @param keyName The name to associate with the generated key pair.
+     * @param authenticationRequired A flag indicating whether user authentication is required
+     *                               for using the key.
+     * @param invalidatedByBiometricEnrollment A flag indicating whether the key should be invalidated
+     *                                          if biometric enrollment changes.
+     *
+     * @return The public key of the generated key pair.
+     */
     fun createKeyPair(
         keyName: String,
         authenticationRequired: Boolean = false,
@@ -70,13 +102,20 @@ class Fido2Api {
         )
     }
 
-    internal fun exportPublicKey(
-        keyName: String,
-        base64EncodingOption: Int = Base64.URL_SAFE
-    ): String? {
-        return KeystoreHelper.exportPublicKey(keyName, base64EncodingOption)
-    }
-
+    /**
+     * Initiates the attestation process with the specified options.
+     *
+     * This function sends a request to the server to initiate the attestation process
+     * with the provided attestation options.
+     *
+     * @param attestationOptionsUrl The URL to send the attestation options request to.
+     * @param authorization The authorization header value to be included in the request.
+     * @param attestationOptions The options for the attestation process.
+     *
+     * @return A Result wrapping the PublicKeyCredentialCreationOptions received from the server
+     *         if the attestation process is successful, or a failure if an error occurs during
+     *         the process.
+     */
     suspend fun initiateAttestation(
         attestationOptionsUrl: String,
         authorization: String,
@@ -97,6 +136,20 @@ class Fido2Api {
         }
     }
 
+    /**
+     * Sends the attestation result to the server.
+     *
+     * This function sends the attestation result, represented by the
+     * AuthenticatorAttestationResponse, to the specified URL on the server.
+     *
+     * @param attestationResultUrl The URL to send the attestation result to.
+     * @param authorization The authorization header value to be included in the request.
+     * @param authenticatorAttestationResponse The response containing the attestation result.
+     *
+     * @return A Result wrapping the AttestationResultResponse received from the server
+     *         if the operation is successful, or a failure if an error occurs during
+     *         the process.
+     */
     suspend fun sendAttestation(
         attestationResultUrl: String,
         authorization: String,
@@ -117,6 +170,21 @@ class Fido2Api {
         }
     }
 
+    /**
+     * Sends the assertion result to the server.
+     *
+     * This function sends the assertion result, represented by the
+     * AuthenticatorAssertionResponse, to the specified URL on the server.
+     * It utilizes suspend coroutine mechanism for asynchronous execution.
+     *
+     * @param assertionResultUrl The URL to send the assertion result to.
+     * @param authorization The authorization header value to be included in the request.
+     * @param authenticatorAssertionResponse The response containing the assertion result.
+     *
+     * @return A Result wrapping the AssertionResultResponse received from the server
+     *         if the operation is successful, or a failure if an error occurs during
+     *         the process.
+     */
     suspend fun sendAssertion(
         assertionResultUrl: String,
         authorization: String,
@@ -137,6 +205,20 @@ class Fido2Api {
         }
     }
 
+    /**
+     * Initiates the assertion process with the specified options.
+     *
+     * This function sends a request to the server to initiate the assertion process
+     * with the provided assertion options.
+     *
+     * @param assertionOptionsUrl The URL to send the assertion options request to.
+     * @param authorization The authorization header value to be included in the request.
+     * @param assertionOptions The options for the assertion process.
+     *
+     * @return A Result wrapping the PublicKeyCredentialRequestOptions received from the server
+     *         if the assertion process is successful, or a failure if an error occurs during
+     *         the process.
+     */
     suspend fun initiateAssertion(
         assertionOptionsUrl: String,
         authorization: String,
@@ -157,6 +239,18 @@ class Fido2Api {
         }
     }
 
+    /**
+     * Converts a byte array to an unsigned fixed-length byte array.
+     *
+     * This function takes a byte array and converts it to an unsigned fixed-length byte array.
+     * If the input byte array is shorter than the specified fixed length, it is padded with zeroes
+     * at the beginning. If it is longer, the excess bytes are truncated from the beginning.
+     *
+     * @param arr The input byte array to be converted.
+     * @param fixedLength The desired length of the output byte array.
+     *
+     * @return The converted unsigned fixed-length byte array.
+     */
     private fun toUnsignedFixedLength(arr: ByteArray, fixedLength: Int): ByteArray {
         val fixed = ByteArray(fixedLength)
         val offset = fixedLength - arr.size
@@ -165,6 +259,16 @@ class Fido2Api {
         return fixed
     }
 
+    /**
+     * Retrieves a COSE (CBOR Object Signing and Encryption) key from the Android KeyStore.
+     *
+     * This function retrieves a COSE key from the Android KeyStore using the provided key name.
+     * It fetches the public key, extracts its coordinates, and constructs a COSEKey object with
+     * the appropriate attributes.
+     *
+     * @param keyName The name of the key in the Android KeyStore.
+     * @return The COSEKey instance representing the key retrieved from the KeyStore.
+     */
     private fun getCoseKey(keyName: String): COSEKey {
         val ecPublicKey = KeystoreHelper.getPublicKey(keyName) as ECPublicKey
         val point = ecPublicKey.w
@@ -173,6 +277,27 @@ class Fido2Api {
         return COSEKey(2, -7, 1, x, y)
     }
 
+    /**
+     * Builds an AuthenticatorAttestationResponse for the given parameters.
+     *
+     * This function constructs an AuthenticatorAttestationResponse, which represents
+     * the response from the authenticator during the attestation process. It is used
+     * to attest to the creation of a new public key credential. The response includes
+     * various data such as client data, attestation statement, and authenticator data.
+     *
+     * @param activity The FragmentActivity instance to display UI prompts.
+     * @param executor The Executor instance to run asynchronous tasks.
+     * @param promptInfoBuilder The PromptInfo.Builder instance to build the biometric
+     *                          authentication dialog.
+     * @param aaGuid The AAGUID (Authenticator Attestation Globally Unique Identifier).
+     * @param keyName The name of the key in the Android KeyStore.
+     * @param flags The flags indicating the capabilities and status of the authenticator.
+     * @param options The PublicKeyCredentialCreationOptions containing the parameters for
+     *                creating the public key credential.
+     * @param nickName The nickname associated with the authenticator.
+     *
+     * @return The constructed AuthenticatorAttestationResponse.
+     */
     suspend fun buildAuthenticatorAttestationResponse(
         activity: FragmentActivity,
         executor: Executor,
@@ -248,6 +373,25 @@ class Fido2Api {
         )
     }
 
+    /**
+     * Builds the attestation statement for the given parameters.
+     *
+     * This function constructs the attestation statement for the attestation process.
+     * It includes the algorithm identifier and the signature generated by biometric
+     * authentication of the attestation data. The signature is computed over a combination
+     * of authenticator data and client data hash.
+     *
+     * @param activity The FragmentActivity instance to display UI prompts.
+     * @param executor The Executor instance to run asynchronous tasks.
+     * @param promptInfoBuilder The PromptInfo.Builder instance to build the biometric
+     *      *                          authentication dialog.
+     * @param keyName The name of the key in the Android KeyStore.
+     * @param clientDataString The string representation of the client data in the attestation process.
+     * @param authenticatorData The authenticator data.
+     *
+     * @return The map representing the attestation statement, including the algorithm identifier
+     *         and the signature generated by biometric authentication.
+     */
     private suspend fun buildAttestationStatement(
         activity: FragmentActivity,
         executor: Executor,
@@ -288,6 +432,21 @@ class Fido2Api {
         return result
     }
 
+    /**
+     * Invokes biometric authentication for the given parameters.
+     *
+     * This function initiates biometric authentication using the provided key name
+     * and displays a biometric prompt to the user for authentication. It returns the result
+     * of the authentication process.
+     *
+     * @param activity The FragmentActivity instance to display the biometric prompt.
+     * @param executor The Executor instance to run asynchronous tasks.
+     * @param promptInfoBuilder The PromptInfo.Builder instance to build the biometric
+     *      *      *            authentication dialog.
+     * @param keyName The name of the key in the Android KeyStore.
+     *
+     * @return A BiometricPromptResult representing the result of the biometric authentication.
+     */
     private suspend fun invokeBiometricAuthentication(
         activity: FragmentActivity,
         executor: Executor,
@@ -335,7 +494,27 @@ class Fido2Api {
         }
     }
 
-
+    /**
+     * Builds an AuthenticatorAssertionResponse for the given parameters.
+     *
+     * This function constructs an AuthenticatorAssertionResponse, which represents
+     * the response from the authenticator during the assertion process. It is used
+     * to attest to the authentication of an existing public key credential. The response
+     * includes various data such as client data, authenticator data, and signature
+     * generated by biometric authentication.
+     *
+     * @param activity The FragmentActivity instance to display UI prompts.
+     * @param executor The Executor instance to run asynchronous tasks.
+     * @param promptInfoBuilder The PromptInfo.Builder instance to build the biometric
+     *                          authentication dialog.
+     * @param keyName The name of the key in the Android KeyStore.
+     * @param flags The flags indicating the capabilities and status of the authenticator.
+     * @param options The PublicKeyCredentialRequestOptions containing the parameters for
+     *                the assertion process.
+     * @param message Optional additional message to include in the assertion.
+     *
+     * @return The constructed AuthenticatorAssertionResponse.
+     */
     suspend fun buildAuthenticatorAssertionResponse(
         activity: FragmentActivity,
         executor: Executor,
@@ -407,8 +586,23 @@ class Fido2Api {
         )
     }
 
+    /**
+     * Represents the result of a biometric prompt operation.
+     *
+     * @param T The type of data associated with the result.
+     */
     internal sealed class BiometricPromptResult<out T> {
+        /**
+         * Represents a successful biometric prompt operation.
+         * @property data The data associated with the success.
+         */
         data class Success<out T>(val data: T) : BiometricPromptResult<T>()
+
+        /**
+         * Represents a failed biometric prompt operation.
+         * @property errorMessage The error message associated with the failure.
+         * @property errorCode An optional error code associated with the failure.
+         */
         data class Failure(val errorMessage: String, val errorCode: Int? = null) :
             BiometricPromptResult<Nothing>()
     }

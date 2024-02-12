@@ -7,6 +7,15 @@ import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the response received after an attestation operation by an authenticator.
+ *
+ * @property id The identifier associated with the response.
+ * @property rawId The raw identifier associated with the response.
+ * @property response The attestation response containing client data JSON and attestation object.
+ * @property type The type of the response.
+ * @property nickname The nickname associated with the authenticator. Defaults to "FIDO2App - Android".
+ */
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class AuthenticatorAttestationResponse(
@@ -17,6 +26,12 @@ data class AuthenticatorAttestationResponse(
     @EncodeDefault(EncodeDefault.Mode.ALWAYS) val nickname: String = "FIDO2App - Android"
 )
 
+/**
+ * Represents the response data included in an attestation response.
+ *
+ * @property clientDataJSON The client data JSON included in the attestation response.
+ * @property attestationObject The attestation object included in the attestation response.
+ */
 @Serializable
 data class ResponseAttestation(
     val clientDataJSON: String,

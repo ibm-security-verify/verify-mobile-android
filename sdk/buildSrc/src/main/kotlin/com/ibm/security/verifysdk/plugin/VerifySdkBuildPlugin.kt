@@ -25,9 +25,9 @@ class VerifySdkBuildPlugin : Plugin<Project> {
         val androidExtension = project.extensions.getByName("android")
         if (androidExtension is BaseExtension) {
             androidExtension.apply {
-                compileSdkVersion(33)
+                compileSdkVersion(34)
                 defaultConfig {
-                    targetSdk = 30
+                    targetSdk = 34
                     minSdk = 29
                     versionCode = 101
                     versionName = "3.0.1"
@@ -44,7 +44,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
                 project.configurations.all {
                     resolutionStrategy.failOnVersionConflict()
                     resolutionStrategy.preferProjectModules()
-                    resolutionStrategy.force("com.fasterxml.woodstox:woodstox-core:6.4.0")
+//                    resolutionStrategy.force("com.fasterxml.woodstox:woodstox-core:6.4.0")
                 }
 
                 testOptions.unitTests {
@@ -96,7 +96,12 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             }
         }
 
+        val kotlin_coroutines = "1.7.3"
+        val kotlin_lib = "1.9.22"
+        val square = "4.12.0"
+
         project.dependencies {
+
             add("androidTestImplementation", "androidx.test.ext:junit:1.1.5")
             add("androidTestImplementation", "androidx.test:core:1.5.0")
             add("androidTestImplementation", "androidx.test:rules:1.5.0")
@@ -105,36 +110,36 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             add("androidTestImplementation", "androidx.test.uiautomator:uiautomator:2.2.0")
             add("androidTestImplementation", "junit:junit:4.13.1")
             add("androidTestImplementation", "org.junit.jupiter:junit-jupiter")    // JUnit5
-            add("androidTestImplementation", "org.mockito.kotlin:mockito-kotlin:4.0.0")
-            add("androidTestImplementation", "com.squareup.okhttp3:mockwebserver:4.10.0")
-            add("androidTestImplementation", "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1")
+            add("androidTestImplementation", "org.mockito.kotlin:mockito-kotlin:5.2.1")
+            add("androidTestImplementation", "com.squareup.okhttp3:mockwebserver:$square")
+            add("androidTestImplementation", "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlin_coroutines")
             add("androidTestImplementation", platform("org.junit:junit-bom:5.8.2"))          // JUnit5
             add("androidTestImplementation", "org.slf4j:slf4j-jdk14:2.0.7")
 
-            add("coreLibraryDesugaring", "com.android.tools:desugar_jdk_libs:1.1.5")
+            add("coreLibraryDesugaring", "com.android.tools:desugar_jdk_libs:2.0.4")
 
+            add("implementation", "androidx.biometric:biometric:1.2.0-alpha05")
             add("implementation", "androidx.core:core-ktx:1.12.0")
+            add("implementation", "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
             add("implementation", "com.google.code.gson:gson:2.9.0")
             add("implementation", "org.jacoco:org.jacoco.core:0.8.8")
             add("implementation", "com.squareup.retrofit2:retrofit:2.9.0")
             add("implementation", "com.squareup.retrofit2:converter-gson:2.9.0")
-            add("implementation", "com.squareup.okhttp3:okhttp:4.10.0")
-            add("implementation", "com.squareup.okhttp3:logging-interceptor:4.10.0")
-            add("implementation", "org.jetbrains.kotlin:kotlin-stdlib:1.9.10")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.6.4")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.6.4")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+            add("implementation", "com.squareup.okhttp3:okhttp:$square")
+            add("implementation", "com.squareup.okhttp3:logging-interceptor:$square")
+            add("implementation", "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_lib")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlin_coroutines")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-rx3:$kotlin_coroutines")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
             add("implementation", "org.slf4j:slf4j-api:2.0.7")
-            add("implementation", "androidx.browser:browser:1.5.0")
+            add("implementation", "androidx.browser:browser:1.7.0")
             add("implementation", "com.fasterxml.jackson.core:jackson-core:2.16.1")
-            add("implementation", "com.fasterxml.jackson.core:jackson-databind:2.16.1")
             add("implementation", "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.16.1")
 
             add("testImplementation", "junit:junit:4.13.1") // JUnit4 for Adaptive SDK
-//            add("testImplementation", "org.json:json:20220320")             // Using json in unit tests
         }
     }
 

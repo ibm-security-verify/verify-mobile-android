@@ -7,8 +7,15 @@ import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the entity associated with a public key credential user.
+ *
+ * @property id The identifier associated with the user.
+ * @property displayName The display name of the user.
+ * @property name The name of the user.
+ * @property icon The icon URL of the user. Defaults to null.
+ */
 @OptIn(ExperimentalSerializationApi::class)
-@Suppress("unused")
 @Serializable
 data class PublicKeyCredentialUserEntity(
     val id: String,
