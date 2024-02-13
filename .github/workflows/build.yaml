@@ -103,6 +103,7 @@ jobs:
           path: ~/.m2/repository/com/ibm/security
 
       - name: Publish to GitHub packages
+        working-directory: ./sdk
         run: ./gradlew publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
