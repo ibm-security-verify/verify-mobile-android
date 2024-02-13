@@ -102,6 +102,12 @@ jobs:
           name: maven-local
           path: ~/.m2/repository/com/ibm/security
 
+      - name: Publish to GitHub packages
+        run: ./gradlew publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
   owasp_scan:
     name: Run OWASP depedency scan
     runs-on: ubuntu-latest
