@@ -89,7 +89,7 @@ class Fido2Api {
      */
     fun createKeyPair(
         keyName: String,
-        authenticationRequired: Boolean = false,
+        authenticationRequired: Boolean = true,
         invalidatedByBiometricEnrollment: Boolean = false
     ): PublicKey {
 
@@ -175,7 +175,6 @@ class Fido2Api {
      *
      * This function sends the assertion result, represented by the
      * AuthenticatorAssertionResponse, to the specified URL on the server.
-     * It utilizes suspend coroutine mechanism for asynchronous execution.
      *
      * @param assertionResultUrl The URL to send the assertion result to.
      * @param authorization The authorization header value to be included in the request.

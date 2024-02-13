@@ -42,9 +42,12 @@ class VerifySdkBuildPlugin : Plugin<Project> {
                 }
 
                 project.configurations.all {
-                    resolutionStrategy.failOnVersionConflict()
-                    resolutionStrategy.preferProjectModules()
-//                    resolutionStrategy.force("com.fasterxml.woodstox:woodstox-core:6.4.0")
+                    resolutionStrategy {
+                        failOnVersionConflict()
+                        preferProjectModules()
+                        force("com.fasterxml.woodstox:woodstox-core:6.4.0")
+                        force("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.1")
+                    }
                 }
 
                 testOptions.unitTests {
