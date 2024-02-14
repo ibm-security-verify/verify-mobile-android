@@ -47,7 +47,7 @@ class RegistrationActivity : AppCompatActivity() {
             val accessToken = getSharedPreferences(
                 application.packageName,
                 Context.MODE_PRIVATE
-            ).getString("accessToken", null) ?: "e4p6DwatfV4gtzOUXACIxtxVkyPFba"
+            ).getString("accessToken", null) ?: "no access token found"
 
             lifecycleScope.launch {
                 getWhoAmI(accessToken)
