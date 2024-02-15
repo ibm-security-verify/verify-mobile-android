@@ -95,7 +95,7 @@ class AuthenticationActivity : AppCompatActivity() {
                     }
 
                     .onFailure {
-                        print("Failure: $it.message")
+                        println("Failure: $it.message")
                         displayError("${it.message}")
                     }
             }

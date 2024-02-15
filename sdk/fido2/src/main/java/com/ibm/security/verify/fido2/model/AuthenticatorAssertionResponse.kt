@@ -10,8 +10,8 @@ import kotlinx.serialization.Serializable
 /**
  * Represents the response received after an assertion operation by an authenticator.
  *
- * @property id The base64 encoded identifier associated with the response.
- * @property rawId The base64 encoded raw identifier associated with the response.
+ * @property id The base64 urlencoded identifier associated with the response.
+ * @property rawId The base64 urlencoded raw identifier associated with the response.
  * @property response The assertion response containing client data JSON, authenticator data, and signature.
  * @property type The type of the response.
  * @property nickname The nickname associated with the authenticator. Defaults to "FIDO2App - Android".
@@ -29,9 +29,9 @@ data class AuthenticatorAssertionResponse(
 /**
  * Represents the response data included in an assertion response.
  *
- * @property clientDataJSON The base64 encoded client data JSON included in the assertion response.
- * @property authenticatorData The base64 encoded authenticator data included in the assertion response.
- * @property signature The base64 encoded signature included in the assertion response.
+ * @property clientDataJSON The base64 urlencoded client data JSON included in the assertion response.
+ * @property authenticatorData The base64 urlencoded authenticator data included in the assertion response.
+ * @property signature The base64 urlencoded signature included in the assertion response.
  */
 @Serializable
 data class ResponseAssertion(
