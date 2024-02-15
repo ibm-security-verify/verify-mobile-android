@@ -121,7 +121,7 @@ lifecycleScope.launch {
             this@RegistrationActivity,
             ContextCompat.getMainExecutor(this@RegistrationActivity),
             promptInfoBuilder,
-            "6DC9F22D-2C0A-4461-B878-DE61E159EC61",
+            "ABCDEFGH-1234-5678-IJKL-MNOPQRSTUVWX",
             keyName,
             flags,
             publicKeyCredentialCreationOptions,
@@ -199,7 +199,7 @@ if (allowTransaction) {
 ```
 
 Pass the activity context, the dialog builder, the `publicKeyCredentialRequestOptions` from the previous network request and few other parameters to generate the `AuthenticatorAssertionResponse`. Due to the authentication dialog, this call needs to be wrapped in a coroutine.
-```Koltin
+```Kotlin
 lifecycleScope.launch {
     val authenticatorAssertionResponse: AuthenticatorAssertionResponse =
         fido2Api.buildAuthenticatorAssertionResponse(
