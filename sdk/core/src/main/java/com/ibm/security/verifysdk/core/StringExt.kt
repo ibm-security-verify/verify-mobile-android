@@ -33,3 +33,24 @@ fun String.snakeToCamelCase(): String {
             }
     }
 }
+
+fun String.decodeBase32(): ByteArray {
+    val map = ('A'..'Z') + ('2'..'7')
+    val reverseMap = map.withIndex().associate { it.value to it.index }
+
+    val paddingLength = when (val padding = this.count { it == '=' }) {
+        0, 6 -> 0
+        1, 3 -> 8 - padding
+        2, 4 -> 16 - padding
+        5 -> throw IllegalArgumentException("Invalid padding in base32 string")
+        else -> throw IllegalArgumentException("Invalid base32 string")
+    }
+
+    val binaryString = this
+        .replace("=", "")
+        .map { reverseMap[it]!! }
+        .joinToString("") { it.toString(2).padStart(5, '0') }
+        .dropLast(paddingLength)
+
+    return binaryString.chunked(8).map { it.toInt(2).toByte() }.toByteArray()
+}
