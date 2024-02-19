@@ -3,7 +3,7 @@
  */
 @file:Suppress("PropertyName")
 
-package com.ibm.security.verify.fido2.model
+package com.ibm.security.verifysdk.fido2.model
 
 import com.ibm.security.verifysdk.core.toJsonElement
 import com.ibm.security.verifysdk.core.toJsonObject

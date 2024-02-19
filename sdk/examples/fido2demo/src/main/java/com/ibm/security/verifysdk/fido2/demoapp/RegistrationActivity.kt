@@ -13,10 +13,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.ibm.security.verify.fido2.Fido2Api
-import com.ibm.security.verify.fido2.model.AttestationOptions
-import com.ibm.security.verify.fido2.model.AuthenticatorAttestationResponse
-import com.ibm.security.verify.fido2.model.PublicKeyCredentialCreationOptions
+import com.ibm.security.verifysdk.fido2.Fido2Api
+import com.ibm.security.verifysdk.fido2.model.AttestationOptions
+import com.ibm.security.verifysdk.fido2.model.AuthenticatorAttestationResponse
+import com.ibm.security.verifysdk.fido2.model.PublicKeyCredentialCreationOptions
 import com.ibm.security.verifysdk.fido2.demoapp.model.IvCreds
 import io.ktor.client.call.body
 import io.ktor.client.request.get

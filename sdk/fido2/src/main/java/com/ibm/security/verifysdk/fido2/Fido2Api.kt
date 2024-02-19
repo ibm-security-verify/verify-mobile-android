@@ -1,26 +1,25 @@
 /*
  *  Copyright contributors to the IBM Security Verify FIDO2 SDK for Android project
  */
-package com.ibm.security.verify.fido2
+package com.ibm.security.verifysdk.fido2
 
 import android.security.keystore.KeyProperties
-import android.util.Base64
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.PromptInfo.Builder
 import androidx.fragment.app.FragmentActivity
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
-import com.ibm.security.verify.fido2.model.AssertionOptions
-import com.ibm.security.verify.fido2.model.AssertionResultResponse
-import com.ibm.security.verify.fido2.model.AttestationOptions
-import com.ibm.security.verify.fido2.model.AttestationResultResponse
-import com.ibm.security.verify.fido2.model.AuthenticatorAssertionResponse
-import com.ibm.security.verify.fido2.model.AuthenticatorAttestationResponse
-import com.ibm.security.verify.fido2.model.ClientDataJsonAssertion
-import com.ibm.security.verify.fido2.model.ClientDataJsonAttestation
-import com.ibm.security.verify.fido2.model.PublicKeyCredentialCreationOptions
-import com.ibm.security.verify.fido2.model.PublicKeyCredentialRequestOptions
-import com.ibm.security.verify.fido2.model.ResponseAssertion
-import com.ibm.security.verify.fido2.model.ResponseAttestation
+import com.ibm.security.verifysdk.fido2.model.AssertionOptions
+import com.ibm.security.verifysdk.fido2.model.AssertionResultResponse
+import com.ibm.security.verifysdk.fido2.model.AttestationOptions
+import com.ibm.security.verifysdk.fido2.model.AttestationResultResponse
+import com.ibm.security.verifysdk.fido2.model.AuthenticatorAssertionResponse
+import com.ibm.security.verifysdk.fido2.model.AuthenticatorAttestationResponse
+import com.ibm.security.verifysdk.fido2.model.ClientDataJsonAssertion
+import com.ibm.security.verifysdk.fido2.model.ClientDataJsonAttestation
+import com.ibm.security.verifysdk.fido2.model.PublicKeyCredentialCreationOptions
+import com.ibm.security.verifysdk.fido2.model.PublicKeyCredentialRequestOptions
+import com.ibm.security.verifysdk.fido2.model.ResponseAssertion
+import com.ibm.security.verifysdk.fido2.model.ResponseAttestation
 import com.ibm.security.verifysdk.core.KeystoreHelper
 import com.ibm.security.verifysdk.core.NetworkHelper
 import com.ibm.security.verifysdk.core.base64UrlEncode

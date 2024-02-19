@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.ibm.security.verify.fido2.Fido2Api
+import com.ibm.security.verifysdk.fido2.Fido2Api
 import com.ibm.security.verifysdk.core.KeystoreHelper
 import com.ibm.security.verifysdk.core.NetworkHelper
 import okhttp3.logging.HttpLoggingInterceptor

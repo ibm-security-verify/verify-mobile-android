@@ -1,4 +1,4 @@
-package com.ibm.security.verify.fido2
+package com.ibm.security.verifysdk.fido2
 
 import org.junit.Test
 

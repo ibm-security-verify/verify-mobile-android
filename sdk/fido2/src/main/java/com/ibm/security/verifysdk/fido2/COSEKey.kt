@@ -1,7 +1,7 @@
 /*
  *  Copyright contributors to the IBM Security Verify FIDO2 SDK for Android project
  */
-package com.ibm.security.verify.fido2
+package com.ibm.security.verifysdk.fido2
 
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
 

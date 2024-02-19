@@ -10,7 +10,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.ibm.security.verify.fido2.model.AssertionResultResponse
+import com.ibm.security.verifysdk.fido2.model.AssertionResultResponse
 import io.ktor.util.decodeBase64Bytes
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
