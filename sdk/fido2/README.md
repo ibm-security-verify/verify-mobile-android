@@ -1,12 +1,11 @@
 # IBM Security Verify FIDO2™ SDK for Android
 
-The FIDO2 software development kit (SDK) is a native implementation of attestation and assertion ceremonies.  Essentially providing the equivalent
-of WebAuthn's `navigator.credentials.create()` and `navigator.credentials.get()` for native mobile apps.  The FIDO2 SDK supports custom certificate attestation and authenticator extensions.
+The FIDO2 software development kit (SDK) for Android is a native implementation of FIDO attestation and assertion ceremonies. The SDK essentially provides the equivalent of WebAuthn's `navigator.credentials.create()` and `navigator.credentials.get()` for native mobile applications with specific security requirements. It is distinctly different from Google's [FIDO2 API for Android](https://developers.google.com/identity/fido/android/native-apps), in the following ways:
+- The FIDO2 SDK always creates device-bound ES256 keys using the Android native [KeyPairGenerator API](https://developer.android.com/reference/kotlin/java/security/KeyPairGenerator.html). The FIDO2 API for Android integrates with platform credential management and permits credential creation including synchronised credentials in any registered credential provider.
+- The FIDO2 SDK allows the integration of extensions such as the `txAuthSimple` extension which facilitates "what you see is what you sign" operations. The FIDO2 API for Android is for authentication only and does not support modifications to the text displayed in system authentication dialogs.
+- The FIDO2 SDK permits integration of your own attestation implementation if desired. The FIDO2 API for Android currently relies on Google Play Store to provide an attestation. This is not always available on all Android devices.
 
-Distinguished from the  [FIDO2 API for Android](https://developers.google.com/identity/fido/android/native-apps), this SDK exhibits the following distinctions:
-- Exclusive support for ES256 keys ensures heightened cryptographic security.
-- Seamless integration of the `txAuthSimple` extension enhances authentication capabilities.
-- Elimination of the necessity for a Digital Asset Links file (`assetlinks.json`) streamlines deployment processes and enhances overall flexibility.
+This FIDO2 SDK is well suited for developers of pure native mobile applications that wish to provision only device-bound keys in scenarios where the use of synchronized passkeys for example is not suitable.
 
 
 ## Example
