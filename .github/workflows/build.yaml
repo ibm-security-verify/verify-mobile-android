@@ -226,12 +226,6 @@ jobs:
           mv ./sdk/adaptive/build/outputs/aar/adaptive-release.aar ./sdk/adaptive/build/outputs/aar/IBM-Verify-SDK_adaptive_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
           mv ./sdk/authentication/build/outputs/aar/authentication-release.aar ./sdk/authentication/build/outputs/aar/IBM-Verify-SDK_authentication_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
 
-      - name: Rename dependency scan files
-        run: |
-          mv ./sdk/core/build/reports/dependency-check-report.html ./sdk/core/build/reports/IBM-Verify-SDK_core_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_dependency-check-report.html
-          mv ./sdk/adaptive/build/reports/dependency-check-report.html ./sdk/adaptive/build/reports/IBM-Verify-SDK_adaptive_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_dependency-check-report.html
-          mv ./sdk/authentication/build/reports/dependency-check-report.html ./sdk/authentication/build/reports/IBM-Verify-SDK_authentication_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_dependency-check-report.html
-          
       - name: Move maven files to accessible folder
         run: |
           mkdir -p ./sdk/maven 
