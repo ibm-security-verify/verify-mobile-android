@@ -3,7 +3,7 @@
 The FIDO2 software development kit (SDK) is a native implementation of attestation and assertion ceremonies.  Essentially providing the equivalent
 of WebAuthn's `navigator.credentials.create()` and `navigator.credentials.get()` for native mobile apps.  The FIDO2 SDK supports custom certificate attestation and authenticator extensions.
 
-In contrast to the [FIDO2 API for Android](https://developers.google.com/identity/fido/android/native-apps), our SDK has the following differences:
+Distinguished from the  [FIDO2 API for Android](https://developers.google.com/identity/fido/android/native-apps), this SDK exhibits the following distinctions:
 - Exclusive support for ES256 keys ensures heightened cryptographic security.
 - Seamless integration of the `txAuthSimple` extension enhances authentication capabilities.
 - Elimination of the necessity for a Digital Asset Links file (`assetlinks.json`) streamlines deployment processes and enhances overall flexibility.
