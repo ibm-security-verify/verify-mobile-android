@@ -1,69 +1,16 @@
-# IBM Security Verify FIDO2™ SDK for Android
+# Module FIDO2 SDK for Android
 
 The FIDO2 software development kit (SDK) is a native implementation of attestation and assertion ceremonies.  Essentially providing the equivalent
 of WebAuthn's `navigator.credentials.create()` and `navigator.credentials.get()` for native mobile apps.  The FIDO2 SDK supports custom certificate attestation and authenticator extensions.
 
-Distinguished from the  [FIDO2 API for Android](https://developers.google.com/identity/fido/android/native-apps), this SDK exhibits the following distinctions:
+In contrast to the [FIDO2 API for Android](https://developers.google.com/identity/fido/android/native-apps), our SDK has the following differences:
 - Exclusive support for ES256 keys ensures heightened cryptographic security.
 - Seamless integration of the `txAuthSimple` extension enhances authentication capabilities.
 - Elimination of the necessity for a Digital Asset Links file (`assetlinks.json`) streamlines deployment processes and enhances overall flexibility.
 
 
 ## Example
-An [example](../../examples/fido2) application is available for the FIDO2 SDK.
-
-## Getting started
-
-### Installation
-
-1. Download all files from [Releases](https://github.com/ibm-security-verify/verify-sdk-android/releases/latest) for the `core` and `fido2` SDKs.
-
-1. Install the SDKs to your local Maven repository (usually it's `~/.m2`):
-
-```
-SDK_VERSION = 3.0.1
-
-### The name of the SDK: core | fido2
-SDK = core 
-
-### Install binary and pom file
-mvn install:install-file -Dfile=$SDK-$SDK_VERSION.aar -DgroupId=com.ibm.security.verifysdk -DartifactId=$SDK -Dversion=$SDK_VERSION -Dpackaging=aar -DpomFile=$SDK-$SDK_VERSION.pom
-
-### Install javadoc
-mvn install:install-file -Dfile=$SDK-$SDK_VERSION-javadoc.jar -DgroupId=com.ibm.security.verifysdk -DartifactId=$SDK -Dversion=$SDK_VERSION -Dpackaging=jar -Dclassifier=javadoc
-
-### Install sources
-mvn install:install-file -Dfile=$SDK-$SDK_VERSION-sources.jar -DgroupId=com.ibm.security.verifysdk -DartifactId=$SDK -Dversion=$SDK_VERSION -Dpackaging=jar -Dclassifier=sources
-``` 
-
-### API documentation
-The FIDO2 SDK API can be reviewed [here](https://ibm-security-verify.github.io/android/fido2/docs).
-
-### Add the SDK to your project
-
-1. Add your local Maven repository to the list of repositories in `settings.gradle`:
-```gradle
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        mavenLocal()
-    }
-}
-```
-
-1. Add the libraries to the dependencies list in `build.gradle` (app):
-```gradle
-dependencies {
-    implementation("com.ibm.security.verifysdk:core:3.0.1")
-    implementation("com.ibm.security.verifysdk:fido2:3.0.1")
-    ...
-}
-```
-
-Sync project with Gradle files. 
-
+An [example](https://github.com/ibm-security-verify/verify-sdk-android/tree/main/sdk/examples/fido2) application is available for the FIDO2 SDK.
 
 ## Usage
 
@@ -111,7 +58,7 @@ flags = (flags or 0x04) // userVerification (UV)
 flags = (flags or 0x40) // attestedCredentialData (AT)
 ```
 
-Pass the activity context, the dialog builder, the `publicKeyCredentialCreationOptions` from the previous network request and few other parameters to generate the `AuthenticatorAttestationResponse`. Due to the authentication dialog, this call needs to be wrapped in a coroutine.
+Pass the activity context, the dialog builder, the `publicKeyCredentialCreationOptions` from the previous network request and other parameters to generate the `AuthenticatorAttestationResponse`. Due to the authentication dialog, this call needs to be wrapped in a coroutine.
 ```Kotlin
 lifecycleScope.launch {
     val authenticatorAssertionResponse: AuthenticatorAttestationResponse =
@@ -196,7 +143,7 @@ if (allowTransaction) {
 }
 ```
 
-Pass the activity context, the dialog builder, the `publicKeyCredentialRequestOptions` from the previous network request and few other parameters to generate the `AuthenticatorAssertionResponse`. Due to the authentication dialog, this call needs to be wrapped in a coroutine.
+Pass the activity context, the dialog builder, the `publicKeyCredentialRequestOptions` from the previous network request and other parameters to generate the `AuthenticatorAssertionResponse`. Due to the authentication dialog, this call needs to be wrapped in a coroutine.
 ```Kotlin
 lifecycleScope.launch {
     val authenticatorAssertionResponse: AuthenticatorAssertionResponse =
@@ -231,7 +178,4 @@ lifecycleScope.launch {
 }
 ```
 
-## License
-This package contains code licensed under the MIT License (the "License"). You may view the License in the [LICENSE](../../LICENSE) file within this package.
-<br/><br/>
-FIDO™ and FIDO2™  are  trademarks (registered in numerous countries) of FIDO Alliance, Inc. 
+# Package com.ibm.security.verifysdk.fido2
