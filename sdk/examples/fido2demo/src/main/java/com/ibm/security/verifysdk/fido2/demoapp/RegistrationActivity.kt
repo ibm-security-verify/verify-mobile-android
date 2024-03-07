@@ -40,6 +40,14 @@ class RegistrationActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.button_initiate_registration).setOnClickListener {
 
+            findViewById<EditText>(R.id.edit_text_access_token).let { editText ->
+                if (editText.text.toString().isNotEmpty()) {
+                    getSharedPreferences(application.packageName, Context.MODE_PRIVATE).edit().putString(
+                        "accessToken", editText.text.toString()
+                    ).apply()
+                }
+            }
+
             val relyingPartyUrl =
                 findViewById<EditText>(R.id.edit_text_relying_party_url).text.toString()
             val nickName =
