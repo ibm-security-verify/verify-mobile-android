@@ -24,10 +24,13 @@ android {
     namespace = "com.ibm.security.verifysdk.core"
 }
 
+dependencies {
+}
+
 tasks {
     register("androidJavadocJar", Jar::class) {
         archiveClassifier.set("javadoc")
-        from("$buildDir/javadoc")
+        from("${project.layout.buildDirectory}/javadoc")
         dependsOn(dokkaJavadoc)
     }
     register("androidSourcesJar", Jar::class) {

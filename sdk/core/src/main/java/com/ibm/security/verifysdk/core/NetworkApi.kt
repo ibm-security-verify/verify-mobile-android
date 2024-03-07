@@ -1,5 +1,6 @@
 package com.ibm.security.verifysdk.core
 
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -61,4 +62,12 @@ interface NetworkApi {
         @FieldMap additionalParameters: Map<String, String>
     ): Response<ResponseBody>
 
+    @POST
+    @Headers("Accept: application/json", "Content-Type: application/json")
+    suspend fun postRequest(
+        @HeaderMap headers: Map<String, String>,
+        @Url url: String,
+        @Header("Authorization") authorization: String,
+        @Body body: RequestBody
+    ): Response<ResponseBody>
 }

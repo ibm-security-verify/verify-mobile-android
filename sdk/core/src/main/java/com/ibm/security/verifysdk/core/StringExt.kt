@@ -4,6 +4,8 @@
 
 package com.ibm.security.verifysdk.core
 
+import com.ibm.security.verifysdk.core.KeystoreHelper.hash
+
 
 fun String.toNumberOrNull(): Number? {
 
@@ -13,4 +15,8 @@ fun String.toNumberOrNull(): Number? {
 fun String.toNumberOrDefault(default: Number): Number {
 
     return this.toIntOrNull() ?: this.toLongOrNull() ?: this.toDoubleOrNull() ?: default
+}
+
+fun String.sha256(): String {
+    return hash(this, "SHA-256")
 }
