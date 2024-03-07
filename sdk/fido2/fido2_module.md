@@ -1,4 +1,4 @@
-# Module IBM Security Verify FIDO2™ SDK for Android
+# Module IBM Security Verify FIDO2(TM) SDK for Android
 
 The IBM Security Verify FIDO2™ SDK for Android is a native implementation of FIDO attestation and assertion ceremonies. The SDK essentially provides the equivalent of WebAuthn's `navigator.credentials.create()` and `navigator.credentials.get()` for native mobile applications with specific security requirements. It is distinctly different from Google's [FIDO2 API for Android](https://developers.google.com/identity/fido/android/native-apps), in the following ways:
 - The Verify FIDO2 SDK for Android always creates device-bound ES256 keys using the Android native [KeyPairGenerator API](https://developer.android.com/reference/kotlin/java/security/KeyPairGenerator.html). The Verify FIDO2 SDK for Android integrates with platform credential management and permits credential creation including synchronised credentials in any registered credential provider.
