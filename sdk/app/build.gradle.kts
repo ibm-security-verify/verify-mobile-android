@@ -42,6 +42,12 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        force("com.squareup.okio:okio-jvm:3.4.0")
+    }
+}
+
 dependencies {
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
