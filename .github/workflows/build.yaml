@@ -102,6 +102,12 @@ jobs:
           name: maven-local
           path: ~/.m2/repository/com/ibm/security
 
+      - name: Publish to GitHub packages
+        working-directory: ./sdk
+        run: ./gradlew publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   coverage_report:
     name: Generate code coverage report
     runs-on: ubuntu-latest
