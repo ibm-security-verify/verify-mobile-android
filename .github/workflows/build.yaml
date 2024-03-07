@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Code checkout
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.1.1
 
       - name: Extract version
         id: set-vars
@@ -47,19 +47,19 @@ jobs:
 
     steps:  
       - name: Code checkout
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.1.1
 
       - name: Install Java
-        uses: actions/setup-java@v4.2.0
+        uses: actions/setup-java@v4.1.0
         with:
           java-version: '17'
           distribution: 'adopt'
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v3.2.0
 
       - name: Load cache
-        uses: actions/cache@v4.2.0
+        uses: actions/cache@v4.0.1
         with:
           path: |
             ~/.gradle/caches
@@ -83,7 +83,7 @@ jobs:
         run: ./gradlew --no-daemon test
 
       - name: Store build and test artifacts
-        uses: actions/upload-artifact@v4.2.0
+        uses: actions/upload-artifact@v4.3.1
         with:
           name: build-and-test
           path: |
@@ -91,13 +91,13 @@ jobs:
             ./sdk/**/build/reports/
 
       - name: Store documentation
-        uses: actions/upload-artifact@v4.2.0
+        uses: actions/upload-artifact@v4.3.1
         with:
           name: documentation
           path: ./sdk/**/build/dokka/       
 
       - name: Store Maven files
-        uses: actions/upload-artifact@v4.2.0
+        uses: actions/upload-artifact@v4.3.1
         with:
           name: maven-local
           path: ~/.m2/repository/com/ibm/security
@@ -115,19 +115,19 @@ jobs:
 
     steps:
       - name: Code checkout
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.1.1
 
       - name: Install Java
-        uses: actions/setup-java@v4.2.0
+        uses: actions/setup-java@v4.1.0
         with:
           java-version: '17'
           distribution: 'adopt'
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v4.2.0
+        uses: android-actions/setup-android@v3.2.0
 
       - name: Load cache
-        uses: actions/cache@v4.2.0
+        uses: actions/cache@v4.0.1
         with:
           path: |
             ~/.gradle/caches
@@ -146,7 +146,7 @@ jobs:
           script: ./gradlew --no-daemon jacocoDebugCoverageReport
 
       - name: Store code coverage report
-        uses: actions/upload-artifact@v4.2.0
+        uses: actions/upload-artifact@v4.3.1
         with:
           name: code-coverage
           path: ./sdk/app/build/reports/jacoco/jacocoDebugCoverageReport/
@@ -165,12 +165,12 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0
       
       - name: Install Java
-        uses: actions/setup-java@v4.2.0
+        uses: actions/setup-java@v4.1.0
         with:
           java-version: '17'
           distribution: 'adopt'
@@ -202,25 +202,25 @@ jobs:
         run: mkdir -p ./sdk
 
       - name: Collect alle artificats
-        uses: actions/download-artifact@v4.2.0
+        uses: actions/download-artifact@4.1.4
         with:
           name: build-and-test
           path: ./sdk
 
       - name: Collect documentation artificats
-        uses: actions/download-artifact@v4.2.0
+        uses: actions/download-artifact@4.1.4
         with:
           name: documentation
           path: ./sdk     
 
       - name: Collect maven-local artificats
-        uses: actions/download-artifac@v4.2.0
+        uses: actions/download-artifact@v4.1.4
         with:
           name: maven-local
           path: ~/.m2/repository/com/ibm/security
 
       - name: Collect code coverate result
-        uses: actions/download-artifact@v4.2.0
+        uses: actions/download-artifact@4.1.4
         if: false
         with:
           name: code-coverage
