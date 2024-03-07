@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AuthenticationActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            android:padding="32dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Your FIDO authenticator has been registered."
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/text_view_relying_party_url"
+                android:text="Relying Party URL" />
+
+            <TextView
+                android:id="@+id/text_view_relying_party_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/text_view_nickname"
+                android:text="Nickname" />
+
+            <TextView
+                android:id="@+id/text_view_nickname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/text_view_created_at"
+                android:text="Created at" />
+
+            <TextView
+                android:id="@+id/text_view_created_at"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp" />
+
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/allow_transaction_confirmation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Allow transaction confirmation"
+                android:layout_marginBottom="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:labelFor="@id/edit_text_transaction_message"
+                android:text="Transaction message" />
+
+            <EditText
+                android:id="@+id/edit_text_transaction_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="18dp"
+                android:text=""
+                android:textSize="16sp"
+
+                android:inputType="text" />
+
+            <Button
+                android:id="@+id/button_initiate_authentication"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:text="Authenticate" />
+
+            <Button
+                android:id="@+id/button_remove_authenticator"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:text="Remove"
+                android:textColor="?attr/colorError" />
+        </LinearLayout>
+
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

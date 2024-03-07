@@ -102,41 +102,11 @@ jobs:
           name: maven-local
           path: ~/.m2/repository/com/ibm/security
 
-  owasp_scan:
-    name: Run OWASP depedency scan
-    runs-on: ubuntu-latest
-    needs: setup_environment
-
-    steps:  
-      - name: Code checkout
-        uses: actions/checkout@v3
-
-      - name: Install Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'adopt'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
-
-      - name: Load cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}      
-   
-      - name: Run OWASP dependency scan
+      - name: Publish to GitHub packages
         working-directory: ./sdk
-        run: ./gradlew --no-daemon dependencyCheckAnalyze
-
-      - name: Store OWASP dependency scan reports
-        uses: actions/upload-artifact@v3
-        with:
-          name: owasp-test
-          path: ./sdk/**/build/reports/dependency-check-report.html
+        run: ./gradlew publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   coverage_report:
     name: Generate code coverage report
@@ -218,7 +188,7 @@ jobs:
   publish:
     name: Publish SDK, reports and documentation
     runs-on: ubuntu-latest
-    needs: [setup_environment, coverage_report, build_and_test, owasp_scan, mend_scan]
+    needs: [setup_environment, coverage_report, build_and_test, mend_scan]
 
     steps:
       - name: Verify release title
@@ -249,12 +219,6 @@ jobs:
           name: maven-local
           path: ~/.m2/repository/com/ibm/security
 
-      - name: Collect owasp-scan result
-        uses: actions/download-artifact@v3
-        with:
-          name: owasp-test
-          path: ./sdk
-
       - name: Collect code coverate result
         uses: actions/download-artifact@v3
         if: false
@@ -268,12 +232,6 @@ jobs:
           mv ./sdk/adaptive/build/outputs/aar/adaptive-release.aar ./sdk/adaptive/build/outputs/aar/IBM-Verify-SDK_adaptive_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
           mv ./sdk/authentication/build/outputs/aar/authentication-release.aar ./sdk/authentication/build/outputs/aar/IBM-Verify-SDK_authentication_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
 
-      - name: Rename dependency scan files
-        run: |
-          mv ./sdk/core/build/reports/dependency-check-report.html ./sdk/core/build/reports/IBM-Verify-SDK_core_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_dependency-check-report.html
-          mv ./sdk/adaptive/build/reports/dependency-check-report.html ./sdk/adaptive/build/reports/IBM-Verify-SDK_adaptive_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_dependency-check-report.html
-          mv ./sdk/authentication/build/reports/dependency-check-report.html ./sdk/authentication/build/reports/IBM-Verify-SDK_authentication_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_dependency-check-report.html
-          
       - name: Move maven files to accessible folder
         run: |
           mkdir -p ./sdk/maven 

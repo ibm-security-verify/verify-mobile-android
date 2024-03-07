@@ -5,6 +5,7 @@
 package com.ibm.security.verifysdk.core
 
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.CertificatePinner
 import okhttp3.Interceptor
@@ -128,7 +129,10 @@ object NetworkHelper {
             if (response.isSuccessful && body != null) {
                 Result.success(json.decodeFromString(body.string()))
             } else {
-                val errorBody = response.errorBody()?.string() ?: ""
+                val errorBody = json.encodeToString(
+                    response.errorBody()?.string()
+                        ?: "{\"errorDescription\":\"No error description found in response.\"}"
+                )
                 Result.failure(AuthenticationException("IVMCR0001E", errorBody))
             }
         } catch (e: HttpException) {
