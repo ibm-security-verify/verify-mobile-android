@@ -35,6 +35,8 @@ internal class OAuthProviderTest {
 
     @Suppress("unused")
     private val log: Logger = LoggerFactory.getLogger(javaClass)
+    
+    private val schema = "http"
 
     companion object {
 
@@ -101,7 +103,7 @@ internal class OAuthProviderTest {
         addMockResponse(200, responseAuthorizeOk)
         val result =
             oAuthProviderSecretNull.refresh(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("$schema://localhost:44444/v1.0/endpoint/default/token)"),
                 "refreshToken",
                 arrayOf("name", "age")
             )
@@ -126,7 +128,7 @@ internal class OAuthProviderTest {
         addMockResponse(200, responseRefreshOk)
         val result =
             oAuthProvider.refresh(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("$schema://localhost:44444/v1.0/endpoint/default/token)"),
                 "refreshToken",
                 arrayOf("name", "age")
             )
@@ -151,7 +153,7 @@ internal class OAuthProviderTest {
         addMockResponse(200, responseRefreshOk)
         val result =
             oAuthProvider.refresh(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("https://localhost:44444/v1.0/endpoint/default/token)".replace("s:/", ":/")),
                 "refreshToken"
             )
 
@@ -175,7 +177,7 @@ internal class OAuthProviderTest {
         addMockResponse(200, "")
         val result =
             oAuthProvider.refresh(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("$schema://localhost:44444/v1.0/endpoint/default/token)"),
                 "refreshToken"
             )
 
@@ -189,7 +191,7 @@ internal class OAuthProviderTest {
         addMockResponse(200, responseAuthorizeOk)
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("$schema://localhost:44444/v1.0/endpoint/default/token)"),
                 URL("https://callback"),
                 "authorizationCode",
                 "codeVerifier",
@@ -215,7 +217,7 @@ internal class OAuthProviderTest {
         addMockResponse(200, responseAuthorizeOk)
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("$schema://localhost:44444/v1.0/endpoint/default/token)"),
                 URL("https://callback"),
                 "authorizationCode",
                 null,
@@ -242,7 +244,7 @@ internal class OAuthProviderTest {
         addMockResponse(200, responseAuthorizeOk)
         val result =
             oAuthProviderSecretNull.authorize(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("$schema://localhost:44444/v1.0/endpoint/default/token)"),
                 URL("https://callback"),
                 "authorizationCode",
                 "codeVerifier",
@@ -267,7 +269,7 @@ internal class OAuthProviderTest {
         addMockResponse(500, "Server error")
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("$schema://localhost:44444/v1.0/endpoint/default/token)"),
                 URL("https://callback"),
                 "authorizationCode",
                 "codeVerifier",
@@ -291,7 +293,7 @@ internal class OAuthProviderTest {
         addMockResponse(200, "")
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("$schema://localhost:44444/v1.0/endpoint/default/token)"),
                 URL("https://callback"),
                 "authorizationCode",
                 "codeVerifier",
@@ -321,7 +323,7 @@ internal class OAuthProviderTest {
         addMockResponse(200, responseAuthorizeOk)
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("https://localhost:44444/v1.0/endpoint/default/token)"),
                 "username",
                 "password"
             )
@@ -345,7 +347,7 @@ internal class OAuthProviderTest {
         addMockResponse(200, responseAuthorizeOk)
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("$schema://localhost:44444/v1.0/endpoint/default/token)"),
                 "username",
                 "password",
                 arrayOf("name", "age")
@@ -373,7 +375,7 @@ internal class OAuthProviderTest {
         addMockResponse(200, responseAuthorizeOk)
         val result =
             oAuthProviderSecretNull.authorize(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("$schema://localhost:44444/v1.0/endpoint/default/token)"),
                 "username",
                 "password",
                 arrayOf("name", "age")
@@ -400,7 +402,7 @@ internal class OAuthProviderTest {
         addMockResponse(200, "")
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("$schema://localhost:44444/v1.0/endpoint/default/token)"),
                 "username",
                 "password"
             )
@@ -422,7 +424,7 @@ internal class OAuthProviderTest {
         addMockResponse(500, "Server error")
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("$schema://localhost:44444/v1.0/endpoint/default/token)"),
                 "username",
                 "password"
             )
@@ -452,7 +454,7 @@ internal class OAuthProviderTest {
         )
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+                URL("$schema://localhost:44444/v1.0/endpoint/default/token)"),
                 "username",
                 "password"
             )
@@ -467,7 +469,7 @@ internal class OAuthProviderTest {
 
         addMockResponse(500, "Server error")
         val result =
-            oAuthProvider.discover(URL("http://localhost:44444/.well-known/openid-configuration"))
+            oAuthProvider.discover(URL("$schema://localhost:44444/.well-known/openid-configuration"))
 
         mockWebServer.takeRequest(10, TimeUnit.SECONDS)?.let { request ->
             assertEquals("GET", request.method)
@@ -487,7 +489,7 @@ internal class OAuthProviderTest {
     fun discover_happyPath_shouldReturnSuccess() = runTest {
         addMockResponse(200, responseDiscoveryOk)
         val result =
-            oAuthProvider.discover((URL("http://localhost:44444/.well-known/openid-configuration")))
+            oAuthProvider.discover((URL("$schema://localhost:44444/.well-known/openid-configuration")))
 
         mockWebServer.takeRequest(10, TimeUnit.SECONDS)
 
@@ -515,7 +517,7 @@ internal class OAuthProviderTest {
             "{\"foo\":\"bar\"}"
         )
         val result =
-            oAuthProvider.discover(URL("http://localhost:44444/.well-known/openid-configuration"))
+            oAuthProvider.discover(URL("$schema://localhost:44444/.well-known/openid-configuration"))
 
         mockWebServer.takeRequest(10, TimeUnit.SECONDS)
 
