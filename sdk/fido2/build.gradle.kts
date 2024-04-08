@@ -1,4 +1,8 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import org.jetbrains.dokka.base.DokkaBase
+import org.jetbrains.dokka.base.DokkaBaseConfiguration
+import org.jetbrains.dokka.gradle.DokkaTask
+import java.net.URL
 
 plugins {
     id("com.android.library")
@@ -112,6 +116,28 @@ configure<PublishingExtension> {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+tasks.withType<DokkaTask>().configureEach {
+    pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+        footerMessage = "(c) 2024 IBM"
+        separateInheritedMembers = false
+        mergeImplicitExpectActualDeclarations = false
+    }
+    dokkaSourceSets {
+        named("main") {
+            moduleName.set("IBM Security Verify FIDO2(TM) SDK for Android")
+            includes.from("fido2_module.md")
+
+            // adds source links that lead to this repository, allowing readers
+            // to easily find source code for inspected declarations
+            sourceLink {
+                localDirectory.set(file("src/main/java"))
+                remoteUrl.set(URL("https://github.com/ibm-security-verify/verify-sdk-android/tree/main/sdk/fido2/src/main/java/"))
+                remoteLineSuffix.set("#L")
             }
         }
     }

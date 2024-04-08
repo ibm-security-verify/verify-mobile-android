@@ -99,6 +99,15 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             }
         }
 
+        // https://github.com/Kotlin/dokka/issues/3472
+        project.configurations.matching { it.name.startsWith("dokka") }.configureEach {
+            resolutionStrategy.eachDependency {
+                if (requested.group.startsWith("com.fasterxml.jackson")) {
+                    useVersion("2.15.3")
+                }
+            }
+        }
+
         val kotlin_coroutines = "1.7.3"
         val kotlin_lib = "1.9.22"
         val square = "4.12.0"
