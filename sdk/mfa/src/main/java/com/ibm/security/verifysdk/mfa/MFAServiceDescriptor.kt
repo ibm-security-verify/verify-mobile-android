@@ -6,6 +6,16 @@ package com.ibm.security.verifysdk.mfa
 
 import com.ibm.security.verifysdk.authentication.TokenInfo
 import com.ibm.security.verifysdk.core.NetworkHelper
+import io.ktor.client.request.accept
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -34,15 +44,25 @@ typealias NextTransactionInfo = Pair<PendingTransactionInfo?, Int>
 suspend fun MFAServiceDescriptor.login(loginUri: URL, code: String): Result<Unit> {
     val body: RequestBody = "{\"lsi\":$code}".toRequestBody("text/plain".toMediaTypeOrNull())
 
-    return try {
-        NetworkHelper.handleApi(
-            NetworkHelper.networkApi().login(
-                loginUri.toString(),
-                authorizationHeader,
-                body
-            )
-        )
+    val decoder = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+    }
 
+    return try {
+        val response = NetworkHelper.getInstance.post {
+            url(loginUri.toString())
+            accept(ContentType.Application.Json)
+            contentType(ContentType.Application.Json)
+            bearerAuth(authorizationHeader)
+            setBody(body)
+        }
+
+        if (response.status.isSuccess()) {
+            Result.success(decoder.decodeFromString<Unit>(response.bodyAsText()))
+        } else {
+            Result.failure(MFAServiceError.General(response.bodyAsText()))
+        }
     } catch (e: Throwable) {
         Result.failure(e)
     }

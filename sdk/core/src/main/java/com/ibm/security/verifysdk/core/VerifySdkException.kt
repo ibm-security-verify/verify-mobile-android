@@ -16,7 +16,7 @@ import java.lang.System.getProperty
 @ExperimentalSerializationApi
 @Suppress("MemberVisibilityCanBePrivate")
 abstract class VerifySdkException(
-    val errorMessage: String,
+    private val errorMessage: String,
     private val throwable: Throwable? = null
 ) : Throwable(throwable) {
 

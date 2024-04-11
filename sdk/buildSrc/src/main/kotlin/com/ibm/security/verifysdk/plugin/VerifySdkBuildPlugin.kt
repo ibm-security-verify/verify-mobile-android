@@ -22,7 +22,6 @@ class VerifySdkBuildPlugin : Plugin<Project> {
         project.plugins.apply("kotlinx-serialization")
         project.plugins.apply("maven-publish")
         project.plugins.apply("org.jetbrains.dokka")
-        project.plugins.apply("org.owasp.dependencycheck")
         project.plugins.apply("com.github.ben-manes.versions")
 
         val androidExtension = project.extensions.getByName("android")
@@ -102,6 +101,9 @@ class VerifySdkBuildPlugin : Plugin<Project> {
         }
 
         project.dependencies {
+
+            val ktorVersion = "2.3.7"
+
             add("androidTestImplementation", "androidx.test.ext:junit:1.1.5")
             add("androidTestImplementation", "androidx.test:core:1.5.0")
             add("androidTestImplementation", "androidx.test:rules:1.5.0")
@@ -115,16 +117,23 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             add("androidTestImplementation", "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1")
             add("androidTestImplementation", platform("org.junit:junit-bom:5.8.2"))          // JUnit5
             add("androidTestImplementation", "org.slf4j:slf4j-jdk14:2.0.7")
+            add("androidTestImplementation", "io.ktor:ktor-client-mock:$ktorVersion")
 
             add("coreLibraryDesugaring", "com.android.tools:desugar_jdk_libs:1.1.5")
 
             add("implementation", "androidx.core:core-ktx:1.7.0")
-//            add("implementation", "com.google.code.gson:gson:2.9.0")
             add("implementation", "org.jacoco:org.jacoco.core:0.8.8")
             add("implementation", "com.squareup.retrofit2:retrofit:2.9.0")
-//            add("implementation", "com.squareup.retrofit2:converter-gson:2.9.0")
             add("implementation", "com.squareup.okhttp3:okhttp:4.10.0")
             add("implementation", "com.squareup.okhttp3:logging-interceptor:4.10.0")
+
+            add("implementation", "io.ktor:ktor-client-core:$ktorVersion")
+            add("implementation", "io.ktor:ktor-client-logging:$ktorVersion")
+            add("implementation", "io.ktor:ktor-client-serialization:$ktorVersion")
+            add("implementation", "io.ktor:ktor-client-auth:$ktorVersion")
+            add("implementation", "io.ktor:ktor-client-okhttp:$ktorVersion")
+            add("implementation", "io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+            add("implementation", "io.ktor:ktor-client-content-negotiation:$ktorVersion")
             add("implementation", "org.jetbrains.kotlin:kotlin-stdlib:1.8.10")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.2")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")

@@ -5,9 +5,10 @@
 package com.ibm.security.verifysdk.mfa.cloud
 
 import com.ibm.security.verifysdk.authentication.TokenInfo
+import com.ibm.security.verifysdk.core.AuthorizationException
+import com.ibm.security.verifysdk.core.ErrorResponse
 import com.ibm.security.verifysdk.core.NetworkHelper
 import com.ibm.security.verifysdk.mfa.MFAAttributeInfo
-import com.ibm.security.verifysdk.mfa.MFARegistrationError
 import com.ibm.security.verifysdk.mfa.MFAServiceDescriptor
 import com.ibm.security.verifysdk.mfa.MFAServiceError
 import com.ibm.security.verifysdk.mfa.NextTransactionInfo
@@ -15,11 +16,20 @@ import com.ibm.security.verifysdk.mfa.PendingTransactionInfo
 import com.ibm.security.verifysdk.mfa.TransactionAttribute
 import com.ibm.security.verifysdk.mfa.TransactionResult
 import com.ibm.security.verifysdk.mfa.UserAction
-import kotlinx.serialization.decodeFromString
+import io.ktor.client.call.body
+import io.ktor.client.request.accept
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
 import org.json.JSONArray
 import org.json.JSONObject
@@ -28,12 +38,18 @@ import java.net.URL
 import java.util.Locale
 import java.util.UUID
 
+@OptIn(ExperimentalSerializationApi::class)
 class CloudAuthenticatorService(
     private var _authorizationHeader: String,
     private var _refreshUri: URL,
     private var _transactionUri: URL,
     private var authenticatorId: String
 ) : MFAServiceDescriptor {
+
+    private val decoder = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+    }
 
     private var _currentPendingTransaction: PendingTransactionInfo? = null
     private var transactionResult: TransactionResult? = null
@@ -76,12 +92,20 @@ class CloudAuthenticatorService(
                 "attributes" to attributes
             )
 
-            val requestBody: RequestBody =
-                JSONObject(data).toString().toRequestBody("application/json".toMediaType())
-            NetworkHelper.handleApi<TokenInfo>(
-                NetworkHelper.networkApi()
-                    .refresh(refreshUri.toString(), metadataInResponse = true, requestBody)
-            )
+            val response = NetworkHelper.getInstance.post {
+                url(refreshUri.toString())
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                parameter("metadataInResponse", true)
+                setBody(data)
+            }
+
+            if (response.status.isSuccess()) {
+                Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
+            } else {
+                val errorResponse = response.body<ErrorResponse>()
+                Result.failure(AuthorizationException(response.status, errorResponse.error, errorResponse.errorDescription))
+            }
         } catch (e: Throwable) {
             Result.failure(e)
         }
@@ -97,17 +121,18 @@ class CloudAuthenticatorService(
                     URL("${transactionUri}/${TransactionFilter.PENDING_BY_IDENTIFIER.value}/${transactionID}")
             }
 
-            val response = NetworkHelper.networkApi().transaction(transactionUri.toString(), authorizationHeader)
-
-            if (response.isSuccessful) {
-                parsePendingTransaction(response)
-            } else {
-                response.errorBody()?.let {
-                    return@nextTransaction Result.failure(MFAServiceError.General(it.string()))
-                }
-                Result.failure(MFARegistrationError.FailedToParse)
+            val response = NetworkHelper.getInstance.get {
+                url(transactionUri.toString())
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                bearerAuth(authorizationHeader)
             }
 
+            if (response.status.isSuccess()) {
+                Result.success(decoder.decodeFromString<NextTransactionInfo>(response.bodyAsText()))
+            } else {
+                Result.failure(MFAServiceError.General(response.bodyAsText()))
+            }
         } catch (e: Throwable) {
             Result.failure(e)
         }
@@ -122,24 +147,26 @@ class CloudAuthenticatorService(
             val pendingTransaction =
                 currentPendingTransaction ?: throw MFAServiceError.InvalidPendingTransaction()
 
-            // Create the request parameters.
             val data = mapOf(
                 "id" to pendingTransaction.factorID.toString().lowercase(Locale.ROOT),
                 "userAction" to userAction.value,
                 "signedData" to (if (userAction == UserAction.VERIFY) signedData else null)
             )
 
-            val requestBody: RequestBody =
-                JSONObject(data).toString().toRequestBody("application/json".toMediaType())
+            val response = NetworkHelper.getInstance.post {
+                url(pendingTransaction.postbackUri.toString())
+                accept(ContentType.Application.Json)
+                contentType(ContentType.Application.Json)
+                bearerAuth(authorizationHeader)
+                setBody(data)
+            }
 
-            NetworkHelper.handleApi(
-                NetworkHelper.networkApi()
-                    .completeTransaction(
-                        pendingTransaction.postbackUri.toString(),
-                        authorizationHeader,
-                        requestBody
-                    )
-            )
+            if (response.status.isSuccess()) {
+                Result.success(decoder.decodeFromString<Unit>(response.bodyAsText()))
+            } else {
+                Result.failure(MFAServiceError.General(response.bodyAsText()))
+            }
+
         } catch (e: Throwable) {
             return Result.failure(e)
         }

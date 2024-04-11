@@ -5,7 +5,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
 
-    val kotlinVersion by extra { "1.8.10" }
+    val kotlinVersion by extra { "1.9.10" }
 
     repositories {
         google()
@@ -18,14 +18,13 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.1.4")
+        classpath("com.android.tools.build:gradle:8.2.2")
         classpath("org.jetbrains.dokka:dokka-gradle-plugin:$kotlinVersion")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0")
-        classpath("org.owasp:dependency-check-gradle:8.4.3")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
-        classpath("gradle.plugin.com.hcl.security:appscan-gradle-plugin:1.0.8")
+        classpath("gradle.plugin.com.hcl.security:appscan-gradle-plugin:1.0.9")
         classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
-        classpath("com.github.ben-manes:gradle-versions-plugin:0.47.0")
+        classpath("com.github.ben-manes:gradle-versions-plugin:0.51.0")
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

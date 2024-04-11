@@ -14,28 +14,15 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
-import com.ibm.security.verifysdk.authentication.OAuthProvider
-import com.ibm.security.verifysdk.authentication.TokenInfo
 import com.ibm.security.verifysdk.core.ContextHelper
-import com.ibm.security.verifysdk.core.NetworkHelper
 import com.ibm.security.verifysdk.core.threadInfo
-import com.ibm.security.verifysdk.core.toJsonElement
-import com.ibm.security.verifysdk.mfa.AuthenticatorDescriptor
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
 import com.ibm.security.verifysdk.mfa.MFARegistrationController
-import com.ibm.security.verifysdk.mfa.MFARegistrationDescriptor
-import com.ibm.security.verifysdk.mfa.MFAServiceDescriptor
 import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticatorService
-import com.ibm.security.verifysdk.mfa.cloud.CloudRegistrationProvider
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import okhttp3.logging.HttpLoggingInterceptor
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -65,8 +52,8 @@ class MainActivity : AppCompatActivity() {
         ContextHelper.init(applicationContext)
         setContentView(R.layout.activity_main)
 
-        NetworkHelper.customLoggingInterceptor =
-            HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+//        NetworkHelper.customLoggingInterceptor =
+//            HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
 
 //        val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
         log.atLevel(Level.DEBUG).log("XXX DEBUG2")

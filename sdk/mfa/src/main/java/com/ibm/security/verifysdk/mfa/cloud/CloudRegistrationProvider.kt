@@ -28,7 +28,15 @@ import com.ibm.security.verifysdk.mfa.MFARegistrationError
 import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
 import com.ibm.security.verifysdk.mfa.TOTPFactorInfo
 import com.ibm.security.verifysdk.mfa.UserPresenceFactorInfo
-import kotlinx.serialization.decodeFromString
+import io.ktor.client.request.accept
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonArray
@@ -41,7 +49,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.net.URL
-import java.util.Base64
 import java.util.UUID
 
 class CloudRegistrationProvider(data: String) :
@@ -89,12 +96,15 @@ class CloudRegistrationProvider(data: String) :
             val registrationUrl =
                 URL("${initializationInfo.uri}?skipTotpEnrollment=${skipTotpEnrollment}")
 
-            val response =
-                NetworkHelper.networkApi()
-                    .register(registrationUrl.toString(), constructRequestBody("code"))
-            if (response.isSuccessful) {
-                val body = response.body()?.string()
-                body?.let { responseBodyData ->
+            val response = NetworkHelper.getInstance.post {
+                url(registrationUrl.toString())
+                accept(ContentType.Application.Json)
+                contentType(ContentType.Application.Json)
+                setBody(constructRequestBody("code"))
+            }
+
+            if (response.status.isSuccess()) {
+                response.bodyAsText().let { responseBodyData ->
                     tokenInfo = decoder.decodeFromString(responseBodyData)
                     val registration: Registration = decoder.decodeFromString(responseBodyData)
 
@@ -143,12 +153,8 @@ class CloudRegistrationProvider(data: String) :
                         )
                     )
                 }
-                Result.failure(MFARegistrationError.FailedToParse)
             } else {
-                response.errorBody()?.let {
-                    return@initiate Result.failure(MFARegistrationError.UnderlyingError(Error(it.string())))
-                }
-                Result.failure(MFARegistrationError.FailedToParse)
+                return Result.failure(MFARegistrationError.UnderlyingError(Error(response.bodyAsText())))
             }
         } catch (e: Throwable) {
             Result.failure(e)
@@ -247,65 +253,65 @@ class CloudRegistrationProvider(data: String) :
             }
         }.toString().toRequestBody("text/plain".toMediaTypeOrNull())
 
-        NetworkHelper.networkApi()
-            .enroll(currentFactor?.uri.toString(), tokenInfo.authorizationHeader(), requestBody)
-            .let { response ->
-                if (response.isSuccessful) {
-                    val body = response.body()?.string()
-                    body?.let { responseBodyData ->
-                        val enrollments = JSONArray(responseBodyData)
+        val response = NetworkHelper.getInstance.post {
+            url(currentFactor?.uri.toString())
+            accept(ContentType.Application.Json)
+            contentType(ContentType.Application.Json)
+            bearerAuth(tokenInfo.authorizationHeader())
+            setBody(requestBody)
+        }
 
-                        for (i in 0 until enrollments.length()) {
-                            (enrollments[i] as JSONObject).let { enrollment ->
-                                val subType = enrollment["subType"] as String
-                                val type =
-                                    EnrollableType.valueOf(subType.camelToSnakeCase().uppercase())
-                                val id = enrollment["id"] as String
-                                val uuid = UUID.fromString(id)
+        if (response.status.isSuccess()) {
+            response.bodyAsText().let { responseBodyData ->
+                val enrollments = JSONArray(responseBodyData)
 
-                                if (type == currentFactor?.type) {
-                                    when (currentFactor?.type) {
-                                        EnrollableType.FACE -> factors.add(
-                                            FactorType.Face(
-                                                FaceFactorInfo(
-                                                    id = uuid,
-                                                    displayName = name,
-                                                    algorithm = algorithm
-                                                )
-                                            )
+                for (i in 0 until enrollments.length()) {
+                    (enrollments[i] as JSONObject).let { enrollment ->
+                        val subType = enrollment["subType"] as String
+                        val type =
+                            EnrollableType.valueOf(subType.camelToSnakeCase().uppercase())
+                        val id = enrollment["id"] as String
+                        val uuid = UUID.fromString(id)
+
+                        if (type == currentFactor?.type) {
+                            when (currentFactor?.type) {
+                                EnrollableType.FACE -> factors.add(
+                                    FactorType.Face(
+                                        FaceFactorInfo(
+                                            id = uuid,
+                                            displayName = name,
+                                            algorithm = algorithm
                                         )
+                                    )
+                                )
 
-                                        EnrollableType.FINGERPRINT -> factors.add(
-                                            FactorType.Fingerprint(
-                                                FingerprintFactorInfo(
-                                                    id = uuid,
-                                                    displayName = name,
-                                                    algorithm = algorithm
-                                                )
-                                            )
+                                EnrollableType.FINGERPRINT -> factors.add(
+                                    FactorType.Fingerprint(
+                                        FingerprintFactorInfo(
+                                            id = uuid,
+                                            displayName = name,
+                                            algorithm = algorithm
                                         )
+                                    )
+                                )
 
-                                        else -> factors.add(
-                                            FactorType.UserPresence(
-                                                UserPresenceFactorInfo(
-                                                    id = uuid,
-                                                    displayName = name,
-                                                    algorithm = algorithm
-                                                )
-                                            )
+                                else -> factors.add(
+                                    FactorType.UserPresence(
+                                        UserPresenceFactorInfo(
+                                            id = uuid,
+                                            displayName = name,
+                                            algorithm = algorithm
                                         )
-                                    }
-                                }
+                                    )
+                                )
                             }
                         }
                     }
-                } else {
-                    response.errorBody()?.let {
-                        throw MFARegistrationError.UnderlyingError(Error(it.string()))
-                    }
-                    throw MFARegistrationError.DataInitializationFailed
                 }
             }
+        } else {
+            throw MFARegistrationError.UnderlyingError(Error(response.bodyAsText()))
+        }
     }
 
     override suspend fun finalize(): Result<MFAAuthenticatorDescriptor> {
@@ -316,13 +322,15 @@ class CloudRegistrationProvider(data: String) :
                 URL("${initializationInfo.uri}?metadataInResponse=false")
 
             // Refresh the token, which sets the authenticator state from ENROLLING to ACTIVE.
-            val response =
-                NetworkHelper.networkApi()
-                    .register(registrationUrl.toString(), constructRequestBody("refreshToken"))
+            val response = NetworkHelper.getInstance.post {
+                url(registrationUrl.toString())
+                accept(ContentType.Application.Json)
+                contentType(ContentType.Application.Json)
+                setBody(constructRequestBody("refreshToken"))
+            }
 
-            if (response.isSuccessful) {
-                val body = response.body()?.string()
-                body?.let { responseBodyData ->
+            if (response.status.isSuccess()) {
+                response.bodyAsText().let { responseBodyData ->
                     tokenInfo = decoder.decodeFromString(responseBodyData)
                 }
             }
