@@ -27,6 +27,7 @@
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/examples/fido2demo" />
             <option value="$PROJECT_DIR$/fido2" />
+            <option value="$PROJECT_DIR$/mfa" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

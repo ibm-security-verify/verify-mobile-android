@@ -9,9 +9,7 @@ import kotlinx.serialization.json.JsonNames
 
 @ExperimentalSerializationApi
 @Serializable
-internal data class ErrorMessage(
+data class ErrorMessage(
     val error: String,
-
-    @JsonNames("error_description", "errorDescription")
     val errorDescription: String
 )

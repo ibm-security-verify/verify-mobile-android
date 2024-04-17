@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, RegistrationActivity::class.java))
         }
 
+        NetworkHelper.initialize()
         redirectToAuthenticationIfLoggedIn()
     }
 

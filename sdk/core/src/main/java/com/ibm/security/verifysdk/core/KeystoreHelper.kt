@@ -9,7 +9,7 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.annotation.Nullable
-import androidx.biometric.BiometricPrompt.CryptoObject
+import androidx.biometric.BiometricPrompt
 import org.slf4j.LoggerFactory
 import java.security.*
 import java.security.spec.ECGenParameterSpec
@@ -304,7 +304,7 @@ object KeystoreHelper {
 
     @Suppress("UNCHECKED_CAST")
     fun <T> signData(
-        cryptoObject: CryptoObject,
+        cryptoObject: BiometricPrompt.CryptoObject,
         dataToSign: T,
         base64EncodingOption: Int = Base64.DEFAULT
     ): T? {

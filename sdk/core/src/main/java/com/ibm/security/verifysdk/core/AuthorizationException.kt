@@ -3,6 +3,7 @@
  */
 package com.ibm.security.verifysdk.core
 
+import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.ExperimentalSerializationApi
 
 /**
@@ -11,5 +12,5 @@ import kotlinx.serialization.ExperimentalSerializationApi
  * @since 3.0.0
  */
 @OptIn(ExperimentalSerializationApi::class)
-class AuthorizationException(code: String, description: String) :
-    VerifySdkException("{\"error\":\"$code\",\"errorDescription\":\"$description\"}")
+class AuthorizationException(val code: HttpStatusCode, id: String, description: String) :
+    VerifySdkException("{\"error\":\"$id\",\"errorDescription\":\"$description\"}")

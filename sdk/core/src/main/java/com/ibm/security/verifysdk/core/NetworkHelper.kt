@@ -4,139 +4,133 @@
 
 package com.ibm.security.verifysdk.core
 
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.ANDROID
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import okhttp3.CertificatePinner
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
-import org.slf4j.LoggerFactory
-import retrofit2.HttpException
-import retrofit2.Response
-import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.HostnameVerifier
+import javax.net.ssl.SSLContext
+import javax.net.ssl.X509TrustManager
 
-/**
- * A singleton to configures the network object that handles the calls.
- *
- * @since 3.0.0
- */
-@Suppress("unused", "MemberVisibilityCanBePrivate")
+@Suppress("MemberVisibilityCanBePrivate")
 object NetworkHelper {
 
-    private val log = LoggerFactory.getLogger(javaClass)
+    private lateinit var client: HttpClient
 
-    var retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("http://localhost")
-        .build()
-
-    /**
-     * Indicates whether redirects should be followed. Default is `true`.
-     */
+    var connectTimeoutMillis: Long = 30000L
+    var requestTimeoutMillis: Long = 30000L
+    var readTimeOutMillis: Long = 30000L
+    var logLevel = LogLevel.ALL
+    var logger = Logger.ANDROID
+    var followRedirects = true
     var followSslRedirects = true
-        set(value) {
-            field = value
-            recreate()
-        }
-
-    /**
-     * Defines a customized interceptor for logging. Added as an
-     * [Application Interceptor](https://square.github.io/okhttp/features/interceptors/)
-     */
-    var customLoggingInterceptor: HttpLoggingInterceptor? = null
-        set(value) {
-            field = value
-            recreate()
-        }
-
-    /**
-     * Defines a customized interceptor. Added as an
-     * [Application Interceptor](https://square.github.io/okhttp/features/interceptors/)
-     */
     var customInterceptor: Interceptor? = null
-        set(value) {
-            field = value
-            recreate()
-        }
-
-    /**
-     * Constrains which certificates are trusted.
-     */
+    var customLoggingInterceptor: HttpLoggingInterceptor? = null
     var certificatePinner: CertificatePinner? = null
-        set(value) {
-            field = value
-            recreate()
-        }
+    var sslContext: SSLContext? = null
+    var hostnameVerifier: HostnameVerifier? = null
+    var trustManager: X509TrustManager? = null
 
-    /**
-     * Defines the timeout in seconds to receive a response. Default is 30 seconds.
-     */
-    var readTimeOut = 30
-        set(value) {
-            field = value
-            recreate()
-        }
-
-    /**
-     * Defines the timeout in seconds to establish a connection. Default is 30 seconds.
-     */
-    var connectionTimeOut = 30
-        set(value) {
-            field = value
-            recreate()
-        }
-
-    val networkApi: NetworkApi by lazy {
-        retrofit.create(NetworkApi::class.java)
+    init {
+        initialize(null)
     }
 
-    private fun recreate() {
+    val getInstance: HttpClient
+        get() {
+            return client
+        }
 
+    fun initialize(httpClientEngine: HttpClientEngine? = null) {
+
+        httpClientEngine?.let {
+            client = HttpClient(httpClientEngine) {
+                install(Logging) {
+                    logger = Logger.ANDROID
+                    level = LogLevel.ALL
+                }
+
+                install(ContentNegotiation) {
+                    json(Json {
+                        isLenient = true
+                        ignoreUnknownKeys = true
+                    })
+                }
+                install(HttpTimeout) {
+                    NetworkHelper.connectTimeoutMillis.also { connectTimeoutMillis = it }
+                    NetworkHelper.requestTimeoutMillis.also { requestTimeoutMillis = it }
+                }
+            }
+        } ?: run {
+            client = HttpClient(engineFactory = OkHttp) {
+                engine {
+                    config {
+                        followRedirects(NetworkHelper.followRedirects)
+                        followSslRedirects(followSslRedirects)
+
+                        customInterceptor?.let { customInterceptor ->
+                            addInterceptor(customInterceptor)
+                        }
+
+                        customLoggingInterceptor?.let {httpLoggingInterceptor ->
+                            addInterceptor(httpLoggingInterceptor)
+                        }
+
+                        preconfigured = createOkHttpClient()
+                    }
+                }
+
+                install(Logging) {
+                    logger = NetworkHelper.logger
+                    level = logLevel
+                }
+
+                install(ContentNegotiation) {
+                    json(Json {
+                        isLenient = true
+                        ignoreUnknownKeys = true
+                    })
+                }
+                install(HttpTimeout) {
+                    NetworkHelper.connectTimeoutMillis.also { connectTimeoutMillis = it }
+                    NetworkHelper.requestTimeoutMillis.also { requestTimeoutMillis = it }
+                }
+            }
+        }
+    }
+
+    internal fun createOkHttpClient(): OkHttpClient {
         val okHttpClientBuilder = OkHttpClient.Builder()
 
-        okHttpClientBuilder.connectTimeout(connectionTimeOut.toLong(), TimeUnit.SECONDS)
-        okHttpClientBuilder.readTimeout(readTimeOut.toLong(), TimeUnit.SECONDS)
-        okHttpClientBuilder.followSslRedirects(followSslRedirects)
-
-        certificatePinner?.let {
-            okHttpClientBuilder.certificatePinner(it)
+        readTimeOutMillis.let { readTimeOutMillis ->
+            okHttpClientBuilder.readTimeout(readTimeOutMillis, TimeUnit.MILLISECONDS)
         }
 
-        customLoggingInterceptor?.let {
-            okHttpClientBuilder.addInterceptor(it)
+        certificatePinner?.let { certificatePinner ->
+            okHttpClientBuilder.certificatePinner(certificatePinner)
         }
 
-        customInterceptor?.let {
-            okHttpClientBuilder.addInterceptor(it)
-        }
-
-        retrofit = Retrofit.Builder()
-            .client(okHttpClientBuilder.build())
-            .baseUrl("http://localhost")
-            .build()
-    }
-
-    /**
-     * Wrap the network response in a result object of a given type.
-     */
-    inline fun <reified T : Any> handleApi(response: Response<ResponseBody>): Result<T> {
-
-        return try {
-            val body = response.body()
-            val json = Json { ignoreUnknownKeys = true }
-            if (response.isSuccessful && body != null) {
-                Result.success(json.decodeFromString(body.string()))
-            } else {
-                val errorBody = json.encodeToString(
-                    response.errorBody()?.string()
-                        ?: "{\"errorDescription\":\"No error description found in response.\"}"
-                )
-                Result.failure(AuthenticationException("IVMCR0001E", errorBody))
+        sslContext?.let { sslContext ->
+            trustManager?.let { trustManager ->
+                okHttpClientBuilder.sslSocketFactory(sslContext.socketFactory, trustManager)
             }
-        } catch (e: HttpException) {
-            Result.failure(e)
         }
+
+        hostnameVerifier?.let { hostnameVerifier ->
+            okHttpClientBuilder.hostnameVerifier(hostnameVerifier)
+        }
+
+        return okHttpClientBuilder.build()
     }
 }

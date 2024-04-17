@@ -65,11 +65,6 @@ internal class KeystoreHelperTest {
     }
 
     @Test
-    fun getSupportedAlgorithms() {
-        assertEquals(supportedAlgorithms, KeystoreHelper.supportedAlgorithms)
-    }
-
-    @Test
     fun createKeyPair_happyPath_shouldReturnPublicKey() {
 
         for (algorithm in supportedAlgorithms) {

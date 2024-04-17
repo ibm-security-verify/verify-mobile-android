@@ -13,17 +13,27 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.ibm.security.verifysdk.core.AuthorizationException
+import com.ibm.security.verifysdk.core.ErrorResponse
 import com.ibm.security.verifysdk.fido2.Fido2Api
 import com.ibm.security.verifysdk.fido2.model.AttestationOptions
 import com.ibm.security.verifysdk.fido2.model.AuthenticatorAttestationResponse
 import com.ibm.security.verifysdk.fido2.model.PublicKeyCredentialCreationOptions
 import com.ibm.security.verifysdk.fido2.demoapp.model.IvCreds
 import io.ktor.client.call.body
+import io.ktor.client.request.accept
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.url
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.launch
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
 import kotlin.experimental.or
 
@@ -76,7 +86,7 @@ class RegistrationActivity : AppCompatActivity() {
 
                             fido2Api.initiateAttestation(
                                 attestationOptionsUrl = "$relyingPartyUrl/attestation/options",
-                                authorization = "Bearer $accessToken",
+                                authorization = accessToken,
                                 AttestationOptions(displayName = ivCreds.name)
                             )
                                 .onSuccess { publicKeyCredentialCreationOptions ->
@@ -100,18 +110,35 @@ class RegistrationActivity : AppCompatActivity() {
         }
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     private suspend fun getWhoAmI(
         accessToken: String
     ): Result<IvCreds> {
+
+        val json = Json {
+            isLenient = true
+            ignoreUnknownKeys = true
+        }
+
         return try {
-            val result = httpClient.get {
+            val response = httpClient.get {
                 url("https://fidointerop.securitypoc.com/ivcreds")
-                headers {
-                    append(HttpHeaders.ContentType, "application/json")
-                    append(HttpHeaders.Authorization, "Bearer $accessToken")
-                }
-            }.body<IvCreds>()
-            Result.success(result)
+                bearerAuth(accessToken)
+                contentType(ContentType.Application.Json)
+            }
+
+            if (response.status.isSuccess()) {
+                Result.success(json.decodeFromString<IvCreds>(response.bodyAsText()))
+           } else {
+                val errorResponse = response.body<ErrorResponse>()
+                Result.failure(
+                    AuthorizationException(
+                        response.status,
+                        errorResponse.error,
+                        errorResponse.errorDescription
+                    )
+                )
+            }
         } catch (e: Throwable) {
             Result.failure(e)
         }
@@ -147,7 +174,7 @@ class RegistrationActivity : AppCompatActivity() {
 
             fido2Api.sendAttestation(
                 attestationResultUrl = "$rpUrl/attestation/result",
-                authorization = "Bearer $accessToken",
+                authorization = accessToken,
                 authenticatorAssertionResponse
             )
                 .onSuccess {

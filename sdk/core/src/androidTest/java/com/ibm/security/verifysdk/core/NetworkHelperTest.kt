@@ -6,7 +6,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 
+@Suppress("KotlinConstantConditions")
 internal class NetworkHelperTest {
+
 
     @Test
     fun test_followSslRedirects() {
@@ -60,22 +62,22 @@ internal class NetworkHelperTest {
 
     @Test
     fun test_readTimeOut() {
-        NetworkHelper.readTimeOut = 42
-        assertEquals(42, NetworkHelper.readTimeOut)
-        NetworkHelper.readTimeOut = 24
-        assertEquals(24, NetworkHelper.readTimeOut)
+        NetworkHelper.readTimeOutMillis = 42
+        assertEquals(42, NetworkHelper.readTimeOutMillis)
+        NetworkHelper.readTimeOutMillis = 24
+        assertEquals(24, NetworkHelper.readTimeOutMillis)
     }
 
     @Test
     fun test_connectionTimeOut() {
-        NetworkHelper.connectionTimeOut = 42
-        assertEquals(42, NetworkHelper.connectionTimeOut)
-        NetworkHelper.connectionTimeOut = 24
-        assertEquals(24, NetworkHelper.connectionTimeOut)
+        NetworkHelper.connectTimeoutMillis = 42
+        assertEquals(42, NetworkHelper.connectTimeoutMillis)
+        NetworkHelper.connectTimeoutMillis = 24
+        assertEquals(24, NetworkHelper.connectTimeoutMillis)
     }
 
     @Test
     fun getNetworkApi() {
-        NetworkHelper.networkApi.hashCode()
+        NetworkHelper.getInstance.hashCode()
     }
 }

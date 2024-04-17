@@ -11,10 +11,26 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.ibm.security.verifysdk.core.AuthenticationException
 import com.ibm.security.verifysdk.core.AuthorizationException
+import com.ibm.security.verifysdk.core.ErrorMessage
+import com.ibm.security.verifysdk.core.ErrorResponse
 import com.ibm.security.verifysdk.core.NetworkHelper
+import io.ktor.client.call.body
+import io.ktor.client.request.accept
+import io.ktor.client.request.get
+import io.ktor.client.request.headers
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.http.formUrlEncode
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.slf4j.Logger
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.net.MalformedURLException
 import java.net.URL
@@ -36,10 +52,16 @@ import kotlin.coroutines.resume
  *
  * @since 3.0.0
  */
+@OptIn(ExperimentalSerializationApi::class)
 @Suppress("unused")
 class OAuthProvider(val clientId: String, val clientSecret: String?) {
 
-    private val log: Logger = LoggerFactory.getLogger(javaClass)
+    private val log = LoggerFactory.getLogger(javaClass)
+
+    private val decoder = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+    }
 
     var additionalHeaders: HashMap<String, String> = HashMap()
     var additionalParameters: HashMap<String, String> = HashMap()
@@ -73,7 +95,10 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
             if (url.path.endsWith(".well-known/openid-configuration", ignoreCase = true).not()) {
                 Result.failure(MalformedURLException("The URL does not end with the .well-known/openid-configuration path component."))
             } else {
-                NetworkHelper.handleApi(NetworkHelper.networkApi.discover(url.toString()))
+                val response = NetworkHelper.getInstance.get {
+                    url(url.toString())
+                }.body<OIDCMetadataInfo>()
+                Result.success(response)
             }
         } catch (e: Throwable) {
             Result.failure(e)
@@ -150,7 +175,8 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
                             continuation.resume(
                                 Result.failure(
                                     AuthorizationException(
-                                        "IVMAU0001E",
+                                        HttpStatusCode.OK,
+                                        "ISVSDKOP01",
                                         "Authorization code not found"
                                     )
                                 )
@@ -160,7 +186,8 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
                         continuation.resume(
                             Result.failure(
                                 AuthenticationException(
-                                    "IVMAU0002E",
+                                    HttpStatusCode.OK,
+                                    "ISVSDKOP02",
                                     "Authentication canceled"
                                 )
                             )
@@ -199,23 +226,36 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
         codeVerifier: String?,
         scope: Array<String>?
     ): Result<TokenInfo> {
-        return try {
 
-            NetworkHelper.handleApi(
-                NetworkHelper.networkApi.authorizeWithAuthCode(
-                    additionalHeaders,
-                    url.toString(),
-                    clientId,
-                    clientSecret ?: "",
-                    authorizationCode,
-                    codeVerifier ?: "",
-                    "authorization_code",
-                    scope?.joinToString(" ") ?: "",
-                    redirectUrl.toString(),
-                    additionalParameters
-                )
+        return try {
+            val formData = listOf(
+                "client_id" to clientId,
+                "client_secret" to (clientSecret ?: ""),
+                "code" to authorizationCode,
+                "code_verifier" to (codeVerifier ?: ""),
+                "grant_type" to "authorization_code",
+                "scope" to (scope?.joinToString(" ") ?: ""),
+                "redirect_uri" to redirectUrl.toString()
             )
 
+            val response = NetworkHelper.getInstance.post {
+                url(url.toString())
+                headers {
+                    additionalHeaders.forEach {
+                        this@headers.append(it.key, it.value)
+                    }
+                }
+                contentType(ContentType.Application.FormUrlEncoded)
+                accept(ContentType.Application.Json)
+                setBody((formData + additionalParameters.toList()).formUrlEncode())
+            }
+
+            if (response.status.isSuccess()) {
+                Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
+            } else {
+                val errorResponse = response.body<ErrorResponse>()
+                Result.failure(AuthorizationException(response.status, errorResponse.error, errorResponse.errorDescription))
+            }
         } catch (e: Throwable) {
             Result.failure(e)
         }
@@ -238,20 +278,35 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
         password: String,
         scope: Array<String>? = arrayOf("")
     ): Result<TokenInfo> {
+
         return try {
-            NetworkHelper.handleApi(
-                NetworkHelper.networkApi.authorizeWithROPC(
-                    additionalHeaders,
-                    url.toString(),
-                    clientId,
-                    clientSecret ?: "",
-                    username,
-                    password,
-                    "password",
-                    scope?.joinToString(" ") ?: "",
-                    additionalParameters
-                )
+            val formData = mapOf(
+                "client_id" to clientId,
+                "client_secret" to (clientSecret ?: ""),
+                "username" to username,
+                "password" to password,
+                "grant_type" to "password",
+                "scope" to (scope?.joinToString(" ") ?: ""),
             )
+
+            val response = NetworkHelper.getInstance.post {
+                url(url.toString())
+                headers {
+                    additionalHeaders.forEach {
+                        this@headers.append(it.key, it.value)
+                    }
+                }
+                contentType(ContentType.Application.FormUrlEncoded)
+                accept(ContentType.Application.Json)
+                setBody(formData + additionalParameters)
+            }
+
+            if (response.status.isSuccess()) {
+                Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
+            } else {
+                val errorResponse = response.body<ErrorResponse>()
+                Result.failure(AuthorizationException(response.status, errorResponse.error, errorResponse.errorDescription))
+            }
         } catch (e: Throwable) {
             Result.failure(e)
         }
@@ -278,20 +333,32 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
         refreshToken: String,
         scope: Array<String>? = arrayOf("")
     ): Result<TokenInfo> {
+
         return try {
-            NetworkHelper.handleApi(
-                NetworkHelper.networkApi.refresh(
-                    additionalHeaders,
-                    url.toString(),
-                    clientId,
-                    clientSecret ?: "",
-                    refreshToken,
-                    "refresh_token",
-                    scope?.joinToString(" ") ?: "",
-                    additionalParameters
-                )
+            val formData = mapOf(
+                "refresh_token" to refreshToken,
+                "grant_type" to "refresh_token",
+                "scope" to (scope?.joinToString(" ") ?: ""),
             )
 
+            val response = NetworkHelper.getInstance.post {
+                url(url.toString())
+                headers {
+                    additionalHeaders.forEach {
+                        this@headers.append(it.key, it.value)
+                    }
+                }
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                setBody(formData + additionalParameters)
+            }
+
+            if (response.status.isSuccess()) {
+                Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
+            } else {
+                val errorResponse = response.body<ErrorResponse>()
+                Result.failure(AuthorizationException(response.status, errorResponse.error, errorResponse.errorDescription))
+            }
         } catch (e: Throwable) {
             Result.failure(e)
         }

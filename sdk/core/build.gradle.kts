@@ -3,6 +3,7 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 plugins {
     id("com.android.library")
     id("ibm-verifysdk-plugin")
+    id("org.jetbrains.kotlin.android")
 }
 
 val moduleArtifactId = "core"
@@ -23,6 +24,12 @@ apply {
 android {
     namespace = "com.ibm.security.verifysdk.core"
 }
+dependencies {
+    implementation("androidx.core:core-ktx:+")
+}
+
+dependencies {
+}
 
 dependencies {
 }
@@ -30,19 +37,13 @@ dependencies {
 tasks {
     register("androidJavadocJar", Jar::class) {
         archiveClassifier.set("javadoc")
-        from("${project.layout.buildDirectory}/javadoc")
+        from("${layout.buildDirectory}/javadoc")
         dependsOn(dokkaJavadoc)
     }
     register("androidSourcesJar", Jar::class) {
         archiveClassifier.set("sources")
         from(android.sourceSets.getByName("main").java.srcDirs)
     }
-}
-
-// To-do: move to VerifySdkBuildPlugin
-configure<org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension> {
-    failOnError = false
-    skipConfigurations.add("lintClassPath")
 }
 
 // To-do: move to VerifySdkBuildPlugin

@@ -6,7 +6,6 @@
 buildscript {
 
     val kotlinVersion by extra { "1.9.10" }
-    val ktorVersion by extra { "2.3.7" }
 
     repositories {
         google()
@@ -20,7 +19,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.2.1")
+        classpath("com.android.tools.build:gradle:8.2.2")
         classpath("com.github.ben-manes:gradle-versions-plugin:0.51.0")
         classpath("gradle.plugin.com.hcl.security:appscan-gradle-plugin:1.0.9")
         classpath("org.jetbrains.dokka:dokka-base:$kotlinVersion")

@@ -82,7 +82,7 @@ class AuthenticationActivity : AppCompatActivity() {
 
                 fido2Api.initiateAssertion(
                     assertionOptionsUrl = "$relyingPartyUrl/assertion/options",
-                    authorization = "Bearer $accessToken",
+                    authorization = accessToken,
                     AssertionOptions(userName, "preferred")
                 )
                     .onSuccess {
@@ -169,7 +169,7 @@ class AuthenticationActivity : AppCompatActivity() {
 
         fido2Api.sendAssertion(
             assertionResultUrl = "$relyingPartyUrl/assertion/result",
-            authorization = "Bearer $accessToken",
+            authorization = accessToken,
             authenticatorAssertionResponse
         )
             .onSuccess { assertionResultResponse ->

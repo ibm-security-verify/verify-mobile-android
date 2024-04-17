@@ -44,12 +44,6 @@ tasks {
 }
 
 // To-do: move to VerifySdkBuildPlugin
-configure<org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension> {
-    failOnError = false
-    skipConfigurations.add("lintClassPath")
-}
-
-// To-do: move to VerifySdkBuildPlugin
 tasks.withType<DependencyUpdatesTask>().configureEach {
     outputFormatter = "html"
     outputDir = "build/dependencyUpdates"
