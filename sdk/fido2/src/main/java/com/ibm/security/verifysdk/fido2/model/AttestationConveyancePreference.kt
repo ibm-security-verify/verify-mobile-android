@@ -3,9 +3,6 @@
  */
 package com.ibm.security.verifysdk.fido2.model
 
-import com.ibm.security.verifysdk.fido2.model.AttestationConveyancePreference.DIRECT
-import com.ibm.security.verifysdk.fido2.model.AttestationConveyancePreference.INDIRECT
-import com.ibm.security.verifysdk.fido2.model.AttestationConveyancePreference.NONE
 import kotlinx.serialization.Serializable
 
 /**
@@ -16,7 +13,7 @@ import kotlinx.serialization.Serializable
  * - [NONE]: Indicates that the authenticator will not convey attestation during registration.
  * - [INDIRECT]: Indicates that the authenticator will convey attestation indirectly via the FIDO server.
  * - [DIRECT]: Indicates that the authenticator will convey attestation directly to the relying party.
- *
+ * 
  * @property value The string value representing the attestation conveyance preference.
  */
 @Serializable

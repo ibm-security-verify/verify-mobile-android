@@ -31,6 +31,9 @@ dependencies {
 dependencies {
 }
 
+dependencies {
+}
+
 tasks {
     register("androidJavadocJar", Jar::class) {
         archiveClassifier.set("javadoc")
