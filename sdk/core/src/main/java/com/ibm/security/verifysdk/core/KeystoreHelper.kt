@@ -9,11 +9,12 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.annotation.Nullable
+import androidx.biometric.BiometricPrompt.CryptoObject
 import org.slf4j.LoggerFactory
 import java.security.*
-import java.security.interfaces.RSAKey
+import java.security.spec.ECGenParameterSpec
 import java.security.spec.RSAKeyGenParameterSpec
-import java.util.Locale
+import javax.crypto.SecretKey
 
 /**
  * Helper class to perform key management and signing operations.
@@ -35,6 +36,9 @@ object KeystoreHelper {
 
     var keySize: Int = 2048
 
+    val supportedAlgorithms: ArrayList<String> =
+        arrayListOf("SHA1withRSA", "SHA256withRSA", "SHA512withRSA", "EC")
+
     /**
      * Generates a private and public key to sign data. An existing key pair with the same alias will
      * be deleted.
@@ -44,6 +48,7 @@ object KeystoreHelper {
      *
      * @param keyName  the unique identifier of the key pair
      * @param algorithm  the standard string name of the algorithm to generate the key pair
+     * @param purpose
      * @param authenticationRequired  indicates whether the generated key requires authentication
      *                               (fingerprint) in order to get access to it.
      * @param invalidatedByBiometricEnrollment  indicates whether the key should be invalidated on biometric enrollment.
@@ -57,6 +62,7 @@ object KeystoreHelper {
     fun createKeyPair(
         keyName: String,
         algorithm: String,
+        purpose: Int,
         authenticationRequired: Boolean = false,
         invalidatedByBiometricEnrollment: Boolean = false
     ): PublicKey {
@@ -66,17 +72,8 @@ object KeystoreHelper {
         log.entering()
 
         try {
-            val keyStore = KeyStore.getInstance(keystoreType)
-            keyStore.load(null)
-
-            if (keyStore.containsAlias(keyName)) keyStore.deleteEntry(keyName)
-
-            digest = when (algorithm.uppercase(Locale.ROOT)) {
-                "SHA1", "HMACSHA1", "RSASHA1", "SHA1WITHRSA" -> KeyProperties.DIGEST_SHA1
-                "SHA256", "HMACSHA256", "RSASHA256", "SHA256WITHRSA" -> KeyProperties.DIGEST_SHA256
-                "SHA384", "HMACSHA384", "RSASHA384", "SHA384WITHRSA" -> KeyProperties.DIGEST_SHA384
-                "SHA512", "HMACSHA512", "RSASHA512", "SHA512WITHRSA" -> KeyProperties.DIGEST_SHA512
-                else -> throw UnsupportedOperationException(
+            if ((algorithm in supportedAlgorithms).not()) {
+                throw UnsupportedOperationException(
                     String.format(
                         "Algorithm %s is not supported",
                         algorithm
@@ -84,24 +81,41 @@ object KeystoreHelper {
                 )
             }
 
+            val keyStore = KeyStore.getInstance(keystoreType)
+            keyStore.load(null)
+
+            if (keyStore.containsAlias(keyName)) keyStore.deleteEntry(keyName)
+
+            if (algorithm == "SHA1withRSA") {
+                digest = KeyProperties.DIGEST_SHA1
+            } else if (algorithm == "SHA256withRSA") {
+                digest = KeyProperties.DIGEST_SHA256
+            } else if (algorithm == "SHA512withRSA") {
+                digest = KeyProperties.DIGEST_SHA512
+            } else {
+                digest = KeyProperties.DIGEST_SHA256 // EC
+            }
+
             val keyGenParameterBuilder = KeyGenParameterSpec.Builder(
                 keyName,
-                KeyProperties.PURPOSE_SIGN
+                purpose,
             )
                 .setDigests(digest)
+                .setUserAuthenticationRequired(authenticationRequired)
+                .setInvalidatedByBiometricEnrollment(invalidatedByBiometricEnrollment)
+
+            if (algorithm == "EC") {    // FIDO keys
+                keyGenParameterBuilder.setAlgorithmParameterSpec(ECGenParameterSpec("secp256r1"))
+            } else {    // MFA keys
                 // https://groups.google.com/forum/#!msg/android-developers/gDb8cJoSzqc/tJchSd0DDAAJ
-                .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
-                .setAlgorithmParameterSpec(
+                keyGenParameterBuilder.setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+                keyGenParameterBuilder.setAlgorithmParameterSpec(
                     RSAKeyGenParameterSpec(
                         keySize,
                         RSAKeyGenParameterSpec.F4
                     )
                 )
-                .setUserAuthenticationRequired(authenticationRequired)
-
-            keyGenParameterBuilder.setInvalidatedByBiometricEnrollment(
-                invalidatedByBiometricEnrollment
-            )
+            }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
                 keyGenParameterBuilder.setUserAuthenticationParameters(
@@ -112,7 +126,10 @@ object KeystoreHelper {
                 keyGenParameterBuilder.setUserAuthenticationValidityDurationSeconds(-1)
             }
 
-            KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, keystoreType).let {
+            KeyPairGenerator.getInstance(
+                if (algorithm == "EC") KeyProperties.KEY_ALGORITHM_EC else KeyProperties.KEY_ALGORITHM_RSA,
+                keystoreType
+            ).let {
                 it.initialize(keyGenParameterBuilder.build())
                 it.generateKeyPair()
 
@@ -201,7 +218,7 @@ object KeystoreHelper {
      * @return the private key or null if the key is not found
      */
     @Nullable
-    private fun getPrivateKey(keyName: String): PrivateKey? {
+    fun getPrivateKey(keyName: String): PrivateKey? {
 
         log.entering()
 
@@ -220,47 +237,62 @@ object KeystoreHelper {
         }
     }
 
-    /**
-     * Using a key generated by the device to sign the data and return the encrypted result.
-     *
-     * @param keyName  the unique identifier of the key pair
-     * @param algorithm  the standard string name of the algorithm used to create the signature
-     * @param dataToSign  the string to encrypt
-     *
-     * @return <ul><li>the base64 signed data or
-     *          <li>null if the value can not be signed</ul>
-     */
-    fun signData(
+    @Nullable
+    fun getSecretKey(keyName: String): SecretKey? {
+
+        var key: SecretKey? = null
+        KeyStore.getInstance(keystoreType).let { keyStore ->
+            keyStore.load(null)
+            keyStore.getKey(keyName, null)?.let {
+                key = it as SecretKey
+            }
+        }
+
+        return key
+    }
+
+    fun getPublicKey(keyName: String): PublicKey? {
+
+        var key: PublicKey? = null
+        KeyStore.getInstance(keystoreType).let { keyStore ->
+            keyStore.load(null)
+            keyStore.getCertificate(keyName)?.let { certificate ->
+                key = certificate.publicKey
+            }
+        }
+
+        return key
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T> signData(
         keyName: String,
         algorithm: String,
-        dataToSign: String,
+        dataToSign: T,
         base64EncodingOption: Int = Base64.DEFAULT
-    ): String? {
+    ): T? {
 
         log.entering()
 
         try {
-            var signedData: String? = null
-
-            val signatureAlgorithm = when (algorithm.uppercase(Locale.ROOT)) {
-                "SHA1", "HMACSHA1", "RSASHA1", "SHA1WITHRSA" -> "SHA1withRSA"
-                "SHA256", "HMACSHA256", "RSASHA256", "SHA256WITHRSA" -> "SHA256withRSA"
-                "SHA384", "HMACSHA384", "RSASHA384", "SHA384WITHRSA" -> "SHA384withRSA"
-                "SHA512", "HMACSHA512", "RSASHA512", "SHA512WITHRSA" -> "SHA512withRSA"
-                else -> throw UnsupportedOperationException(
-                    String.format(
-                        "Algorithm %s is not supported",
-                        algorithm
-                    )
-                )
-            }
-
-            Signature.getInstance(signatureAlgorithm).let { signature ->
+            var signedData: T? = null
+            Signature.getInstance(algorithm).let { signature ->
                 getPrivateKey(keyName)?.let { privateKey ->
                     signature.initSign(privateKey)
-                    signature.update(dataToSign.toByteArray())
 
-                    signedData = Base64.encodeToString(signature.sign(), base64EncodingOption)
+                    when (dataToSign) {
+                        is String -> {
+                            signature.update(dataToSign.toByteArray())
+                            signedData = Base64.encodeToString(signature.sign(), base64EncodingOption) as T
+                        }
+                        is ByteArray -> {
+                            signature.update(dataToSign)
+                            signedData = signature.sign() as T
+                        }
+                        else -> {
+                            // Handle unsupported data type
+                        }
+                    }
                 }
             }
 
@@ -268,5 +300,52 @@ object KeystoreHelper {
         } finally {
             log.exiting()
         }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T> signData(
+        cryptoObject: CryptoObject,
+        dataToSign: T,
+        base64EncodingOption: Int = Base64.DEFAULT
+    ): T? {
+
+        log.entering()
+
+        try {
+            var signedData: T? = null
+            cryptoObject.signature?.let { signature ->
+                when (dataToSign) {
+                    is String -> {
+                        signature.update(dataToSign.toByteArray())
+                        signedData = Base64.encodeToString(signature.sign(), base64EncodingOption) as T
+                    }
+                    is ByteArray -> {
+                        signature.update(dataToSign)
+                        signedData = signature.sign() as T
+                    }
+                    else -> {
+                        // Handle unsupported data type
+                    }
+                }
+            }
+
+            return signedData
+        } finally {
+            log.exiting()
+        }
+    }
+
+    internal fun hash(input: String, algorithm: String): String {
+        return MessageDigest
+            .getInstance(algorithm)
+            .digest(input.toByteArray())
+            .fold("") { str, it -> str + "%02x".format(it) }
+    }
+
+    internal fun hash(input: ByteArray, algorithm: String): String {
+        return MessageDigest
+            .getInstance(algorithm)
+            .digest(input)
+            .fold("") { str, it -> str + "%02x".format(it) }
     }
 }

@@ -6,6 +6,7 @@ package com.ibm.security.verifysdk.authentication
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.ibm.security.verifysdk.core.AuthenticationException
@@ -130,7 +131,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
         method: CodeChallengeMethod = CodeChallengeMethod.PLAIN,
         scope: Array<String>?,
         state: String?,
-        activity: AppCompatActivity
+        activity: ComponentActivity
     ): Result<String> {
 
         return try {

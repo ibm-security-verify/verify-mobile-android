@@ -44,6 +44,8 @@ internal class OAuthProviderTest {
 
     @Suppress("unused")
     private val log: Logger = LoggerFactory.getLogger(javaClass)
+    
+    private val schema = "http"
 
     companion object {
 

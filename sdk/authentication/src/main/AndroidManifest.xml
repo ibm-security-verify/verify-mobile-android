@@ -14,6 +14,7 @@
             android:name=".AuthenticationActivity"
             android:exported="true"
             android:launchMode="singleTop"
+            android:allowBackup="false"
             android:permission="com.ibm.security.verifysdk">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

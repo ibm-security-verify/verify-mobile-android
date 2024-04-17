@@ -34,7 +34,7 @@ android {
 tasks {
     register("androidJavadocJar", Jar::class) {
         archiveClassifier.set("javadoc")
-        from("${layout.buildDirectory}/javadoc")
+        from("${project.layout.buildDirectory}/javadoc")
         dependsOn(dokkaJavadoc)
     }
     register("androidSourcesJar", Jar::class) {
@@ -95,9 +95,15 @@ configure<PublishingExtension> {
                 withXml {
                     fun groovy.util.Node.addDependency(dependency: Dependency, scope: String) {
                         appendNode("dependency").apply {
-                            appendNode("groupId", dependency.group)
-                            appendNode("artifactId", dependency.name)
-                            appendNode("version", dependency.version)
+                            if (dependency.version != "unspecified") {
+                                appendNode("groupId", dependency.group)
+                                appendNode("artifactId", dependency.name)
+                                appendNode("version", dependency.version)
+                            } else {
+                                appendNode("groupId", groupId)
+                                appendNode("artifactId", dependency.name)
+                                appendNode("version", version)
+                            }
                             appendNode("scope", scope)
                         }
                     }

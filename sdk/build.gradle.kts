@@ -13,18 +13,21 @@ buildscript {
         mavenLocal()
         maven {
             url = uri("https://plugins.gradle.org/m2/")
+            url = uri("https://jitpack.io")
         }
         gradlePluginPortal()
     }
 
     dependencies {
         classpath("com.android.tools.build:gradle:8.2.2")
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin:$kotlinVersion")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
-        classpath("gradle.plugin.com.hcl.security:appscan-gradle-plugin:1.0.9")
-        classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
         classpath("com.github.ben-manes:gradle-versions-plugin:0.51.0")
+        classpath("gradle.plugin.com.hcl.security:appscan-gradle-plugin:1.0.9")
+        classpath("org.jetbrains.dokka:dokka-base:$kotlinVersion")
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:$kotlinVersion")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
+        classpath("org.owasp:dependency-check-gradle:9.0.9")
+        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -33,7 +36,7 @@ buildscript {
 
 tasks {
     val clean by registering(Delete::class) {
-        delete(buildDir)
+        delete(project.layout.buildDirectory)
     }
 }
 

@@ -52,7 +52,7 @@ object NetworkHelper {
             return client
         }
 
-    fun initialize(httpClientEngine: HttpClientEngine?) {
+    fun initialize(httpClientEngine: HttpClientEngine? = null) {
 
         httpClientEngine?.let {
             client = HttpClient(httpClientEngine) {
@@ -108,8 +108,6 @@ object NetworkHelper {
                 }
             }
         }
-
-        println("XXX4 $client")
     }
 
     internal fun createOkHttpClient(): OkHttpClient {

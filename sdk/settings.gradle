@@ -3,6 +3,7 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 
     plugins {
@@ -16,6 +17,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 }
 rootProject.name = "IBM Security Verify SDK"
@@ -24,3 +26,8 @@ include ':core'
 include ':adaptive'
 include ':authentication'
 include ':mfa'
+include ':fido2'
+include ':fido2demo'
+
+project(':fido2demo').projectDir = new File('examples/fido2demo')
+

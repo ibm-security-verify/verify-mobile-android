@@ -4,6 +4,7 @@
 
 package com.ibm.security.verifysdk.core
 
+import com.ibm.security.verifysdk.core.KeystoreHelper.hash
 import java.util.Locale
 
 val camelRegex = "(?<=[a-zA-Z])[A-Z]".toRegex()
@@ -17,6 +18,10 @@ fun String.toNumberOrNull(): Number? {
 fun String.toNumberOrDefault(default: Number): Number {
 
     return this.toIntOrNull() ?: this.toLongOrNull() ?: this.toDoubleOrNull() ?: default
+}
+
+fun String.sha256(): String {
+    return hash(this, "SHA-256")
 }
 
 fun String.camelToSnakeCase(): String {
