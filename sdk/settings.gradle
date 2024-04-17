@@ -21,7 +21,7 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "IBM Security Verify SDK"
-include ":app"
+//include ":app"
 include ':core'
 include ':adaptive'
 include ':authentication'

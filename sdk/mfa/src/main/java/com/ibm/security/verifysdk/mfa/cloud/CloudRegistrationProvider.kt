@@ -4,6 +4,7 @@
 
 package com.ibm.security.verifysdk.mfa.cloud
 
+import android.security.keystore.KeyProperties
 import com.ibm.security.verifysdk.authentication.TokenInfo
 import com.ibm.security.verifysdk.core.ContextHelper
 import com.ibm.security.verifysdk.core.KeystoreHelper
@@ -204,6 +205,7 @@ class CloudRegistrationProvider(data: String) :
             KeystoreHelper.createKeyPair(
                 keyName,
                 currentFactor?.algorithm ?: "",
+                KeyProperties.PURPOSE_SIGN,
                 authenticationRequired,
                 invalidatedByBiometricEnrollment
             )

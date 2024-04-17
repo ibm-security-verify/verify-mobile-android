@@ -4,12 +4,6 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-configurations.all {
-    resolutionStrategy {
-        force("com.squareup.okio:okio-jvm:3.4.0")
-    }
-}
-
 android {
     namespace = "com.ibm.security.verifysdk"
     compileSdk = 34
@@ -48,13 +42,6 @@ configurations.all {
         force("com.squareup.okio:okio-jvm:3.4.0")
     }
 }
-
-configurations.all {
-    resolutionStrategy {
-        force("com.squareup.okio:okio-jvm:3.4.0")
-    }
-}
-
 
 dependencies {
 
