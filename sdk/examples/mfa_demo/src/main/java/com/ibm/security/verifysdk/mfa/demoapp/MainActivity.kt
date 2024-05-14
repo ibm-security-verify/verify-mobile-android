@@ -2,7 +2,7 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk
+package com.ibm.security.verifysdk.mfa.demoapp
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -23,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.logging.HttpLoggingInterceptor
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level

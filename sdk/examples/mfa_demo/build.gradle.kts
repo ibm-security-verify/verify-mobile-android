@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.ibm.security.verifysdk"
+    namespace = "com.ibm.security.verifysdk.mfa.demoapp"
     compileSdk = 34
 
     defaultConfig {
@@ -53,15 +53,9 @@ dependencies {
 
     implementation(project(":mfa"))
     implementation(project(":core"))
-    implementation(project(":fido2"))
-    implementation(project(":adaptive"))
     implementation(project(":authentication"))
     implementation("androidx.core:core-ktx:1.10.1")
 
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-}
-
-android {
-    namespace = "com.ibm.security.verifysdk"
 }
