@@ -7,8 +7,8 @@ The FIDO2 sample app is an end-to-end mobile app which uses the FIDO2 server fea
 This demo works with an IBM Security Verify Access instance, hosted on https://fidointerop.securitypoc.com An IBMid is required to access it.
 
 1. Clone this repository and open it in Android Studio
-1. Create a "Run/Debug configuration" for the `fido2demo` module
-1. Start the `fido2demo` module
+1. Create a "Run/Debug configuration" for the `fido2_demo` module
+1. Start the `fido2_demo` module
 1. Login to https://fidointerop.securitypoc.com, go to `Account settings` and copy your `Access Token`
 1. In the demo app, click on `Get Started`: <br/><img src="./fido2demo-1-start.png" width="30%">
 1. Paste your access token, assign a nickname to your registration and click on `Register`: <br/><img src="./fido2demo-2-register.png" width="30%">
