@@ -1,19 +1,23 @@
+/*
+ * Copyright contributors to the IBM Security Verify SDK for Android project
+ */
+
 plugins {
     id("com.android.application")
-    id("ibm-verifysdk-plugin")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
-    namespace = "com.ibm.security.verifysdk.mfa.demoapp"
+    namespace = "com.ibm.security.verifysdk.mfa.demo"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ibm.security.verifysdk"
+        applicationId = "com.ibm.security.verifysdk.mfa.demo"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0.0"
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -37,25 +41,18 @@ android {
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        force("com.squareup.okio:okio-jvm:3.4.0")
-    }
-}
-
 dependencies {
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("org.slf4j:slf4j-jdk14:2.0.12")
-
-    implementation(project(":mfa"))
     implementation(project(":core"))
+    implementation(project(":mfa"))
     implementation(project(":authentication"))
-    implementation("androidx.core:core-ktx:1.10.1")
 
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("org.slf4j:slf4j-jdk14:2.0.12")
+    implementation("androidx.core:core-ktx:1.10.1")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 }

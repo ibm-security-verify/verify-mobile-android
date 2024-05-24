@@ -58,7 +58,7 @@ class AuthenticationResultActivity : AppCompatActivity() {
 
             fidoLoginDetailsJson["requestData"]?.jsonObject?.get("authData")?.jsonObject?.get("extensions")
                 ?.let { extensions ->
-                    extensions.jsonObject?.getValue("txAuthSimple")?.jsonPrimitive?.let { txAuthSimple ->
+                    extensions.jsonObject.getValue("txAuthSimple").jsonPrimitive.let { txAuthSimple ->
                         println("Transaction: $txAuthSimple")
                         findViewById<TextView>(R.id.text_view_transaction).text =
                             txAuthSimple.content

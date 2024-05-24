@@ -1,7 +1,6 @@
 /*
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
-
 package com.ibm.security.verifysdk.mfa.demoapp
 
 import android.content.Intent
@@ -19,6 +18,7 @@ import com.ibm.security.verifysdk.core.threadInfo
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
 import com.ibm.security.verifysdk.mfa.MFARegistrationController
 import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticatorService
+import com.ibm.security.verifysdk.mfa.demo.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch

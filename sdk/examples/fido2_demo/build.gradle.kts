@@ -2,7 +2,6 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization")
-    id("com.hcl.security.appscan")
 }
 
 android {
@@ -40,7 +39,7 @@ android {
 
 dependencies {
 
-    val ktorVersion by extra { "2.3.7" }
+    val ktorVersion by extra { "2.3.11" }
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
