@@ -49,7 +49,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
                         failOnVersionConflict()
                         preferProjectModules()
                         force("com.fasterxml.woodstox:woodstox-core:6.4.0")
-                        force("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.1")
+                        force("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.1")
                     }
                 }
 
@@ -119,20 +119,20 @@ class VerifySdkBuildPlugin : Plugin<Project> {
 
         project.dependencies {
 
-            val kotlinCoroutines = "1.7.3"
-            val kotlinLib = "1.9.22"
+            val kotlinCoroutines = "1.8.1"
+            val kotlinLib = "1.9.24"
             val square = "4.12.0"
-            val ktorVersion = "2.3.7"
+            val ktorVersion = "2.3.11"
 
             add("androidTestImplementation", "androidx.test.ext:junit:1.1.5")
             add("androidTestImplementation", "androidx.test:core:1.5.0")
             add("androidTestImplementation", "androidx.test:rules:1.5.0")
             add("androidTestImplementation", "androidx.test:runner:1.5.0")
             add("androidTestImplementation", "androidx.test.espresso:espresso-core:3.5.1")
-            add("androidTestImplementation", "androidx.test.uiautomator:uiautomator:2.2.0")
-            add("androidTestImplementation", "junit:junit:4.13.1")
+            add("androidTestImplementation", "androidx.test.uiautomator:uiautomator:2.3.0")
+            add("androidTestImplementation", "junit:junit:4.13.2")
             add("androidTestImplementation", "org.junit.jupiter:junit-jupiter")    // JUnit5
-            add("androidTestImplementation", "org.mockito.kotlin:mockito-kotlin:5.2.1")
+            add("androidTestImplementation", "org.mockito.kotlin:mockito-kotlin:5.3.1")
             add("androidTestImplementation", "com.squareup.okhttp3:mockwebserver:$square")
             add("androidTestImplementation", "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinCoroutines")
             add("androidTestImplementation", platform("org.junit:junit-bom:5.8.2"))          // JUnit5
@@ -159,15 +159,15 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutines")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinCoroutines")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-rx3:$kotlinCoroutines")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
             add("implementation", "org.slf4j:slf4j-api:2.0.7")
             add("implementation", "androidx.biometric:biometric:1.2.0-alpha05")
-            add("implementation", "androidx.browser:browser:1.7.0")
-            add("implementation", "com.fasterxml.jackson.core:jackson-core:2.16.1")
-            add("implementation", "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.16.1")
+            add("implementation", "androidx.browser:browser:1.8.0")
+            add("implementation", "com.fasterxml.jackson.core:jackson-core:2.17.1")
+            add("implementation", "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:2.17.1")
 
-            add("testImplementation", "junit:junit:4.13.1") // JUnit4 for Adaptive SDK
+            add("testImplementation", "junit:junit:4.13.2") // JUnit4 for Adaptive SDK
 //            add("testImplementation", "org.json:json:20220320")             // Using json in unit tests
         }
     }
