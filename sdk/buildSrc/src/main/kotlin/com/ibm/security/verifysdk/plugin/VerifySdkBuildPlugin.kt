@@ -109,13 +109,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
                 }
             }
         }
-
-        project.configurations.all {
-            resolutionStrategy {
-                force("com.squareup.okio:okio-jvm:3.4.0")
-            }
-        }
-
+        
         project.dependencies {
 
             val kotlinVersion = "2.0.0"
