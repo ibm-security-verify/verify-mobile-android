@@ -25,7 +25,7 @@ android {
     namespace = "com.ibm.security.verifysdk.core"
 }
 dependencies {
-    implementation("androidx.core:core-ktx:+")
+    implementation("androidx.core:core-ktx:1.13.1")
 }
 
 dependencies {

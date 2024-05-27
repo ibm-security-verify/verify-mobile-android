@@ -16,7 +16,7 @@ val moduleScmDeveloperConnection = "scm:git:ssh://github.com/ibm-security-verify
 val moduleScmUrl = "https://github.com/ibm-security-verify/verify-sdk-android"
 
 dependencies {
-    implementation("androidx.lifecycle:lifecycle-process:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-process:2.8.0")
     implementation("androidx.test:rules:1.5.0")
     implementation("androidx.test.ext:junit-ktx:1.1.5")
     implementation("androidx.core:core-ktx:1.13.1")

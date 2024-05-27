@@ -4,16 +4,15 @@
 
 package com.ibm.security.verifysdk.plugin
 
-import com.android.build.api.variant.BuildConfigField
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
-import com.android.builder.model.ClassField
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
-
+import org.gradle.kotlin.dsl.embeddedKotlinVersion
+import org.gradle.kotlin.dsl.extra
 class VerifySdkBuildPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
@@ -119,8 +118,8 @@ class VerifySdkBuildPlugin : Plugin<Project> {
 
         project.dependencies {
 
+            val kotlinVersion = "2.0.0"
             val kotlinCoroutines = "1.8.1"
-            val kotlinLib = "1.9.24"
             val square = "4.12.0"
             val ktorVersion = "2.3.11"
 
@@ -141,7 +140,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
 
             add("coreLibraryDesugaring", "com.android.tools:desugar_jdk_libs:2.0.4")
 
-            add("implementation", "androidx.core:core-ktx:1.7.0")
+            add("implementation", "androidx.core:core-ktx:1.13.1")
             add("implementation", "org.jacoco:org.jacoco.core:0.8.8")
             add("implementation", "com.squareup.retrofit2:retrofit:2.9.0")
             add("implementation", "com.squareup.okhttp3:okhttp:$square")
@@ -154,12 +153,12 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             add("implementation", "io.ktor:ktor-client-okhttp:$ktorVersion")
             add("implementation", "io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
             add("implementation", "io.ktor:ktor-client-content-negotiation:$ktorVersion")
-            add("implementation", "org.jetbrains.kotlin:kotlin-stdlib:$kotlinLib")
+            add("implementation", "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutines")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutines")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinCoroutines")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-rx3:$kotlinCoroutines")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
             add("implementation", "org.slf4j:slf4j-api:2.0.7")
             add("implementation", "androidx.biometric:biometric:1.2.0-alpha05")
