@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.ibm.security.verifysdk.mfa.demo"
+    namespace = "com.ibm.security.verifysdk.mfa.demoapp"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ibm.security.verifysdk.mfa.demo"
+        applicationId = "com.ibm.security.verifysdk.mfa.demoapp"
         minSdk = 29
         targetSdk = 34
         versionCode = 1
@@ -43,6 +43,7 @@ android {
 
 dependencies {
 
+    implementation("androidx.activity:activity:1.9.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     implementation(project(":core"))

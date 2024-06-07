@@ -7,18 +7,26 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Button
+import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import com.ibm.security.verifysdk.core.ContextHelper
+import com.ibm.security.verifysdk.core.KeystoreHelper
 import com.ibm.security.verifysdk.core.threadInfo
+import com.ibm.security.verifysdk.mfa.EnrollableType
+import com.ibm.security.verifysdk.mfa.FactorType
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
 import com.ibm.security.verifysdk.mfa.MFARegistrationController
+import com.ibm.security.verifysdk.mfa.NextTransactionInfo
+import com.ibm.security.verifysdk.mfa.PendingTransactionInfo
+import com.ibm.security.verifysdk.mfa.UserAction
+import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticator
 import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticatorService
-import com.ibm.security.verifysdk.mfa.demo.R
+import com.ibm.security.verifysdk.mfa.cloud.CloudRegistrationProvider
+import com.ibm.security.verifysdk.mfa.completeTransaction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -27,12 +35,13 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 
-
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
 
     private val log: Logger = LoggerFactory.getLogger(javaClass.name)
-    private val REQUESTCAMERAPERMISSIONCODE = 88
+    private val requestCameraPermissionCode = 88
     private lateinit var mfaAuthenticatorDescriptor: MFAAuthenticatorDescriptor
+    private lateinit var cloudAuthenticatorService: CloudAuthenticatorService
+//    private lateinit var currentTransaction: PendingTransactionInfo
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -50,11 +59,6 @@ class MainActivity : AppCompatActivity() {
 
         ContextHelper.init(applicationContext)
         setContentView(R.layout.activity_main)
-
-//        NetworkHelper.customLoggingInterceptor =
-//            HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-
-//        val log: Logger = LoggerFactory.getLogger(MainActivity::class.java)
         log.atLevel(Level.DEBUG).log("XXX DEBUG2")
 
         log.debug("XXX DEBUG")
@@ -64,11 +68,15 @@ class MainActivity : AppCompatActivity() {
         log.trace("XXX TRACE")
         log.trace("XXX TRACE")
 
+        findViewById<Button>(R.id.btn_scan_qr).setOnClickListener {
+            requestCamera()
+        }
         findViewById<Button>(R.id.btn_check_transactions).setOnClickListener {
             checkPendingTransaction()
         }
-
-        requestCamera()
+        findViewById<Button>(R.id.btn_complete_transactions).setOnClickListener {
+            completeTransaction()
+        }
     }
 
     private fun requestCamera() {
@@ -97,7 +105,7 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            REQUESTCAMERAPERMISSIONCODE -> {
+            requestCameraPermissionCode -> {
                 // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() &&
                             grantResults[0] == PackageManager.PERMISSION_GRANTED)
@@ -137,7 +145,7 @@ class MainActivity : AppCompatActivity() {
             IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (intentResult != null && intentResult.contents != null) {
             val qrCode = intentResult.contents
-            log.error("data: $qrCode")
+            log.info("data: $qrCode")
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
                     log.threadInfo()
@@ -145,9 +153,11 @@ class MainActivity : AppCompatActivity() {
                         MFARegistrationController(qrCode).initiate("Carsten's Test account")
                             .onSuccess {
                                 val cloudRegistrationProvider = it
+                                log.info(cloudRegistrationProvider.accountName)
                             }
                             .onFailure {
                                 val error = it
+                                log.error(error.message)
                             }
 
                     val cloudRegistrationProvider = result.getOrNull()
@@ -175,21 +185,41 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkPendingTransaction() {
 
-        val cloudAuthenticatorService = CloudAuthenticatorService(
-            mfaAuthenticatorDescriptor.token.authorizationHeader(),
+        cloudAuthenticatorService = CloudAuthenticatorService(
+            mfaAuthenticatorDescriptor.token.accessToken,
             mfaAuthenticatorDescriptor.refreshUri,
             mfaAuthenticatorDescriptor.transactionUri,
             mfaAuthenticatorDescriptor.id
         )
 
         lifecycleScope.launch {
-            withContext((Dispatchers.IO)) {
+            withContext(Dispatchers.IO) {
                 cloudAuthenticatorService.nextTransaction()
-                    .onSuccess {
-                        log.info("Success: $it")
+                    .onSuccess { nextTransactionInfo ->
+                        log.info("Success: $nextTransactionInfo")
                     }
                     .onFailure {
                         log.info("Failure: $it")
+                    }
+            }
+        }
+    }
+
+    private fun completeTransaction() {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                mfaAuthenticatorDescriptor.allowedFactors.firstOrNull { it.id == cloudAuthenticatorService.currentPendingTransaction?.factorID }
+                    ?.let { factorType ->
+                        cloudAuthenticatorService.completeTransaction(
+                            UserAction.VERIFY,
+                            factorType
+                        )
+                            .onSuccess {
+                                log.info("Success: ${cloudAuthenticatorService.currentPendingTransaction?.message}")
+                            }
+                            .onFailure {
+                                log.error("Failure: $it")
+                            }
                     }
             }
         }

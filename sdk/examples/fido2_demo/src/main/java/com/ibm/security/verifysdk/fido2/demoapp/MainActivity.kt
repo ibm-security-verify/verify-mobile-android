@@ -16,10 +16,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 
 class MainActivity : AppCompatActivity() {
 
-    //    private val rpUrl =
-//        "https://fidointerop.securitypoc.com/mgaauth/sps/fido2/d03ef3f4-0633-41ff-b8b2-c84f82e5a780"
     private val keyName = "61683285-900f-4bed-87e0-b83b5277ba93"
-
     private val fido2Api = Fido2Api()
 
     override fun onCreate(savedInstanceState: Bundle?) {

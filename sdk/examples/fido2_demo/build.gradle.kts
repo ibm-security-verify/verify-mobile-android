@@ -1,3 +1,7 @@
+/*
+ * Copyright contributors to the IBM Security Verify SDK for Android project
+ */
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
