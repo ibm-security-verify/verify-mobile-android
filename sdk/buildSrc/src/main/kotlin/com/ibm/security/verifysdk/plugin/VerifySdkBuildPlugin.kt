@@ -95,11 +95,11 @@ class VerifySdkBuildPlugin : Plugin<Project> {
         // Unit tests: JUnit5
         // Instrumentation tests: JUnit4
         
-        project.configurations.all {
-            resolutionStrategy {
-                force("com.squareup.okio:okio-jvm:3.4.0")
-            }
-        }
+//        project.configurations.all {
+//            resolutionStrategy {
+//                force("com.squareup.okio:okio-jvm:3.4.0")
+//            }
+//        }
 
         // https://github.com/Kotlin/dokka/issues/3472
         project.configurations.matching { it.name.startsWith("dokka") }.configureEach {
@@ -136,8 +136,8 @@ class VerifySdkBuildPlugin : Plugin<Project> {
 
             add("implementation", "androidx.core:core-ktx:1.13.1")
             add("implementation", "org.jacoco:org.jacoco.core:0.8.8")
-            add("implementation", "com.squareup.retrofit2:retrofit:2.9.0")
-            add("implementation", "com.squareup.okhttp3:okhttp:$square")
+//            add("implementation", "com.squareup.retrofit2:retrofit:2.9.0")
+//            add("implementation", "com.squareup.okhttp3:okhttp:$square")
             add("implementation", "com.squareup.okhttp3:logging-interceptor:$square")
 
             add("implementation", "io.ktor:ktor-client-core:$ktorVersion")
