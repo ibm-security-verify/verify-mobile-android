@@ -17,6 +17,7 @@ import com.ibm.security.verifysdk.mfa.TransactionAttribute
 import com.ibm.security.verifysdk.mfa.TransactionResult
 import com.ibm.security.verifysdk.mfa.UserAction
 import io.ktor.client.call.body
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -24,26 +25,26 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import okhttp3.ResponseBody
 import org.json.JSONArray
 import org.json.JSONObject
-import retrofit2.Response
 import java.net.URL
 import java.util.Locale
 import java.util.UUID
 
 @OptIn(ExperimentalSerializationApi::class)
 class CloudAuthenticatorService(
-    private var _authorizationHeader: String,
+    private var _accessToken: String,
     private var _refreshUri: URL,
     private var _transactionUri: URL,
-    private var authenticatorId: String
+    private var _authenticatorId: String
 ) : MFAServiceDescriptor {
 
     private val decoder = Json {
@@ -54,8 +55,8 @@ class CloudAuthenticatorService(
     private var _currentPendingTransaction: PendingTransactionInfo? = null
     private var transactionResult: TransactionResult? = null
 
-    override val authorizationHeader: String
-        get() = _authorizationHeader
+    override val accessToken: String
+        get() = _accessToken
 
     override val refreshUri: URL
         get() = _refreshUri
@@ -65,6 +66,9 @@ class CloudAuthenticatorService(
 
     override val currentPendingTransaction: PendingTransactionInfo?
         get() = _currentPendingTransaction
+
+    override val authenticatorId: String
+        get() = _authenticatorId
 
     internal enum class TransactionFilter(val value: String) {
         NEXT_PENDING("?filter=id,creationTime,transactionData,authenticationMethods&search=state=%22PENDING%22&sort=-creationTime"),
@@ -104,7 +108,13 @@ class CloudAuthenticatorService(
                 Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
             } else {
                 val errorResponse = response.body<ErrorResponse>()
-                Result.failure(AuthorizationException(response.status, errorResponse.error, errorResponse.errorDescription))
+                Result.failure(
+                    AuthorizationException(
+                        response.status,
+                        errorResponse.error,
+                        errorResponse.errorDescription
+                    )
+                )
             }
         } catch (e: Throwable) {
             Result.failure(e)
@@ -125,11 +135,14 @@ class CloudAuthenticatorService(
                 url(transactionUri.toString())
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
-                bearerAuth(authorizationHeader)
+                bearerAuth(accessToken)
             }
 
             if (response.status.isSuccess()) {
-                Result.success(decoder.decodeFromString<NextTransactionInfo>(response.bodyAsText()))
+                parsePendingTransaction(response)
+                    .onSuccess {
+                        _currentPendingTransaction = it.first
+                    }
             } else {
                 Result.failure(MFAServiceError.General(response.bodyAsText()))
             }
@@ -147,43 +160,34 @@ class CloudAuthenticatorService(
             val pendingTransaction =
                 currentPendingTransaction ?: throw MFAServiceError.InvalidPendingTransaction()
 
-            val data = mapOf(
+            val data = arrayOf(mapOf(
                 "id" to pendingTransaction.factorID.toString().lowercase(Locale.ROOT),
                 "userAction" to userAction.value,
                 "signedData" to (if (userAction == UserAction.VERIFY) signedData else null)
-            )
+            ))
 
             val response = NetworkHelper.getInstance.post {
                 url(pendingTransaction.postbackUri.toString())
                 accept(ContentType.Application.Json)
                 contentType(ContentType.Application.Json)
-                bearerAuth(authorizationHeader)
+                bearerAuth(accessToken)
                 setBody(data)
             }
 
             if (response.status.isSuccess()) {
-                Result.success(decoder.decodeFromString<Unit>(response.bodyAsText()))
+                Result.success(Unit)
             } else {
                 Result.failure(MFAServiceError.General(response.bodyAsText()))
             }
-
         } catch (e: Throwable) {
             return Result.failure(e)
         }
     }
 
-    private fun parsePendingTransaction(response: Response<ResponseBody>): Result<NextTransactionInfo> {
+    private suspend fun parsePendingTransaction(response: HttpResponse): Result<NextTransactionInfo> {
 
         return try {
-            val responseBody = response.body()?.string()
-
-            require(responseBody != null)
-
-            val decoder = Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-            }
-
+            val responseBody = response.bodyAsText()
             val result: TransactionResult = try {
                 decoder.decodeFromString(responseBody)
             } catch (e: Exception) {
@@ -210,7 +214,7 @@ class CloudAuthenticatorService(
         val verificationInfo = result.verifications?.first() ?: return null
 
         // 2. Get the postback to the transaction.
-        val postbackUri = URL(transactionUri, verificationInfo.id)
+        val postbackUri = URL(transactionUri, "verifications/${verificationInfo.id}")
 
         // 3. Get the message to display.
         val message = transactionMessage(verificationInfo.transactionInfo)
@@ -239,14 +243,16 @@ class CloudAuthenticatorService(
         // Add the default type (of request) to the result.  Might be overriden if specified in additionalData.
         result.putIfAbsent(TransactionAttribute.Type, "PendingRequestTypeDefault")
 
-        JSONObject(transactionInfo).let {   transactionData ->
+        JSONObject(transactionInfo).let { transactionData ->
             transactionData.has("originIpAddress").let {
-                result[TransactionAttribute.IPAddress] = transactionData.optString("originIpAddress")
+                result[TransactionAttribute.IPAddress] =
+                    transactionData.optString("originIpAddress")
                 transactionData.remove("originIpAddress")
             }
 
             transactionData.has("originUserAgent").let {
-                result[TransactionAttribute.UserAgent] = transactionData.optString("originUserAgent")
+                result[TransactionAttribute.UserAgent] =
+                    transactionData.optString("originUserAgent")
                 transactionData.remove("originUserAgent")
             }
 

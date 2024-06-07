@@ -12,20 +12,20 @@ sealed class FactorType {
 
     val id: UUID
         get() = when (this) {
-            is FactorType.Totp -> value.id
-            is FactorType.Hotp -> value.id
-            is FactorType.Face -> value.id
-            is FactorType.Fingerprint -> value.id
-            is FactorType.UserPresence -> value.id
+            is Totp -> value.id
+            is Hotp -> value.id
+            is Face -> value.id
+            is Fingerprint -> value.id
+            is UserPresence -> value.id
         }
 
     val displayName: String
         get() = when (this) {
-            is FactorType.Totp -> value.displayName
-            is FactorType.Hotp -> value.displayName
-            is FactorType.Face -> value.displayName
-            is FactorType.Fingerprint -> value.displayName
-            is FactorType.UserPresence -> value.displayName
+            is Totp -> value.displayName
+            is Hotp -> value.displayName
+            is Face -> value.displayName
+            is Fingerprint -> value.displayName
+            is UserPresence -> value.displayName
         }
 
     data class Totp(val value: TOTPFactorInfo) : FactorType()

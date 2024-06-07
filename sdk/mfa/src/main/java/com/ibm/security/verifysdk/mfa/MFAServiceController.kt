@@ -21,7 +21,7 @@ class MFAServiceController(private val authenticator: MFAAuthenticatorDescriptor
 
         when (authenticator) {
             is OnPremiseAuthenticator -> return OnPremiseAuthenticatorService(
-                authorizationHeader = authenticator.token.authorizationHeader(),
+                accessToken = authenticator.token.accessToken,
                 refreshUri = authenticator.refreshUri,
                 transactionUri = authenticator.transactionUri,
                 clientId = authenticator.clientId,
@@ -29,10 +29,10 @@ class MFAServiceController(private val authenticator: MFAAuthenticatorDescriptor
             )
 
             is CloudAuthenticator -> return CloudAuthenticatorService(
-                _authorizationHeader = authenticator.token.authorizationHeader(),
+                _accessToken = authenticator.token.accessToken,
                 _refreshUri = authenticator.refreshUri,
                 _transactionUri = authenticator.transactionUri,
-                authenticatorId = authenticator.id
+                _authenticatorId = authenticator.id
             )
 
             else -> throw MFARegistrationError.InvalidFormat

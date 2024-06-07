@@ -12,12 +12,13 @@ import com.ibm.security.verifysdk.mfa.UserAction
 import java.net.URL
 
 class OnPremiseAuthenticatorService(
-    override var authorizationHeader: String,
+    override var accessToken: String,
     override var refreshUri: URL,
     override var transactionUri: URL,
     override var currentPendingTransaction: PendingTransactionInfo? = null,
+    override var authenticatorId: String,
     val clientId: String,
-    val authenticatorId: String
+
 ) : MFAServiceDescriptor {
 
     override suspend fun refreshToken(

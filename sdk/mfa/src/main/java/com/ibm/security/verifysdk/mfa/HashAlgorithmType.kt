@@ -17,7 +17,6 @@ enum class HashAlgorithmType(private val rawValue: String) {
     override fun toString(): String {
         return rawValue
     }
-
     companion object {
         /**
          * Accepts "SHAx" and "HmacSHAx" (and other variations). The latter is required by Java itself
@@ -31,6 +30,20 @@ enum class HashAlgorithmType(private val rawValue: String) {
                 "SHA256", "HMACSHA256", "RSASHA256", "SHA256WITHRSA" -> SHA256
                 "SHA384", "HMACSHA384", "RSASHA384", "SHA384WITHRSA" -> SHA384
                 "SHA512", "HMACSHA512", "RSASHA512", "SHA512WITHRSA" -> SHA512
+                else -> throw HashAlgorithmError.InvalidHash
+            }
+        }
+
+        /**
+         * Normalize algorithm to value defined in
+         * https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#Signature
+         */
+        fun forSigning(rawValue: String): String {
+            return when (rawValue.uppercase(Locale.ROOT)) {
+                "SHA1", "HMACSHA1", "RSASHA1", "SHA1WITHRSA" -> "SHA1withRSA"
+                "SHA256", "HMACSHA256", "RSASHA256", "SHA256WITHRSA" -> "SHA256withRSA"
+                "SHA384", "HMACSHA384", "RSASHA384", "SHA384WITHRSA" -> "SHA384withRSA"
+                "SHA512", "HMACSHA512", "RSASHA512", "SHA512WITHRSA" -> "SHA512withRSA"
                 else -> throw HashAlgorithmError.InvalidHash
             }
         }

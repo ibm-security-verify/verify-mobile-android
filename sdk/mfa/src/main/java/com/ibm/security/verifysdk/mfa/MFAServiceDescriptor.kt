@@ -4,6 +4,7 @@
 
 package com.ibm.security.verifysdk.mfa
 
+import android.util.Base64
 import com.ibm.security.verifysdk.authentication.TokenInfo
 import com.ibm.security.verifysdk.core.NetworkHelper
 import io.ktor.client.request.accept
@@ -16,16 +17,16 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import java.net.URL
 
 interface MFAServiceDescriptor {
-    val authorizationHeader: String
+    val accessToken: String
     val refreshUri: URL
     val transactionUri: URL
     val currentPendingTransaction: PendingTransactionInfo?
+    val authenticatorId: String
 
     suspend fun refreshToken(
         refreshToken: String,
@@ -42,7 +43,9 @@ interface MFAServiceDescriptor {
 typealias NextTransactionInfo = Pair<PendingTransactionInfo?, Int>
 
 suspend fun MFAServiceDescriptor.login(loginUri: URL, code: String): Result<Unit> {
-    val body: RequestBody = "{\"lsi\":$code}".toRequestBody("text/plain".toMediaTypeOrNull())
+    val body = buildJsonObject {
+        put("lsi", code)
+    }
 
     val decoder = Json {
         ignoreUnknownKeys = true
@@ -54,7 +57,7 @@ suspend fun MFAServiceDescriptor.login(loginUri: URL, code: String): Result<Unit
             url(loginUri.toString())
             accept(ContentType.Application.Json)
             contentType(ContentType.Application.Json)
-            bearerAuth(authorizationHeader)
+            bearerAuth(accessToken)
             setBody(body)
         }
 
@@ -70,23 +73,32 @@ suspend fun MFAServiceDescriptor.login(loginUri: URL, code: String): Result<Unit
 
 suspend fun MFAServiceDescriptor.completeTransaction(
     userAction: UserAction = UserAction.VERIFY,
-    factor: FactorType
-) {
+    factorType: FactorType
+):Result<Unit> {
+    var signedData = ""
     val pendingTransaction =
         currentPendingTransaction ?: throw MFAServiceError.InvalidPendingTransaction()
-    val value = factorNameAndAlgorithm(factor)
-        ?: throw MFAServiceError.General("Invalid factor to perform signing.")
-    var signedData = ""
 
-    // TODO: check whether this is correct - it does not seem to provide the right key name
+    val (keyName, algorithm) = factorKeyNameAndAlgorithm(factorType)
 
     if (userAction == UserAction.VERIFY) {
         signedData = sign(
-            keyName = value.first,
-            algorithm = value.second.name,
-            dataToSign = pendingTransaction.dataToSign
+            keyName = keyName,
+            algorithm = HashAlgorithmType.forSigning(algorithm.name),
+            dataToSign = pendingTransaction.dataToSign,
+            base64EncodingOptions = Base64.NO_WRAP
         )
     }
 
-    completeTransaction(userAction = userAction, signedData = signedData)
+    return completeTransaction(userAction = userAction, signedData = signedData)
+}
+
+internal fun factorKeyNameAndAlgorithm(factorType: FactorType): Pair<String, HashAlgorithmType> {
+
+    return when (factorType) {
+        is FactorType.Face -> Pair(factorType.value.keyName, factorType.value.algorithm)
+        is FactorType.Fingerprint -> Pair(factorType.value.keyName, factorType.value.algorithm)
+        is FactorType.UserPresence -> Pair(factorType.value.keyName, factorType.value.algorithm)
+        else -> throw MFAServiceError.General("Invalid factor to perform signing.")
+    }
 }

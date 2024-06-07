@@ -5,6 +5,7 @@
 package com.ibm.security.verifysdk.mfa.cloud
 
 import com.ibm.security.verifysdk.authentication.TokenInfo
+import com.ibm.security.verifysdk.mfa.EnrollableType
 import com.ibm.security.verifysdk.mfa.FactorType
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
 import com.ibm.security.verifysdk.mfa.URLSerializer
