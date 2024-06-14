@@ -8,6 +8,18 @@
     tools:context=".MainActivity">
 
     <Button
+        android:id="@+id/btn_approve_transactions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Approve Transactions"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_check_transactions"
+        app:layout_constraintVertical_bias="0.79" />
+
+    <Button
         android:id="@+id/btn_scan_qr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -40,10 +52,10 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/btn_complete_transactions"
+        android:id="@+id/btn_deny_transactions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Complete Transactions"
+        android:text="Deny Transactions"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"

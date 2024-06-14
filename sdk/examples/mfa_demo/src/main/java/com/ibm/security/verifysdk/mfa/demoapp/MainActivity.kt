@@ -6,6 +6,7 @@ package com.ibm.security.verifysdk.mfa.demoapp
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,21 +15,14 @@ import androidx.lifecycle.lifecycleScope
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import com.ibm.security.verifysdk.core.ContextHelper
-import com.ibm.security.verifysdk.core.KeystoreHelper
 import com.ibm.security.verifysdk.core.threadInfo
 import com.ibm.security.verifysdk.mfa.EnrollableType
-import com.ibm.security.verifysdk.mfa.FactorType
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
 import com.ibm.security.verifysdk.mfa.MFARegistrationController
-import com.ibm.security.verifysdk.mfa.NextTransactionInfo
-import com.ibm.security.verifysdk.mfa.PendingTransactionInfo
 import com.ibm.security.verifysdk.mfa.UserAction
-import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticator
 import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticatorService
-import com.ibm.security.verifysdk.mfa.cloud.CloudRegistrationProvider
 import com.ibm.security.verifysdk.mfa.completeTransaction
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.Logger
@@ -41,7 +35,6 @@ class MainActivity : ComponentActivity() {
     private val requestCameraPermissionCode = 88
     private lateinit var mfaAuthenticatorDescriptor: MFAAuthenticatorDescriptor
     private lateinit var cloudAuthenticatorService: CloudAuthenticatorService
-//    private lateinit var currentTransaction: PendingTransactionInfo
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -66,7 +59,6 @@ class MainActivity : ComponentActivity() {
         log.warn("XXX WARN")
         log.info("XXX INFO")
         log.trace("XXX TRACE")
-        log.trace("XXX TRACE")
 
         findViewById<Button>(R.id.btn_scan_qr).setOnClickListener {
             requestCamera()
@@ -74,8 +66,11 @@ class MainActivity : ComponentActivity() {
         findViewById<Button>(R.id.btn_check_transactions).setOnClickListener {
             checkPendingTransaction()
         }
-        findViewById<Button>(R.id.btn_complete_transactions).setOnClickListener {
-            completeTransaction()
+        findViewById<Button>(R.id.btn_approve_transactions).setOnClickListener {
+            completeTransaction(UserAction.VERIFY)
+        }
+        findViewById<Button>(R.id.btn_deny_transactions).setOnClickListener {
+            completeTransaction(UserAction.DENY)
         }
     }
 
@@ -137,7 +132,6 @@ class MainActivity : ComponentActivity() {
         integrator.initiateScan()
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -150,32 +144,32 @@ class MainActivity : ComponentActivity() {
                 withContext(Dispatchers.IO) {
                     log.threadInfo()
                     val result =
-                        MFARegistrationController(qrCode).initiate("Carsten's Test account")
+                        MFARegistrationController(qrCode).initiate("Carsten's Test account", false)
                             .onSuccess {
-                                val cloudRegistrationProvider = it
-                                log.info(cloudRegistrationProvider.accountName)
+                                val mfaRegistrationProvider = it
+                                log.info("Success: ${mfaRegistrationProvider.accountName}")
                             }
                             .onFailure {
-                                val error = it
-                                log.error(error.message)
+                                log.error("Failure: $it")
                             }
-
-                    val cloudRegistrationProvider = result.getOrNull()
+                    val mfaRegistrationProvider = result.getOrNull()
                     log.threadInfo()
-                    log.info("Counter " + cloudRegistrationProvider?.countOfAvailableEnrollments)
-                    cloudRegistrationProvider?.nextEnrollment()
-                    cloudRegistrationProvider?.enroll()
-                    cloudRegistrationProvider?.nextEnrollment()
-                    cloudRegistrationProvider?.enroll()
-                    cloudRegistrationProvider?.nextEnrollment()
-                    cloudRegistrationProvider?.enroll()
-                    cloudRegistrationProvider?.finalize()
+                    log.info("Counter " + mfaRegistrationProvider?.countOfAvailableEnrollments)
+
+                    var nextEnrollment = mfaRegistrationProvider?.nextEnrollment()
+                    while (nextEnrollment != null) {
+                        if (nextEnrollment.enrollableType != EnrollableType.FACE) { // not supported
+                            mfaRegistrationProvider?.enroll()
+                        }
+                        nextEnrollment = mfaRegistrationProvider?.nextEnrollment()
+                    }
+                    mfaRegistrationProvider?.finalize()
                         ?.onSuccess {
-                            log.info(it.toString())
+                            log.info("Success: $it")
                             mfaAuthenticatorDescriptor = it
                         }
                         ?.onFailure {
-                            log.error(it.toString())
+                            log.error("Failure: $it")
                         }
 
                 }
@@ -205,13 +199,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun completeTransaction() {
+    private fun completeTransaction(userAction: UserAction) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 mfaAuthenticatorDescriptor.allowedFactors.firstOrNull { it.id == cloudAuthenticatorService.currentPendingTransaction?.factorID }
                     ?.let { factorType ->
                         cloudAuthenticatorService.completeTransaction(
-                            UserAction.VERIFY,
+                            userAction,
                             factorType
                         )
                             .onSuccess {
