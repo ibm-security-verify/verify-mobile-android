@@ -24,13 +24,12 @@ class OnPremiseAuthenticator (
     override val serviceName: String,
     override var accountName: String,
     override val allowedFactors: List<FactorType>,
-    override var publicKeyCertificate: String?,
     @Serializable(with = URLSerializer::class)
     val qrLoginUri: URL?,
-    private var ignoreSSLCertificate_: Boolean = false,
-    private var clientId_: String
+    val ignoreSSLCertificate: Boolean = false,
+    val clientId: String
 ) : MFAAuthenticatorDescriptor {
 
-    val ignoreSSLCertificate: Boolean get() = ignoreSSLCertificate_
-    val clientId: String get() = clientId_
+//    val ignoreSSLCertificate: Boolean get() = _ignoreSSLCertificate
+//    val clientId: String get() = _clientId
 }
