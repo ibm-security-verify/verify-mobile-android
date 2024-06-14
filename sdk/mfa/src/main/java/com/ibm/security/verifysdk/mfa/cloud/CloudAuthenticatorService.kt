@@ -160,11 +160,13 @@ class CloudAuthenticatorService(
             val pendingTransaction =
                 currentPendingTransaction ?: throw MFAServiceError.InvalidPendingTransaction()
 
-            val data = arrayOf(mapOf(
-                "id" to pendingTransaction.factorID.toString().lowercase(Locale.ROOT),
-                "userAction" to userAction.value,
-                "signedData" to (if (userAction == UserAction.VERIFY) signedData else null)
-            ))
+            val data = arrayOf(
+                mapOf(
+                    "id" to pendingTransaction.factorID.toString().lowercase(Locale.ROOT),
+                    "userAction" to userAction.value,
+                    "signedData" to (if (userAction == UserAction.VERIFY) signedData else null)
+                )
+            )
 
             val response = NetworkHelper.getInstance.post {
                 url(pendingTransaction.postbackUri.toString())
@@ -196,12 +198,12 @@ class CloudAuthenticatorService(
 
             if (result.count == 0) {
                 Result.success(NextTransactionInfo(null, 0))
-            }
-
-            createPendingTransaction(result)?.let {
-                Result.success(NextTransactionInfo(it, result.count))
-            } ?: kotlin.run {
-                Result.failure(MFAServiceError.UnableToCreateTransaction())
+            } else {
+                createPendingTransaction(result)?.let {
+                    Result.success(NextTransactionInfo(it, result.count))
+                } ?: kotlin.run {
+                    Result.failure(MFAServiceError.UnableToCreateTransaction())
+                }
             }
 
         } catch (e: Throwable) {

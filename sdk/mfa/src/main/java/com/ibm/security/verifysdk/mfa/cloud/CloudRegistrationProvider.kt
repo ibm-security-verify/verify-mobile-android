@@ -19,7 +19,6 @@ import com.ibm.security.verifysdk.mfa.FaceFactorInfo
 import com.ibm.security.verifysdk.mfa.FactorType
 import com.ibm.security.verifysdk.mfa.FingerprintFactorInfo
 import com.ibm.security.verifysdk.mfa.HashAlgorithmType
-import com.ibm.security.verifysdk.mfa.InitializationInfo
 import com.ibm.security.verifysdk.mfa.MFAAttributeInfo
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
 import com.ibm.security.verifysdk.mfa.MFARegistrationDescriptor
@@ -61,12 +60,11 @@ class CloudRegistrationProvider(data: String) :
         isLenient = true
     }
 
-    private val initializationInfo: InitializationInfo = decoder.decodeFromString(data)
-
-    private lateinit var tokenInfo: TokenInfo
-    private lateinit var metaData: Metadata
+    private var initializationInfo: InitializationInfo
     private var currentFactor: SignatureEnrollableFactor? = null
     private var factors: MutableList<FactorType> = mutableListOf()
+    private lateinit var tokenInfo: TokenInfo
+    private lateinit var metaData: Metadata
 
     override var pushToken: String = ""
     override var accountName: String = ""
@@ -78,8 +76,12 @@ class CloudRegistrationProvider(data: String) :
     override var invalidatedByBiometricEnrollment: Boolean = false
 
     init {
-        accountName = initializationInfo.accountName
-        pushToken = ""
+        try {
+            initializationInfo = decoder.decodeFromString(data)
+            accountName = initializationInfo.accountName
+        } catch (e: Exception) {
+            throw MFARegistrationError.FailedToParse
+        }
     }
 
     internal suspend fun initiate(
@@ -105,25 +107,25 @@ class CloudRegistrationProvider(data: String) :
             if (response.status.isSuccess()) {
                 response.bodyAsText().let { responseBodyData ->
                     tokenInfo = decoder.decodeFromString(responseBodyData)
-                    val registration: Registration = decoder.decodeFromString(responseBodyData)
+                    val cloudRegistration: CloudRegistration = decoder.decodeFromString(responseBodyData)
 
-                    registration.metadataContainer.let {
+                    cloudRegistration.metadataContainer.let {
                         metaData = Metadata(
-                            id = registration.id,
+                            id = cloudRegistration.id,
                             registrationUri = it.registrationUri,
                             serviceName = it.serviceName,
                             transactionUri = it.registrationUri.replace(
                                 "registration",
-                                "${registration.id}/verifications"
+                                "${cloudRegistration.id}/verifications"
                             ),
                             features = it.features,
                             custom = it.custom,
                             theme = it.theme,
-                            availableFactors = registration.availableFactor
+                            availableFactors = cloudRegistration.availableFactors
                         )
                     }
 
-                    registration.availableFactor.stream()
+                    cloudRegistration.availableFactors.stream()
                         .filter { factor -> factor.type == EnrollableType.TOTP }.findFirst()
                         .ifPresent { factor ->
                             (factor as? CloudTOTPEnrollableFactor)?.let { cloudTotpEnrollableFactor ->
@@ -143,7 +145,7 @@ class CloudRegistrationProvider(data: String) :
                                 }
                             }
                         }
-                    registration.availableFactor.removeAll { factor -> factor.type == EnrollableType.TOTP }
+                    cloudRegistration.availableFactors.removeAll { factor -> factor.type == EnrollableType.TOTP }
 
                     return@initiate Result.success(
                         CloudRegistrationProviderResultData(
@@ -164,29 +166,30 @@ class CloudRegistrationProvider(data: String) :
 
     override fun nextEnrollment(): EnrollableSignature? {
 
-        try {
+        return try {
             log.entering()
 
             if (metaData.availableFactors.isEmpty()) {
-                return null
-            }
+                null
+            } else {
+                metaData.availableFactors.first().let { enrollableFactor ->
+                    (enrollableFactor as SignatureEnrollableFactor).let { signatureEnrollableFactor ->
+                        currentFactor = signatureEnrollableFactor
+                        metaData.availableFactors.removeAll { enrollableFactor.type == it.type }
 
-            metaData.availableFactors.first().let { enrollableFactor ->
-                (enrollableFactor as SignatureEnrollableFactor).let { signatureEnrollableFactor ->
-                    currentFactor = signatureEnrollableFactor
-                    metaData.availableFactors.removeAll { enrollableFactor.type == it.type }
+                        val algorithm =
+                            currentFactor?.algorithm?.let { HashAlgorithmType.fromString(it) }
+                        val biometricAuthentication =
+                            (currentFactor?.type == EnrollableType.USER_PRESENCE).not()
 
-                    val algorithm =
-                        currentFactor?.algorithm?.let { HashAlgorithmType.fromString(it) }
-                    val biometricAuthentication =
-                        (currentFactor?.type == EnrollableType.USER_PRESENCE).not()
-
-                    return@nextEnrollment algorithm?.let {
-                        EnrollableSignature(
-                            biometricAuthentication,
-                            it,
-                            metaData.id
-                        )
+                        algorithm?.let {
+                            EnrollableSignature(
+                                biometricAuthentication,
+                                it,
+                                metaData.id,
+                                signatureEnrollableFactor.type
+                            )
+                        }
                     }
                 }
             }

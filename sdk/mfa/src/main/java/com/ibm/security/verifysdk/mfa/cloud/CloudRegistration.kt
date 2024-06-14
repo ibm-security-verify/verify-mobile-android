@@ -17,7 +17,7 @@ import kotlinx.serialization.json.JsonNames
 import java.net.URL
 
 @Serializable
-internal data class Registration @OptIn(ExperimentalSerializationApi::class) constructor(
+internal data class CloudRegistration @OptIn(ExperimentalSerializationApi::class) constructor(
     val accessToken: String,
     val expiresIn: Int,
     val id: String,
@@ -30,11 +30,11 @@ internal data class Registration @OptIn(ExperimentalSerializationApi::class) con
     val transactionUri: URL =
         URL(metadataContainer.registrationUri.toString().replace("registration", "$id/verifications"))
 
-    var availableFactor: ArrayList<EnrollableFactor> = java.util.ArrayList()
+    var availableFactors: ArrayList<EnrollableFactor> = java.util.ArrayList()
 
     init {
         metadataContainer.authenticationMethods.userPresence?.let {
-            availableFactor.add(
+            availableFactors.add(
                 SignatureEnrollableFactor(
                     it.enrollmentUri,
                     EnrollableType.USER_PRESENCE,
@@ -44,7 +44,7 @@ internal data class Registration @OptIn(ExperimentalSerializationApi::class) con
         }
 
         metadataContainer.authenticationMethods.face?.let {
-            availableFactor.add(
+            availableFactors.add(
                 SignatureEnrollableFactor(
                     it.enrollmentUri,
                     EnrollableType.FACE,
@@ -55,7 +55,7 @@ internal data class Registration @OptIn(ExperimentalSerializationApi::class) con
         }
 
         metadataContainer.authenticationMethods.fingerprint?.let {
-            availableFactor.add(
+            availableFactors.add(
                 SignatureEnrollableFactor(
                     it.enrollmentUri,
                     EnrollableType.FINGERPRINT,
@@ -67,7 +67,7 @@ internal data class Registration @OptIn(ExperimentalSerializationApi::class) con
 
         metadataContainer.authenticationMethods.totp?.let {totp ->
             totp.attributes?.let {
-                availableFactor.add(
+                availableFactors.add(
                     CloudTOTPEnrollableFactor(
                         totp.enrollmentUri,
                         EnrollableType.TOTP,
