@@ -79,9 +79,8 @@ suspend fun MFAServiceDescriptor.completeTransaction(
     val pendingTransaction =
         currentPendingTransaction ?: throw MFAServiceError.InvalidPendingTransaction()
 
-    val (keyName, algorithm) = factorKeyNameAndAlgorithm(factorType)
-
     if (userAction == UserAction.VERIFY) {
+        val (keyName, algorithm) = factorKeyNameAndAlgorithm(factorType)
         signedData = sign(
             keyName = keyName,
             algorithm = HashAlgorithmType.forSigning(algorithm.name),

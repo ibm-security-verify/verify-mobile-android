@@ -13,5 +13,4 @@ interface MFAAuthenticatorDescriptor : AuthenticatorDescriptor {
     val transactionUri : URL
     var theme : Map<String, String>
     var token : TokenInfo
-    var publicKeyCertificate : String?
 }

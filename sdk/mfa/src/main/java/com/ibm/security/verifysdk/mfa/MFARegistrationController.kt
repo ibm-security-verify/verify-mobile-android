@@ -4,8 +4,10 @@
 
 package com.ibm.security.verifysdk.mfa
 
+import android.util.Log
 import com.ibm.security.verifysdk.core.threadInfo
 import com.ibm.security.verifysdk.mfa.cloud.CloudRegistrationProvider
+import com.ibm.security.verifysdk.mfa.onprem.OnPremiseRegistrationProvider
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
@@ -36,21 +38,49 @@ class MFARegistrationController(private var data: String) {
         accountName: String,
         skipTotpEnrollment: Boolean = true,
         pushToken: String? = "",
-        additionalData: Map<String, Any>? = null
+        additionalHeaders: HashMap<String, String>? = null
     ): Result<MFARegistrationDescriptor<MFAAuthenticatorDescriptor>> {
-        val cloudRegistrationProvider = CloudRegistrationProvider(data)
 
-        log.threadInfo()
-
-        cloudRegistrationProvider.initiate(accountName, skipTotpEnrollment, pushToken)
-            .let { resultInitiate ->
-                resultInitiate.onSuccess {
-                    return Result.success(cloudRegistrationProvider)
-                }
-                resultInitiate.onFailure {
-                    return Result.failure(it)
-                }
+        try {
+            CloudRegistrationProvider(data).let { cloudRegistrationProvider ->
+                cloudRegistrationProvider.initiate(accountName, skipTotpEnrollment, pushToken)
+                    .let { resultInitiate ->
+                        resultInitiate.onSuccess {
+                            return Result.success(cloudRegistrationProvider)
+                        }
+                        resultInitiate.onFailure {
+                            return Result.failure(it)
+                        }
+                    }
             }
+        } catch (t: Throwable) {
+            t.localizedMessage?.let { localizedMessage ->
+                log.error(localizedMessage)
+            }
+        }
+
+        try {
+            OnPremiseRegistrationProvider(data).let { onPremiseRegistrationProvider ->
+                onPremiseRegistrationProvider.initiate(
+                    accountName,
+                    skipTotpEnrollment,
+                    pushToken,
+                    additionalHeaders
+                )
+                    .let { resultInitiate ->
+                        resultInitiate.onSuccess {
+                            return Result.success(onPremiseRegistrationProvider)
+                        }
+                        resultInitiate.onFailure {
+                            return Result.failure(it)
+                        }
+                    }
+            }
+        } catch (t: Throwable) {
+            t.localizedMessage?.let { localizedMessage ->
+                log.error(localizedMessage)
+            }
+        }
 
         return Result.failure(MFARegistrationError.InvalidFormat)
     }

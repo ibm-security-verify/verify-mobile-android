@@ -11,5 +11,3 @@ internal data class SignatureEnrollableFactor(
     override val type: EnrollableType,
     val algorithm: String
 ) : EnrollableFactor
-
-typealias EnrollableSignature = Triple<Boolean, HashAlgorithmType, String>

@@ -19,5 +19,12 @@ enum class EnrollableType {
                 null
             }
         }
+
+        internal fun forIsvaEnrollment(type: EnrollableType?):String {
+            return when (type) {
+                USER_PRESENCE -> "userPresence"
+                else -> type?.name?.lowercase() ?: ""
+            }
+        }
     }
 }
