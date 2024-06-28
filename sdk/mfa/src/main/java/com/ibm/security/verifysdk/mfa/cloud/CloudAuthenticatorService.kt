@@ -14,10 +14,9 @@ import com.ibm.security.verifysdk.mfa.MFAServiceError
 import com.ibm.security.verifysdk.mfa.NextTransactionInfo
 import com.ibm.security.verifysdk.mfa.PendingTransactionInfo
 import com.ibm.security.verifysdk.mfa.TransactionAttribute
-import com.ibm.security.verifysdk.mfa.TransactionResult
 import com.ibm.security.verifysdk.mfa.UserAction
+import com.ibm.security.verifysdk.mfa.cloud.model.TransactionResult
 import io.ktor.client.call.body
-import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -28,7 +27,6 @@ import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -140,9 +138,13 @@ class CloudAuthenticatorService(
 
             if (response.status.isSuccess()) {
                 parsePendingTransaction(response)
-                    .onSuccess {
-                        _currentPendingTransaction = it.first
-                    }
+                    .fold(
+                        onSuccess = {
+                            Result.success(it)
+                        },
+                        onFailure = {
+                            Result.failure(it)
+                        })
             } else {
                 Result.failure(MFAServiceError.General(response.bodyAsText()))
             }

@@ -2,7 +2,7 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.mfa.cloud
+package com.ibm.security.verifysdk.mfa.onprem.model
 
 import com.ibm.security.verifysdk.mfa.URLSerializer
 import kotlinx.serialization.SerialName
@@ -11,9 +11,11 @@ import java.net.URL
 
 @Serializable
 internal data class InitializationInfo(
-    @SerialName("registrationUri")
+    @SerialName("details_url")
     @Serializable(with = URLSerializer::class)
     val uri: URL,
     val code: String,
-    val accountName: String
+    val ignoreSSLCertificate: Boolean = false,
+    @SerialName("client_id")
+    val clientId: String
 )

@@ -4,10 +4,10 @@
 
 package com.ibm.security.verifysdk.mfa
 
-import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticator
 import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticatorService
-import com.ibm.security.verifysdk.mfa.onprem.OnPremiseAuthenticator
+import com.ibm.security.verifysdk.mfa.cloud.model.CloudAuthenticator
 import com.ibm.security.verifysdk.mfa.onprem.OnPremiseAuthenticatorService
+import com.ibm.security.verifysdk.mfa.onprem.model.OnPremiseAuthenticator
 
 class MFAServiceController(private val authenticator: MFAAuthenticatorDescriptor) {
 
@@ -21,11 +21,12 @@ class MFAServiceController(private val authenticator: MFAAuthenticatorDescriptor
 
         when (authenticator) {
             is OnPremiseAuthenticator -> return OnPremiseAuthenticatorService(
-                accessToken = authenticator.token.accessToken,
-                refreshUri = authenticator.refreshUri,
-                transactionUri = authenticator.transactionUri,
-                clientId = authenticator.clientId,
-                authenticatorId = authenticator.id
+                _accessToken = authenticator.token.accessToken,
+                _refreshUri = authenticator.refreshUri,
+                _transactionUri = authenticator.transactionUri,
+                _clientId = authenticator.clientId,
+                _authenticatorId = authenticator.id,
+                _ignoreSslCertificate = authenticator.ignoreSSLCertificate
             )
 
             is CloudAuthenticator -> return CloudAuthenticatorService(

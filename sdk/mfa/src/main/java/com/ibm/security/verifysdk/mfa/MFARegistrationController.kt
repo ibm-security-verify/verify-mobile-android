@@ -4,8 +4,6 @@
 
 package com.ibm.security.verifysdk.mfa
 
-import android.util.Log
-import com.ibm.security.verifysdk.core.threadInfo
 import com.ibm.security.verifysdk.mfa.cloud.CloudRegistrationProvider
 import com.ibm.security.verifysdk.mfa.onprem.OnPremiseRegistrationProvider
 import kotlinx.serialization.json.Json

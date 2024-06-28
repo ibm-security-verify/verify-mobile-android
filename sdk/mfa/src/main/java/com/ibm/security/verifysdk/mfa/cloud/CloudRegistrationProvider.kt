@@ -26,6 +26,12 @@ import com.ibm.security.verifysdk.mfa.MFARegistrationError
 import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
 import com.ibm.security.verifysdk.mfa.TOTPFactorInfo
 import com.ibm.security.verifysdk.mfa.UserPresenceFactorInfo
+import com.ibm.security.verifysdk.mfa.cloud.model.CloudAuthenticator
+import com.ibm.security.verifysdk.mfa.cloud.model.CloudRegistration
+import com.ibm.security.verifysdk.mfa.cloud.model.CloudRegistrationProviderResultData
+import com.ibm.security.verifysdk.mfa.cloud.model.CloudTOTPEnrollableFactor
+import com.ibm.security.verifysdk.mfa.cloud.model.InitializationInfo
+import com.ibm.security.verifysdk.mfa.cloud.model.Metadata
 import com.ibm.security.verifysdk.mfa.generateKeys
 import com.ibm.security.verifysdk.mfa.sign
 import io.ktor.client.request.accept

@@ -2,7 +2,7 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.mfa.onprem
+package com.ibm.security.verifysdk.mfa.onprem.model
 
 import com.ibm.security.verifysdk.authentication.TokenInfo
 import com.ibm.security.verifysdk.mfa.FactorType

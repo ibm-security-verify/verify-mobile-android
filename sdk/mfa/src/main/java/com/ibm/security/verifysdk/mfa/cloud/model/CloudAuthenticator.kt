@@ -2,10 +2,9 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.mfa.cloud
+package com.ibm.security.verifysdk.mfa.cloud.model
 
 import com.ibm.security.verifysdk.authentication.TokenInfo
-import com.ibm.security.verifysdk.mfa.EnrollableType
 import com.ibm.security.verifysdk.mfa.FactorType
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
 import com.ibm.security.verifysdk.mfa.URLSerializer

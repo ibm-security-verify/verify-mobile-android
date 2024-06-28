@@ -23,6 +23,14 @@ import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
 import com.ibm.security.verifysdk.mfa.TOTPFactorInfo
 import com.ibm.security.verifysdk.mfa.UserPresenceFactorInfo
 import com.ibm.security.verifysdk.mfa.generateKeys
+import com.ibm.security.verifysdk.mfa.onprem.model.DetailsData
+import com.ibm.security.verifysdk.mfa.onprem.model.EnrollmentResult
+import com.ibm.security.verifysdk.mfa.onprem.model.InitializationInfo
+import com.ibm.security.verifysdk.mfa.onprem.model.Metadata
+import com.ibm.security.verifysdk.mfa.onprem.model.OnPremiseAuthenticator
+import com.ibm.security.verifysdk.mfa.onprem.model.OnPremiseRegistrationProviderResultData
+import com.ibm.security.verifysdk.mfa.onprem.model.OnPremiseTOTPEnrollableFactor
+import com.ibm.security.verifysdk.mfa.onprem.model.TotpConfiguration
 import com.ibm.security.verifysdk.mfa.sign
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
