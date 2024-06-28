@@ -108,48 +108,48 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  coverage_report:
-    name: Generate code coverage report
-    runs-on: ubuntu-latest
-    needs: setup_environment
+  # coverage_report:
+  #   name: Generate code coverage report
+  #   runs-on: ubuntu-latest
+  #   needs: setup_environment
 
-    steps:
-      - name: Code checkout
-        uses: actions/checkout@v4.1.1
+  #   steps:
+  #     - name: Code checkout
+  #       uses: actions/checkout@v4.1.1
 
-      - name: Install Java
-        uses: actions/setup-java@v4.1.0
-        with:
-          java-version: '17'
-          distribution: 'adopt'
+  #     - name: Install Java
+  #       uses: actions/setup-java@v4.1.0
+  #       with:
+  #         java-version: '17'
+  #         distribution: 'adopt'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3.2.0
+  #     - name: Setup Android SDK
+  #       uses: android-actions/setup-android@v3.2.0
 
-      - name: Load cache
-        uses: actions/cache@v4.0.1
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}      
+  #     - name: Load cache
+  #       uses: actions/cache@v4.0.1
+  #       with:
+  #         path: |
+  #           ~/.gradle/caches
+  #           ~/.gradle/wrapper
+  #         key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}      
    
-      - name: Run instrumentation Tests
-        uses: reactivecircus/android-emulator-runner@v2
-        if: false
-        with:
-          working-directory: ./sdk
-          api-level: 28
-          target: default
-          arch: x86
-          profile: Nexus 6
-          script: ./gradlew --no-daemon jacocoDebugCoverageReport
+  #     - name: Run instrumentation Tests
+  #       uses: reactivecircus/android-emulator-runner@v2
+  #       if: false
+  #       with:
+  #         working-directory: ./sdk
+  #         api-level: 28
+  #         target: default
+  #         arch: x86
+  #         profile: Nexus 6
+  #         script: ./gradlew --no-daemon jacocoDebugCoverageReport
 
-      - name: Store code coverage report
-        uses: actions/upload-artifact@v4.3.1
-        with:
-          name: code-coverage
-          path: ./sdk/app/build/reports/jacoco/jacocoDebugCoverageReport/
+  #     - name: Store code coverage report
+  #       uses: actions/upload-artifact@v4.3.1
+  #       with:
+  #         name: code-coverage
+  #         path: ./sdk/app/build/reports/jacoco/jacocoDebugCoverageReport/
 
   mend_scan:
     name: Mend scan
@@ -188,7 +188,7 @@ jobs:
   publish:
     name: Publish SDK, reports and documentation
     runs-on: ubuntu-latest
-    needs: [setup_environment, coverage_report, build_and_test, mend_scan]
+    needs: [setup_environment, build_and_test, mend_scan]
 
     steps:
       - name: Verify release title
