@@ -17,14 +17,29 @@ import com.google.zxing.integration.android.IntentResult
 import com.ibm.security.verifysdk.core.ContextHelper
 import com.ibm.security.verifysdk.core.threadInfo
 import com.ibm.security.verifysdk.mfa.EnrollableType
+import com.ibm.security.verifysdk.mfa.FactorType
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
 import com.ibm.security.verifysdk.mfa.MFARegistrationController
+import com.ibm.security.verifysdk.mfa.MFAServiceController
+import com.ibm.security.verifysdk.mfa.MFAServiceDescriptor
+import com.ibm.security.verifysdk.mfa.TOTPFactorInfo
 import com.ibm.security.verifysdk.mfa.UserAction
+import com.ibm.security.verifysdk.mfa.UserPresenceFactorInfo
 import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticatorService
+import com.ibm.security.verifysdk.mfa.cloud.model.CloudAuthenticator
 import com.ibm.security.verifysdk.mfa.completeTransaction
+import com.ibm.security.verifysdk.mfa.onprem.model.OnPremiseAuthenticator
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonTransformingSerializer
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
@@ -34,7 +49,7 @@ class MainActivity : ComponentActivity() {
     private val log: Logger = LoggerFactory.getLogger(javaClass.name)
     private val requestCameraPermissionCode = 88
     private lateinit var mfaAuthenticatorDescriptor: MFAAuthenticatorDescriptor
-    private lateinit var cloudAuthenticatorService: CloudAuthenticatorService
+    private lateinit var mfaService: MFAServiceDescriptor
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -179,16 +194,11 @@ class MainActivity : ComponentActivity() {
 
     private fun checkPendingTransaction() {
 
-        cloudAuthenticatorService = CloudAuthenticatorService(
-            mfaAuthenticatorDescriptor.token.accessToken,
-            mfaAuthenticatorDescriptor.refreshUri,
-            mfaAuthenticatorDescriptor.transactionUri,
-            mfaAuthenticatorDescriptor.id
-        )
+        mfaService = MFAServiceController(mfaAuthenticatorDescriptor).initiate()
 
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                cloudAuthenticatorService.nextTransaction()
+                mfaService.nextTransaction()
                     .onSuccess { nextTransactionInfo ->
                         log.info("Success: $nextTransactionInfo")
                     }
@@ -202,20 +212,74 @@ class MainActivity : ComponentActivity() {
     private fun completeTransaction(userAction: UserAction) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                mfaAuthenticatorDescriptor.allowedFactors.firstOrNull { it.id == cloudAuthenticatorService.currentPendingTransaction?.factorID }
-                    ?.let { factorType ->
-                        cloudAuthenticatorService.completeTransaction(
-                            userAction,
-                            factorType
-                        )
-                            .onSuccess {
-                                log.info("Success: ${cloudAuthenticatorService.currentPendingTransaction?.message}")
-                            }
-                            .onFailure {
-                                log.error("Failure: $it")
+                when (mfaAuthenticatorDescriptor) {
+                    is CloudAuthenticator -> {
+                        mfaAuthenticatorDescriptor.allowedFactors.firstOrNull { it.id == mfaService.currentPendingTransaction?.factorID }
+                            ?.let { factorType ->
+                                mfaService.completeTransaction(
+                                    userAction,
+                                    factorType
+                                )
+                                    .onSuccess {
+                                        log.info("Success: ${mfaService.currentPendingTransaction?.message}")
+                                    }
+                                    .onFailure {
+                                        log.error("Failure: $it")
+                                    }
                             }
                     }
+
+                    is OnPremiseAuthenticator -> {
+                        mfaAuthenticatorDescriptor.allowedFactors.filterIsInstance<FactorType.UserPresence>()
+                            .firstOrNull() {
+                                it.value.keyName.split(".")[1].equals(
+                                    mfaService.currentPendingTransaction?.factorType,
+                                    ignoreCase = true
+                                )
+                            }?.let {
+                                processFactorType(userAction = userAction, factorType = it)
+                            }
+
+                        mfaAuthenticatorDescriptor.allowedFactors.filterIsInstance<FactorType.Fingerprint>()
+                            .firstOrNull() {
+                                it.value.keyName.split(".")[1].equals(
+                                    mfaService.currentPendingTransaction?.factorType,
+                                    ignoreCase = true
+                                )
+                            }?.let {
+                                processFactorType(userAction = userAction, factorType = it)
+                            }
+
+                        mfaAuthenticatorDescriptor.allowedFactors.filterIsInstance<FactorType.Face>()
+                            .firstOrNull() {
+                                it.value.keyName.split(".")[1].equals(
+                                    mfaService.currentPendingTransaction?.factorType,
+                                    ignoreCase = true
+                                )
+                            }?.let {
+                                processFactorType(userAction = userAction, factorType = it)
+                            }
+                    }
+                }
             }
         }
     }
+
+    private suspend fun processFactorType(
+        userAction: UserAction,
+        factorType: FactorType
+    ) {
+        mfaService.completeTransaction(
+            userAction,
+            factorType
+        )
+            .onSuccess {
+                log.info("Success: ${mfaService.currentPendingTransaction?.message}")
+            }
+            .onFailure {
+                log.error("Failure: $it")
+            }
+    }
+
 }
+
