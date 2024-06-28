@@ -418,30 +418,7 @@ class OnPremiseAuthenticatorService(
                     result[TransactionAttribute.Image] = attributeInfo.values.first()
                 }
 
-                {
-                        // Assign the remaining values to TransactionAttribute.custom
-                        if (data.isNotEmpty()) {
-                            // Normalize the array of value for consistency with Cloud (CIV).  i.e [{"name":"name1", "value": "value1"}, ...]
-                            val additionalData =
-                                data.map { mapOf("name" to it.key, "value" to it.value) }
-
-                            val customData = JSONObject(mapOf("custom" to additionalData)).toString()
-                            result[TransactionAttribute.CUSTOM] = customData
-                        }
-                }
             }
-
-// If there is no type in the array, add the default "request"
-            if (!result.containsKey(TransactionAttribute.TYPE)) {
-                result[TransactionAttribute.TYPE] = NSLocalizedString(
-                    "PendingRequestTypeDefault",
-                    bundle = Bundle.module,
-                    comment = ""
-                )
-            }
-
-
-
             result
         } finally {
             log.exiting()
