@@ -115,27 +115,27 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             val kotlinVersion = "2.0.0"
             val kotlinCoroutines = "1.8.1"
             val square = "4.12.0"
-            val ktorVersion = "2.3.11"
+            val ktorVersion = "2.3.12"
 
-            add("androidTestImplementation", "androidx.test.ext:junit:1.1.5")
-            add("androidTestImplementation", "androidx.test:core:1.5.0")
-            add("androidTestImplementation", "androidx.test:rules:1.5.0")
-            add("androidTestImplementation", "androidx.test:runner:1.5.0")
-            add("androidTestImplementation", "androidx.test.espresso:espresso-core:3.5.1")
+            add("androidTestImplementation", "androidx.test.ext:junit:1.2.0")
+            add("androidTestImplementation", "androidx.test:core:1.6.0")
+            add("androidTestImplementation", "androidx.test:rules:1.6.0")
+            add("androidTestImplementation", "androidx.test:runner:1.6.0")
+            add("androidTestImplementation", "androidx.test.espresso:espresso-core:3.6.0")
             add("androidTestImplementation", "androidx.test.uiautomator:uiautomator:2.3.0")
             add("androidTestImplementation", "junit:junit:4.13.2")
             add("androidTestImplementation", "org.junit.jupiter:junit-jupiter")    // JUnit5
             add("androidTestImplementation", "org.mockito.kotlin:mockito-kotlin:5.3.1")
             add("androidTestImplementation", "com.squareup.okhttp3:mockwebserver:$square")
             add("androidTestImplementation", "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinCoroutines")
-            add("androidTestImplementation", platform("org.junit:junit-bom:5.8.2"))          // JUnit5
-            add("androidTestImplementation", "org.slf4j:slf4j-jdk14:2.0.7")
+            add("androidTestImplementation", platform("org.junit:junit-bom:5.10.2"))          // JUnit5
+            add("androidTestImplementation", "org.slf4j:slf4j-jdk14:2.0.13")
             add("androidTestImplementation", "io.ktor:ktor-client-mock:$ktorVersion")
 
             add("coreLibraryDesugaring", "com.android.tools:desugar_jdk_libs:2.0.4")
 
             add("implementation", "androidx.core:core-ktx:1.13.1")
-            add("implementation", "org.jacoco:org.jacoco.core:0.8.8")
+            add("implementation", "org.jacoco:org.jacoco.core:0.8.12")
 //            add("implementation", "com.squareup.retrofit2:retrofit:2.9.0")
 //            add("implementation", "com.squareup.okhttp3:okhttp:$square")
             add("implementation", "com.squareup.okhttp3:logging-interceptor:$square")
@@ -153,8 +153,8 @@ class VerifySdkBuildPlugin : Plugin<Project> {
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinCoroutines")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-coroutines-rx3:$kotlinCoroutines")
             add("implementation", "org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
-            add("implementation", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-            add("implementation", "org.slf4j:slf4j-api:2.0.7")
+            add("implementation", "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.0")
+            add("implementation", "org.slf4j:slf4j-api:2.0.13")
             add("implementation", "androidx.biometric:biometric:1.2.0-alpha05")
             add("implementation", "androidx.browser:browser:1.8.0")
             add("implementation", "com.fasterxml.jackson.core:jackson-core:2.17.1")
