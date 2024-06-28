@@ -47,3 +47,7 @@ tasks.withType<Test>().configureEach  {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
     kotlinOptions.freeCompilerArgs = kotlinOptions.freeCompilerArgs.plus("'-opt-in=kotlin.RequiresOptIn")
 }
+
+allprojects {
+    tasks.register<DependencyReportTask>("allDeps")
+}
