@@ -79,7 +79,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
     constructor(
         clientId: String,
         clientSecret: String? = null,
-        additionalHeaders: Map<String, String>?,
+        additionalHeaders: Map<String, String>? = null,
         additionalParameters: Map<String, String>?,
     ) : this(clientId, clientSecret) {
         additionalHeaders?.let {
