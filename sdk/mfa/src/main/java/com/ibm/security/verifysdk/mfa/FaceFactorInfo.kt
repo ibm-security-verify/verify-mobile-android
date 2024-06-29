@@ -12,5 +12,6 @@ data class FaceFactorInfo(
     @Serializable(with = UUIDSerializer::class)
     override val id: UUID = UUID.randomUUID(),
     override val displayName: String = "Face ID",
+    val keyName: String = "face",
     val algorithm: HashAlgorithmType = HashAlgorithmType.SHA1,
 ) : Factor

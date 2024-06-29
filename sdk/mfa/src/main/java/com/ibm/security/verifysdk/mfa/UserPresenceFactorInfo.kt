@@ -12,5 +12,6 @@ data class UserPresenceFactorInfo(
     @Serializable(with = UUIDSerializer::class)
     override val id: UUID = UUID.randomUUID(),
     override val displayName: String = "User presence",
+    val keyName: String = "userpresence",
     val algorithm: HashAlgorithmType = HashAlgorithmType.SHA1,
 ) : Factor

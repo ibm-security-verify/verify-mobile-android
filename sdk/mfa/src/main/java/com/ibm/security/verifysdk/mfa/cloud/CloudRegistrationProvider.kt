@@ -4,24 +4,21 @@
 
 package com.ibm.security.verifysdk.mfa.cloud
 
-import android.security.keystore.KeyProperties
 import com.ibm.security.verifysdk.authentication.TokenInfo
 import com.ibm.security.verifysdk.core.ContextHelper
-import com.ibm.security.verifysdk.core.KeystoreHelper
 import com.ibm.security.verifysdk.core.NetworkHelper
 import com.ibm.security.verifysdk.core.camelToSnakeCase
 import com.ibm.security.verifysdk.core.entering
 import com.ibm.security.verifysdk.core.exiting
 import com.ibm.security.verifysdk.core.replace
 import com.ibm.security.verifysdk.core.snakeToCamelCase
+import com.ibm.security.verifysdk.core.toJsonObject
 import com.ibm.security.verifysdk.mfa.EnrollableSignature
 import com.ibm.security.verifysdk.mfa.EnrollableType
 import com.ibm.security.verifysdk.mfa.FaceFactorInfo
 import com.ibm.security.verifysdk.mfa.FactorType
 import com.ibm.security.verifysdk.mfa.FingerprintFactorInfo
-import com.ibm.security.verifysdk.mfa.HashAlgorithmError
 import com.ibm.security.verifysdk.mfa.HashAlgorithmType
-import com.ibm.security.verifysdk.mfa.InitializationInfo
 import com.ibm.security.verifysdk.mfa.MFAAttributeInfo
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
 import com.ibm.security.verifysdk.mfa.MFARegistrationDescriptor
@@ -29,6 +26,14 @@ import com.ibm.security.verifysdk.mfa.MFARegistrationError
 import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
 import com.ibm.security.verifysdk.mfa.TOTPFactorInfo
 import com.ibm.security.verifysdk.mfa.UserPresenceFactorInfo
+import com.ibm.security.verifysdk.mfa.cloud.model.CloudAuthenticator
+import com.ibm.security.verifysdk.mfa.cloud.model.CloudRegistration
+import com.ibm.security.verifysdk.mfa.cloud.model.CloudRegistrationProviderResultData
+import com.ibm.security.verifysdk.mfa.cloud.model.CloudTOTPEnrollableFactor
+import com.ibm.security.verifysdk.mfa.cloud.model.InitializationInfo
+import com.ibm.security.verifysdk.mfa.cloud.model.Metadata
+import com.ibm.security.verifysdk.mfa.generateKeys
+import com.ibm.security.verifysdk.mfa.sign
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.post
@@ -39,18 +44,17 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.net.URL
 import java.util.UUID
+import kotlin.collections.set
 
 class CloudRegistrationProvider(data: String) :
     MFARegistrationDescriptor<MFAAuthenticatorDescriptor> {
@@ -62,12 +66,11 @@ class CloudRegistrationProvider(data: String) :
         isLenient = true
     }
 
-    private val initializationInfo: InitializationInfo
-
-    private lateinit var tokenInfo: TokenInfo
-    private lateinit var metaData: Metadata
+    private var initializationInfo: InitializationInfo
     private var currentFactor: SignatureEnrollableFactor? = null
     private var factors: MutableList<FactorType> = mutableListOf()
+    private lateinit var tokenInfo: TokenInfo
+    private lateinit var metaData: Metadata
 
     override var pushToken: String = ""
     override var accountName: String = ""
@@ -79,9 +82,12 @@ class CloudRegistrationProvider(data: String) :
     override var invalidatedByBiometricEnrollment: Boolean = false
 
     init {
-        initializationInfo = decoder.decodeFromString(data)
-        accountName = initializationInfo.accountName
-        pushToken = ""
+        try {
+            initializationInfo = decoder.decodeFromString(data)
+            accountName = initializationInfo.accountName
+        } catch (e: Exception) {
+            throw MFARegistrationError.FailedToParse
+        }
     }
 
     internal suspend fun initiate(
@@ -107,25 +113,25 @@ class CloudRegistrationProvider(data: String) :
             if (response.status.isSuccess()) {
                 response.bodyAsText().let { responseBodyData ->
                     tokenInfo = decoder.decodeFromString(responseBodyData)
-                    val registration: Registration = decoder.decodeFromString(responseBodyData)
+                    val cloudRegistration: CloudRegistration = decoder.decodeFromString(responseBodyData)
 
-                    registration.metadataContainer.let {
+                    cloudRegistration.metadataContainer.let {
                         metaData = Metadata(
-                            id = registration.id,
+                            id = cloudRegistration.id,
                             registrationUri = it.registrationUri,
                             serviceName = it.serviceName,
                             transactionUri = it.registrationUri.replace(
                                 "registration",
-                                "${registration.id}/verifications"
+                                "${cloudRegistration.id}/verifications"
                             ),
                             features = it.features,
                             custom = it.custom,
                             theme = it.theme,
-                            availableFactors = registration.availableFactor
+                            availableFactors = cloudRegistration.availableFactors
                         )
                     }
 
-                    registration.availableFactor.stream()
+                    cloudRegistration.availableFactors.stream()
                         .filter { factor -> factor.type == EnrollableType.TOTP }.findFirst()
                         .ifPresent { factor ->
                             (factor as? CloudTOTPEnrollableFactor)?.let { cloudTotpEnrollableFactor ->
@@ -145,7 +151,7 @@ class CloudRegistrationProvider(data: String) :
                                 }
                             }
                         }
-                    registration.availableFactor.removeAll { factor -> factor.type == EnrollableType.TOTP }
+                    cloudRegistration.availableFactors.removeAll { factor -> factor.type == EnrollableType.TOTP }
 
                     return@initiate Result.success(
                         CloudRegistrationProviderResultData(
@@ -166,29 +172,30 @@ class CloudRegistrationProvider(data: String) :
 
     override fun nextEnrollment(): EnrollableSignature? {
 
-        try {
+        return try {
             log.entering()
 
             if (metaData.availableFactors.isEmpty()) {
-                return null
-            }
+                null
+            } else {
+                metaData.availableFactors.first().let { enrollableFactor ->
+                    (enrollableFactor as SignatureEnrollableFactor).let { signatureEnrollableFactor ->
+                        currentFactor = signatureEnrollableFactor
+                        metaData.availableFactors.removeAll { enrollableFactor.type == it.type }
 
-            metaData.availableFactors.first().let { enrollableFactor ->
-                (enrollableFactor as SignatureEnrollableFactor).let { signatureEnrollableFactor ->
-                    currentFactor = signatureEnrollableFactor
-                    metaData.availableFactors.removeAll { enrollableFactor.type == it.type }
+                        val algorithm =
+                            currentFactor?.algorithm?.let { HashAlgorithmType.fromString(it) }
+                        val biometricAuthentication =
+                            (currentFactor?.type == EnrollableType.USER_PRESENCE).not()
 
-                    val algorithm =
-                        currentFactor?.algorithm?.let { HashAlgorithmType.fromString(it) }
-                    val biometricAuthentication =
-                        (currentFactor?.type == EnrollableType.USER_PRESENCE).not()
-
-                    return@nextEnrollment algorithm?.let {
-                        EnrollableSignature(
-                            biometricAuthentication,
-                            it,
-                            metaData.id
-                        )
+                        algorithm?.let {
+                            EnrollableSignature(
+                                biometricAuthentication,
+                                it,
+                                metaData.id,
+                                signatureEnrollableFactor.type
+                            )
+                        }
                     }
                 }
             }
@@ -199,41 +206,29 @@ class CloudRegistrationProvider(data: String) :
 
     override suspend fun enroll() {
 
-        currentFactor?.let {
-
-            val keyName = "${metaData.id}.${currentFactor?.type?.name}"
-            KeystoreHelper.createKeyPair(
+        currentFactor?.let { signatureEnrollableFactor ->
+            val keyName = "${metaData.id}.${signatureEnrollableFactor.type.name}"
+            generateKeys(
                 keyName,
-                currentFactor?.algorithm ?: "",
-                KeyProperties.PURPOSE_SIGN,
-                authenticationRequired,
-                invalidatedByBiometricEnrollment
-            )
-
-            KeystoreHelper.exportPublicKey(keyName, android.util.Base64.NO_WRAP)?.let { publicKey ->
-                KeystoreHelper.signData(
+                HashAlgorithmType.forSigning(signatureEnrollableFactor.algorithm)
+            ).let { publicKey ->
+                sign(
                     keyName,
-                    currentFactor?.algorithm ?: "",
+                    HashAlgorithmType.forSigning(signatureEnrollableFactor.algorithm),
                     metaData.id,
                     android.util.Base64.NO_WRAP
-                )
-                    ?.let { signedData ->
-                        enroll(keyName, publicKey, signedData)
-                    }
+                ).let { signedData ->
+                    enroll(keyName, publicKey, signedData)
+                }
             }
         }
-
-        return
     }
 
-    override suspend fun enroll(name: String, publicKey: String, signedData: String) {
+    override suspend fun enroll(keyName: String, publicKey: String, signedData: String) {
 
-        val algorithm = currentFactor?.algorithm?.let { HashAlgorithmType.fromString(it) }
-            ?: run {
-                throw HashAlgorithmError.InvalidHash
-            }
+        val algorithm = HashAlgorithmType.fromString(currentFactor?.algorithm ?: "")
 
-        val requestBody: RequestBody = buildJsonArray {
+        val requestBody = buildJsonArray {
             addJsonObject {
                 put("subType", currentFactor?.type?.name?.lowercase()?.snakeToCamelCase())
                 put("enabled", true)
@@ -248,18 +243,18 @@ class CloudRegistrationProvider(data: String) :
                     put("additionalData", buildJsonArray {
                         addJsonObject {
                             put("name", "name")
-                            put("value", name)
+                            put("value", keyName)
                         }
                     })
                 })
             }
-        }.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        }
 
         val response = NetworkHelper.getInstance.post {
             url(currentFactor?.uri.toString())
             accept(ContentType.Application.Json)
             contentType(ContentType.Application.Json)
-            bearerAuth(tokenInfo.authorizationHeader())
+            bearerAuth(tokenInfo.accessToken)
             setBody(requestBody)
         }
 
@@ -281,7 +276,7 @@ class CloudRegistrationProvider(data: String) :
                                     FactorType.Face(
                                         FaceFactorInfo(
                                             id = uuid,
-                                            displayName = name,
+                                            keyName = keyName,
                                             algorithm = algorithm
                                         )
                                     )
@@ -291,7 +286,7 @@ class CloudRegistrationProvider(data: String) :
                                     FactorType.Fingerprint(
                                         FingerprintFactorInfo(
                                             id = uuid,
-                                            displayName = name,
+                                            keyName = keyName,
                                             algorithm = algorithm
                                         )
                                     )
@@ -301,7 +296,7 @@ class CloudRegistrationProvider(data: String) :
                                     FactorType.UserPresence(
                                         UserPresenceFactorInfo(
                                             id = uuid,
-                                            displayName = name,
+                                            keyName = keyName,
                                             algorithm = algorithm
                                         )
                                     )
@@ -339,7 +334,7 @@ class CloudRegistrationProvider(data: String) :
             Result.success(
                 CloudAuthenticator(
                     refreshUri = metaData.registrationUri,
-                    transactionUri =  metaData.registrationUri.replace(
+                    transactionUri = metaData.registrationUri.replace(
                         "registration",
                         "${metaData.id}/verifications"
                     ),
@@ -357,7 +352,7 @@ class CloudRegistrationProvider(data: String) :
         }
     }
 
-    private fun constructRequestBody(additionalData: String): RequestBody {
+    private fun constructRequestBody(additionalData: String): JsonObject {
 
         val attributes =
             MFAAttributeInfo.init(ContextHelper.context).dictionary().toMutableMap()
@@ -365,16 +360,14 @@ class CloudRegistrationProvider(data: String) :
         attributes["pushToken"] = this.pushToken
         attributes.remove("applicationName")
 
-        val data: MutableMap<String, Any> = HashMap()
-        data["attributes"] = attributes
+        val data = mutableMapOf<String, Any>()
+        data["attributes"] = attributes.toJsonObject()
 
         when (additionalData) {
             "refreshToken" -> data["refreshToken"] = tokenInfo.refreshToken
             "code" -> data["code"] = initializationInfo.code
         }
 
-        return (data as Map<*, *>).let {
-            JSONObject(it).toString().toRequestBody("text/plain".toMediaTypeOrNull())
-        }
+        return data.toJsonObject()
     }
 }

@@ -6,6 +6,7 @@ package com.ibm.security.verifysdk.authentication
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
@@ -21,7 +22,7 @@ import androidx.browser.customtabs.CustomTabsIntent
  *
  * @since 3.0.0
  */
-internal class AuthenticationActivity : AppCompatActivity() {
+internal class AuthenticationActivity : ComponentActivity() {
 
     private val builder = CustomTabsIntent.Builder()
     private var url: String = ""

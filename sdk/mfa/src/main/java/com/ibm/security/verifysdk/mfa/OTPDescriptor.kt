@@ -21,7 +21,7 @@ interface OTPDescriptor {
         }
     }
 
-    fun generatePasscode(value: Long): String {
+    fun generatePasscode(counter: Long): String {
 
         val digitsPower = intArrayOf(1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000)
         val mac: Mac = Mac.getInstance(algorithm.toString())
@@ -30,7 +30,7 @@ interface OTPDescriptor {
             algorithm.toString()
         )
         mac.init(macKey)
-        val hmacResult: ByteArray = mac.doFinal(value.toByteArray())
+        val hmacResult: ByteArray = mac.doFinal(counter.toByteArray())
         val offset: Int = hmacResult[hmacResult.size - 1].toInt() and 0x0f
         var binary: Int = hmacResult[offset].toInt() and 0x7f shl 24
         binary = binary or (hmacResult[offset + 1].toInt() and 0xff shl 16)

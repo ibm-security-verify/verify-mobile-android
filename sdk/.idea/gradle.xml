@@ -21,11 +21,11 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/adaptive" />
-            <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/authentication" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/core" />
-            <option value="$PROJECT_DIR$/examples/fido2demo" />
+            <option value="$PROJECT_DIR$/examples/fido2_demo" />
+            <option value="$PROJECT_DIR$/examples/mfa_demo" />
             <option value="$PROJECT_DIR$/fido2" />
             <option value="$PROJECT_DIR$/mfa" />
           </set>

@@ -41,7 +41,16 @@ object NetworkHelper {
     var certificatePinner: CertificatePinner? = null
     var sslContext: SSLContext? = null
     var hostnameVerifier: HostnameVerifier? = null
+        set(value) {
+            field = value
+            initialize(null)
+        }
+
     var trustManager: X509TrustManager? = null
+        set(value) {
+            field = value
+            initialize(null)
+        }
 
     init {
         initialize(null)
@@ -83,7 +92,7 @@ object NetworkHelper {
                             addInterceptor(customInterceptor)
                         }
 
-                        customLoggingInterceptor?.let {httpLoggingInterceptor ->
+                        customLoggingInterceptor?.let { httpLoggingInterceptor ->
                             addInterceptor(httpLoggingInterceptor)
                         }
 
@@ -132,5 +141,23 @@ object NetworkHelper {
         }
 
         return okHttpClientBuilder.build()
+    }
+
+    fun insecureTrustManager(): X509TrustManager {
+        return object : X509TrustManager {
+            override fun checkClientTrusted(
+                chain: Array<out java.security.cert.X509Certificate>?,
+                authType: String?
+            ) {
+            }
+
+            override fun checkServerTrusted(
+                chain: Array<out java.security.cert.X509Certificate>?,
+                authType: String?
+            ) {
+            }
+
+            override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate> = arrayOf()
+        }
     }
 }

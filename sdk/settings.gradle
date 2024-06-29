@@ -7,8 +7,8 @@ pluginManagement {
     }
 
     plugins {
-        id 'com.android.application' version '8.2.2' apply false
-        id 'com.android.library' version '8.2.2' apply false
+        id 'com.android.application' version '8.4.1' apply false
+        id 'com.android.library' version '8.4.1' apply false
         id 'org.jetbrains.kotlin.android' version '1.9.10' apply false
     }
 }
@@ -21,13 +21,14 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "IBM Security Verify SDK"
-//include ":app"
 include ':core'
 include ':adaptive'
 include ':authentication'
 include ':mfa'
+include ':mfa_demo'
 include ':fido2'
-include ':fido2demo'
+include ':fido2_demo'
 
-project(':fido2demo').projectDir = new File('examples/fido2demo')
 
+project(':fido2_demo').projectDir = new File('examples/fido2_demo')
+project(':mfa_demo').projectDir = new File('examples/mfa_demo')

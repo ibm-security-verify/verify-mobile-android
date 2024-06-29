@@ -14,6 +14,7 @@ import com.ibm.security.verifysdk.core.AuthorizationException
 import com.ibm.security.verifysdk.core.ErrorMessage
 import com.ibm.security.verifysdk.core.ErrorResponse
 import com.ibm.security.verifysdk.core.NetworkHelper
+import com.ibm.security.verifysdk.core.NetworkHelper.trustManager
 import io.ktor.client.call.body
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
@@ -34,6 +35,7 @@ import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.net.MalformedURLException
 import java.net.URL
+import javax.net.ssl.X509TrustManager
 import kotlin.coroutines.resume
 
 
@@ -63,14 +65,22 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
         isLenient = true
     }
 
-    var additionalHeaders: HashMap<String, String> = HashMap()
-    var additionalParameters: HashMap<String, String> = HashMap()
+    var ignoreSsl: Boolean = false
+        set(value) {
+            field = value
+            if (value) {
+                trustManager = NetworkHelper.insecureTrustManager()
+            }
+        }
+
+    var additionalHeaders: Map<String, String> = HashMap()
+    var additionalParameters: Map<String, String> = HashMap()
 
     constructor(
         clientId: String,
-        clientSecret: String?,
-        additionalHeaders: HashMap<String, String>?,
-        additionalParameters: HashMap<String, String>?
+        clientSecret: String? = null,
+        additionalHeaders: Map<String, String>? = null,
+        additionalParameters: Map<String, String>?,
     ) : this(clientId, clientSecret) {
         additionalHeaders?.let {
             this.additionalHeaders = it
@@ -221,9 +231,9 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
      */
     suspend fun authorize(
         url: URL,
-        redirectUrl: URL,
+        redirectUrl: URL? = null,
         authorizationCode: String,
-        codeVerifier: String?,
+        codeVerifier: String? = null,
         scope: Array<String>?
     ): Result<TokenInfo> {
 
@@ -235,7 +245,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
                 "code_verifier" to (codeVerifier ?: ""),
                 "grant_type" to "authorization_code",
                 "scope" to (scope?.joinToString(" ") ?: ""),
-                "redirect_uri" to redirectUrl.toString()
+                "redirect_uri" to (redirectUrl?.toString() ?: "")
             )
 
             val response = NetworkHelper.getInstance.post {

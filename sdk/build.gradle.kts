@@ -5,7 +5,8 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
 
-    val kotlinVersion by extra { "1.9.10" }
+    val kotlinVersion by extra { "2.0.0" }
+    val dokkaVersion by extra { "1.9.20" }
 
     repositories {
         google()
@@ -19,11 +20,10 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.2.2")
+        classpath("com.android.tools.build:gradle:8.4.1")
         classpath("com.github.ben-manes:gradle-versions-plugin:0.51.0")
-        classpath("gradle.plugin.com.hcl.security:appscan-gradle-plugin:1.0.9")
-        classpath("org.jetbrains.dokka:dokka-base:$kotlinVersion")
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin:$kotlinVersion")
+        classpath("org.jetbrains.dokka:dokka-base:$dokkaVersion")
+        classpath("org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
         classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
         classpath("org.owasp:dependency-check-gradle:9.0.9")
@@ -46,4 +46,8 @@ tasks.withType<Test>().configureEach  {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
     kotlinOptions.freeCompilerArgs = kotlinOptions.freeCompilerArgs.plus("'-opt-in=kotlin.RequiresOptIn")
+}
+
+allprojects {
+    tasks.register<DependencyReportTask>("allDeps")
 }

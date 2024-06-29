@@ -108,48 +108,48 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  coverage_report:
-    name: Generate code coverage report
-    runs-on: ubuntu-latest
-    needs: setup_environment
+  # coverage_report:
+  #   name: Generate code coverage report
+  #   runs-on: ubuntu-latest
+  #   needs: setup_environment
 
-    steps:
-      - name: Code checkout
-        uses: actions/checkout@v4.1.1
+  #   steps:
+  #     - name: Code checkout
+  #       uses: actions/checkout@v4.1.1
 
-      - name: Install Java
-        uses: actions/setup-java@v4.1.0
-        with:
-          java-version: '17'
-          distribution: 'adopt'
+  #     - name: Install Java
+  #       uses: actions/setup-java@v4.1.0
+  #       with:
+  #         java-version: '17'
+  #         distribution: 'adopt'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3.2.0
+  #     - name: Setup Android SDK
+  #       uses: android-actions/setup-android@v3.2.0
 
-      - name: Load cache
-        uses: actions/cache@v4.0.1
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}      
+  #     - name: Load cache
+  #       uses: actions/cache@v4.0.1
+  #       with:
+  #         path: |
+  #           ~/.gradle/caches
+  #           ~/.gradle/wrapper
+  #         key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}      
    
-      - name: Run instrumentation Tests
-        uses: reactivecircus/android-emulator-runner@v2
-        if: false
-        with:
-          working-directory: ./sdk
-          api-level: 28
-          target: default
-          arch: x86
-          profile: Nexus 6
-          script: ./gradlew --no-daemon jacocoDebugCoverageReport
+  #     - name: Run instrumentation Tests
+  #       uses: reactivecircus/android-emulator-runner@v2
+  #       if: false
+  #       with:
+  #         working-directory: ./sdk
+  #         api-level: 28
+  #         target: default
+  #         arch: x86
+  #         profile: Nexus 6
+  #         script: ./gradlew --no-daemon jacocoDebugCoverageReport
 
-      - name: Store code coverage report
-        uses: actions/upload-artifact@v4.3.1
-        with:
-          name: code-coverage
-          path: ./sdk/app/build/reports/jacoco/jacocoDebugCoverageReport/
+  #     - name: Store code coverage report
+  #       uses: actions/upload-artifact@v4.3.1
+  #       with:
+  #         name: code-coverage
+  #         path: ./sdk/app/build/reports/jacoco/jacocoDebugCoverageReport/
 
   mend_scan:
     name: Mend scan
@@ -188,7 +188,7 @@ jobs:
   publish:
     name: Publish SDK, reports and documentation
     runs-on: ubuntu-latest
-    needs: [setup_environment, coverage_report, build_and_test, mend_scan]
+    needs: [setup_environment, build_and_test, mend_scan]
 
     steps:
       - name: Verify release title
@@ -232,6 +232,8 @@ jobs:
           mv ./sdk/fido2/build/outputs/aar/fido2-release.aar ./sdk/fido2/build/outputs/aar/IBM-Verify-SDK_fido2_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
           mv ./sdk/adaptive/build/outputs/aar/adaptive-release.aar ./sdk/adaptive/build/outputs/aar/IBM-Verify-SDK_adaptive_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
           mv ./sdk/authentication/build/outputs/aar/authentication-release.aar ./sdk/authentication/build/outputs/aar/IBM-Verify-SDK_authentication_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
+          mv ./sdk/mfa/build/outputs/aar/mfa-release.aar ./sdk/mfa/build/outputs/aar/IBM-Verify-SDK_mfa_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
+
 
       - name: Move maven files to accessible folder
         run: |
@@ -240,6 +242,8 @@ jobs:
           mv ~/.m2/repository/com/ibm/security/verifysdk/fido2/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/* ./sdk/maven/
           mv ~/.m2/repository/com/ibm/security/verifysdk/adaptive/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
           mv ~/.m2/repository/com/ibm/security/verifysdk/authentication/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
+          mv ~/.m2/repository/com/ibm/security/verifysdk/mfa/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
+
 
       - name: Update documentation folder structure for GitHub commit
         run: |
@@ -247,10 +251,13 @@ jobs:
           mkdir -p ./sdk/documentation/android/fido2/docs
           mkdir -p ./sdk/documentation/android/adaptive/docs
           mkdir -p ./sdk/documentation/android/authentication/docs
+          mkdir -p ./sdk/documentation/android/mfa/docs
           mv ./sdk/core/build/dokka/javadoc/* ./sdk/documentation/android/core/docs/
           mv ./sdk/fido2/build/dokka/javadoc/* ./sdk/documentation/android/fido2/docs/
           mv ./sdk/adaptive/build/dokka/javadoc/* ./sdk/documentation/android/adaptive/docs/
           mv ./sdk/authentication/build/dokka/javadoc/* ./sdk/documentation/android/authentication/docs/
+          mv ./sdk/mfa/build/dokka/javadoc/* ./sdk/documentation/android/mfa/docs/
+
 
       - name: Zip code coverage report
         if: false
@@ -272,6 +279,8 @@ jobs:
             ./sdk/adaptive/build/reports/*.html
             ./sdk/authentication/build/outputs/aar/*.aar
             ./sdk/authentication/build/reports/*.html
+            ./sdk/mfa/build/outputs/aar/*.aar
+            ./sdk/mfa/build/reports/*.html
             # ./sdk/IBM-Verify-SDK_*_code-coverage-report.zip
 
       - name: Upload documentation to GitHub.io repo
