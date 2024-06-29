@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     id("ibm-verifysdk-plugin")
+    id("org.jetbrains.kotlin.android")
 }
 
 val moduleArtifactId = "adaptive"
@@ -15,9 +16,10 @@ val moduleScmDeveloperConnection = "scm:git:ssh://github.com/ibm-security-verify
 val moduleScmUrl = "https://github.com/ibm-security-verify/verify-sdk-android"
 
 dependencies {
-    implementation("androidx.lifecycle:lifecycle-process:2.6.1")
-    implementation("androidx.test:rules:1.5.0")
-    implementation("androidx.test.ext:junit-ktx:1.1.5")
+    implementation("androidx.lifecycle:lifecycle-process:2.8.2")
+    implementation("androidx.test:rules:1.6.0")
+    implementation("androidx.test.ext:junit-ktx:1.2.0")
+    implementation("androidx.core:core-ktx:1.13.1")
     androidTestImplementation("com.github.kittinunf.fuel:fuel-android:2.3.1")
 }
 
@@ -42,12 +44,6 @@ tasks {
     withType<Test> {
         useJUnitPlatform()
     }
-}
-
-// To-do: move to VerifySdkBuildPlugin
-configure<org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension> {
-    failOnError = false
-    skipConfigurations.add("lintClassPath")
 }
 
 // To-do: move to VerifySdkBuildPlugin
@@ -99,9 +95,15 @@ configure<PublishingExtension> {
                 withXml {
                     fun groovy.util.Node.addDependency(dependency: Dependency, scope: String) {
                         appendNode("dependency").apply {
-                            appendNode("groupId", dependency.group)
-                            appendNode("artifactId", dependency.name)
-                            appendNode("version", dependency.version)
+                            if (dependency.version != "unspecified") {
+                                appendNode("groupId", dependency.group)
+                                appendNode("artifactId", dependency.name)
+                                appendNode("version", dependency.version)
+                            } else {
+                                appendNode("groupId", groupId)
+                                appendNode("artifactId", dependency.name)
+                                appendNode("version", version)
+                            }
                             appendNode("scope", scope)
                         }
                     }

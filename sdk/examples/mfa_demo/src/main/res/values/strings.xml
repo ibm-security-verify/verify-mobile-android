@@ -1,0 +1,7 @@
+<!--
+  ~ Copyright contributors to the IBM Security Verify SDK for Android project
+  -->
+
+<resources>
+    <string name="app_name">MFA Demo</string>
+</resources>

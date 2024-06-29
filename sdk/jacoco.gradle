@@ -4,7 +4,7 @@
 apply plugin: 'jacoco'
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = "0.8.12"
 }
 
 tasks.withType(Test) {
@@ -31,6 +31,10 @@ project.afterEvaluate {
                     ":adaptive:connectedDebugAndroidTest",
                     ":authentication:testDebugUnitTest",
                     ":authentication:connectedDebugAndroidTest",
+                    ":fido2:testDebugUnitTest",
+                    ":fido2:connectedDebugAndroidTest",
+                    ":mfa:testDebugUnitTest",
+                    ":mfa:connectedDebugAndroidTest",
             ]) {
                 group = "Reporting"
                 description = "Generate Jacoco coverage reports for the ${variantName.capitalize()} build"
@@ -86,13 +90,17 @@ project.afterEvaluate {
                         fileTree(dir: "$project.rootDir/core/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
                         fileTree(dir: "$project.rootDir/adaptive/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
                         fileTree(dir: "$project.rootDir/authentication/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
+                        fileTree(dir: "$project.rootDir/fido2/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
+                        fileTree(dir: "$project.rootDir/mfa/build/tmp/kotlin-classes/${variantName}", excludes: excludes),
                         javaClasses
                 ]))
 
                 def coverageSourceDirs = [
                         "$project.rootDir/core/src/main/java",
                         "$project.rootDir/adaptive/src/main/java",
-                        "$project.rootDir/authentication/src/main/java"
+                        "$project.rootDir/authentication/src/main/java",
+                        "$project.rootDir/fido2/src/main/java",
+                        "$project.rootDir/mfa/src/main/java"
                 ]
 
                 sourceDirectories.setFrom(project.files(coverageSourceDirs))
@@ -101,9 +109,13 @@ project.afterEvaluate {
                         "$project.rootDir/core/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
                         "$project.rootDir/adaptive/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
                         "$project.rootDir/authentication/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                        "$project.rootDir/fido2/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                        "$project.rootDir/mfa/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
                         fileTree(dir: "$project.rootDir/core/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"]),
                         fileTree(dir: "$project.rootDir/adaptive/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"]),
-                        fileTree(dir: "$project.rootDir/authentication/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"])
+                        fileTree(dir: "$project.rootDir/authentication/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"]),
+                        fileTree(dir: "$project.rootDir/fido2/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"]),
+                        fileTree(dir: "$project.rootDir/mfa/build/outputs/code_coverage/debugAndroidTest/connected/", includes: ["**/*.ec"])
                 ]))
             }
         }

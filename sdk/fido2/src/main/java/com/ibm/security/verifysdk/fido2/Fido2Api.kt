@@ -8,6 +8,12 @@ import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.PromptInfo.Builder
 import androidx.fragment.app.FragmentActivity
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
+import com.ibm.security.verifysdk.core.AuthorizationException
+import com.ibm.security.verifysdk.core.ErrorResponse
+import com.ibm.security.verifysdk.core.KeystoreHelper
+import com.ibm.security.verifysdk.core.NetworkHelper
+import com.ibm.security.verifysdk.core.base64UrlEncode
+import com.ibm.security.verifysdk.core.sha256
 import com.ibm.security.verifysdk.fido2.model.AssertionOptions
 import com.ibm.security.verifysdk.fido2.model.AssertionResultResponse
 import com.ibm.security.verifysdk.fido2.model.AttestationOptions
@@ -20,17 +26,22 @@ import com.ibm.security.verifysdk.fido2.model.PublicKeyCredentialCreationOptions
 import com.ibm.security.verifysdk.fido2.model.PublicKeyCredentialRequestOptions
 import com.ibm.security.verifysdk.fido2.model.ResponseAssertion
 import com.ibm.security.verifysdk.fido2.model.ResponseAttestation
-import com.ibm.security.verifysdk.core.KeystoreHelper
-import com.ibm.security.verifysdk.core.NetworkHelper
-import com.ibm.security.verifysdk.core.base64UrlEncode
-import com.ibm.security.verifysdk.core.sha256
+import io.ktor.client.call.body
+import io.ktor.client.request.accept
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.Clock
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.security.PublicKey
@@ -50,7 +61,8 @@ import kotlin.math.min
 @OptIn(
     ExperimentalUnsignedTypes::class,
     ExperimentalCoroutinesApi::class,
-    ExperimentalStdlibApi::class
+    ExperimentalStdlibApi::class,
+    ExperimentalSerializationApi::class
 )
 class Fido2Api {
 
@@ -121,15 +133,26 @@ class Fido2Api {
         attestationOptions: AttestationOptions
     ): Result<PublicKeyCredentialCreationOptions> {
         return try {
-            NetworkHelper.handleApi<PublicKeyCredentialCreationOptions>(
-                NetworkHelper.networkApi.postRequest(
-                    HashMap(),
-                    attestationOptionsUrl,
-                    authorization,
-                    Json.encodeToString(attestationOptions)
-                        .toRequestBody("application/json".toMediaType())
+            val response = NetworkHelper.getInstance.post {
+                url(attestationOptionsUrl)
+                bearerAuth(authorization)
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                setBody(attestationOptions)
+            }
+
+            if (response.status.isSuccess()) {
+                Result.success(json.decodeFromString<PublicKeyCredentialCreationOptions>(response.bodyAsText()))
+            } else {
+                val errorResponse = response.body<ErrorResponse>()
+                Result.failure(
+                    AuthorizationException(
+                        response.status,
+                        errorResponse.error,
+                        errorResponse.errorDescription
+                    )
                 )
-            )
+            }
         } catch (e: Throwable) {
             Result.failure(e)
         }
@@ -155,15 +178,26 @@ class Fido2Api {
         authenticatorAttestationResponse: AuthenticatorAttestationResponse
     ): Result<AttestationResultResponse> {
         return try {
-            NetworkHelper.handleApi<AttestationResultResponse>(
-                NetworkHelper.networkApi.postRequest(
-                    HashMap(),
-                    attestationResultUrl,
-                    authorization,
-                    Json.encodeToString(authenticatorAttestationResponse)
-                        .toRequestBody("application/json".toMediaType())
+            val response = NetworkHelper.getInstance.post {
+                url(attestationResultUrl)
+                bearerAuth(authorization)
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                setBody(authenticatorAttestationResponse)
+            }
+
+            if (response.status.isSuccess()) {
+                Result.success(json.decodeFromString<AttestationResultResponse>(response.bodyAsText()))
+            } else {
+                val errorResponse = response.body<ErrorResponse>()
+                Result.failure(
+                    AuthorizationException(
+                        response.status,
+                        errorResponse.error,
+                        errorResponse.errorDescription
+                    )
                 )
-            )
+            }
         } catch (e: Throwable) {
             Result.failure(e)
         }
@@ -189,15 +223,26 @@ class Fido2Api {
         authenticatorAssertionResponse: AuthenticatorAssertionResponse
     ): Result<AssertionResultResponse> {
         return try {
-            NetworkHelper.handleApi<AssertionResultResponse>(
-                NetworkHelper.networkApi.postRequest(
-                    HashMap(),
-                    assertionResultUrl,
-                    authorization,
-                    Json.encodeToString(authenticatorAssertionResponse)
-                        .toRequestBody("application/json".toMediaType())
+            val response = NetworkHelper.getInstance.post {
+                url(assertionResultUrl)
+                bearerAuth(authorization)
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                setBody(authenticatorAssertionResponse)
+            }
+
+            if (response.status.isSuccess()) {
+                Result.success(json.decodeFromString<AssertionResultResponse>(response.bodyAsText()))
+            } else {
+                val errorResponse = response.body<ErrorResponse>()
+                Result.failure(
+                    AuthorizationException(
+                        response.status,
+                        errorResponse.error,
+                        errorResponse.errorDescription
+                    )
                 )
-            )
+            }
         } catch (e: Throwable) {
             Result.failure(e)
         }
@@ -222,16 +267,28 @@ class Fido2Api {
         authorization: String,
         assertionOptions: AssertionOptions
     ): Result<PublicKeyCredentialRequestOptions> {
+
         return try {
-            NetworkHelper.handleApi<PublicKeyCredentialRequestOptions>(
-                NetworkHelper.networkApi.postRequest(
-                    HashMap(),
-                    assertionOptionsUrl,
-                    authorization,
-                    Json.encodeToString(assertionOptions)
-                        .toRequestBody("application/json".toMediaType())
+            val response = NetworkHelper.getInstance.post {
+                url(assertionOptionsUrl)
+                bearerAuth(authorization)
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                setBody(assertionOptions)
+            }
+
+            if (response.status.isSuccess()) {
+                Result.success(json.decodeFromString<PublicKeyCredentialRequestOptions>(response.bodyAsText()))
+            } else {
+                val errorResponse = response.body<ErrorResponse>()
+                Result.failure(
+                    AuthorizationException(
+                        response.status,
+                        errorResponse.error,
+                        errorResponse.errorDescription
+                    )
                 )
-            )
+            }
         } catch (e: Throwable) {
             Result.failure(e)
         }

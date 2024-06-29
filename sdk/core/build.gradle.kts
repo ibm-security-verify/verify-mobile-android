@@ -3,6 +3,7 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 plugins {
     id("com.android.library")
     id("ibm-verifysdk-plugin")
+    id("org.jetbrains.kotlin.android")
 }
 
 val moduleArtifactId = "core"
@@ -23,6 +24,12 @@ apply {
 android {
     namespace = "com.ibm.security.verifysdk.core"
 }
+dependencies {
+    implementation("androidx.core:core-ktx:1.13.1")
+}
+
+dependencies {
+}
 
 dependencies {
 }
@@ -30,19 +37,13 @@ dependencies {
 tasks {
     register("androidJavadocJar", Jar::class) {
         archiveClassifier.set("javadoc")
-        from("${project.layout.buildDirectory}/javadoc")
+        from("${layout.buildDirectory}/javadoc")
         dependsOn(dokkaJavadoc)
     }
     register("androidSourcesJar", Jar::class) {
         archiveClassifier.set("sources")
         from(android.sourceSets.getByName("main").java.srcDirs)
     }
-}
-
-// To-do: move to VerifySdkBuildPlugin
-configure<org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension> {
-    failOnError = false
-    skipConfigurations.add("lintClassPath")
 }
 
 // To-do: move to VerifySdkBuildPlugin
@@ -94,9 +95,15 @@ configure<PublishingExtension> {
                 withXml {
                     fun groovy.util.Node.addDependency(dependency: Dependency, scope: String) {
                         appendNode("dependency").apply {
-                            appendNode("groupId", dependency.group)
-                            appendNode("artifactId", dependency.name)
-                            appendNode("version", dependency.version)
+                            if (dependency.version != "unspecified") {
+                                appendNode("groupId", dependency.group)
+                                appendNode("artifactId", dependency.name)
+                                appendNode("version", dependency.version)
+                            } else {
+                                appendNode("groupId", groupId)
+                                appendNode("artifactId", dependency.name)
+                                appendNode("version", version)
+                            }
                             appendNode("scope", scope)
                         }
                     }

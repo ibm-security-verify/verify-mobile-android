@@ -28,14 +28,15 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.8.0")
+    implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.core:core-ktx:1.13.1")
 }
 
 tasks {
     register("androidJavadocJar", Jar::class) {
         archiveClassifier.set("javadoc")
-        from("${project.layout.buildDirectory}/javadoc")
+        from("${layout.buildDirectory}/javadoc")
         dependsOn(dokkaJavadoc)
     }
     register("androidSourcesJar", Jar::class) {
@@ -45,12 +46,6 @@ tasks {
     withType<Test> {
         useJUnitPlatform()
     }
-}
-
-// To-do: move to VerifySdkBuildPlugin
-configure<org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension> {
-    failOnError = false
-    skipConfigurations.add("lintClassPath")
 }
 
 // To-do: move to VerifySdkBuildPlugin
@@ -102,9 +97,15 @@ configure<PublishingExtension> {
                 withXml {
                     fun groovy.util.Node.addDependency(dependency: Dependency, scope: String) {
                         appendNode("dependency").apply {
-                            appendNode("groupId", dependency.group)
-                            appendNode("artifactId", dependency.name)
-                            appendNode("version", dependency.version)
+                            if (dependency.version != "unspecified") {
+                                appendNode("groupId", dependency.group)
+                                appendNode("artifactId", dependency.name)
+                                appendNode("version", dependency.version)
+                            } else {
+                                appendNode("groupId", groupId)
+                                appendNode("artifactId", dependency.name)
+                                appendNode("version", version)
+                            }
                             appendNode("scope", scope)
                         }
                     }

@@ -9,7 +9,7 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.annotation.Nullable
-import androidx.biometric.BiometricPrompt.CryptoObject
+import androidx.biometric.BiometricPrompt
 import org.slf4j.LoggerFactory
 import java.security.*
 import java.security.spec.ECGenParameterSpec
@@ -36,7 +36,8 @@ object KeystoreHelper {
 
     var keySize: Int = 2048
 
-    val supportedAlgorithms: ArrayList<String> =
+    // https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#Signature
+    private val supportedAlgorithmsSigning: ArrayList<String> =
         arrayListOf("SHA1withRSA", "SHA256withRSA", "SHA512withRSA", "EC")
 
     /**
@@ -72,7 +73,7 @@ object KeystoreHelper {
         log.entering()
 
         try {
-            if ((algorithm in supportedAlgorithms).not()) {
+            if ((algorithm in supportedAlgorithmsSigning).not()) {
                 throw UnsupportedOperationException(
                     String.format(
                         "Algorithm %s is not supported",
@@ -304,7 +305,7 @@ object KeystoreHelper {
 
     @Suppress("UNCHECKED_CAST")
     fun <T> signData(
-        cryptoObject: CryptoObject,
+        cryptoObject: BiometricPrompt.CryptoObject,
         dataToSign: T,
         base64EncodingOption: Int = Base64.DEFAULT
     ): T? {

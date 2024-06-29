@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    implementation("com.android.tools.build:gradle:8.2.1")
+    implementation("com.android.tools.build:gradle:8.4.1")
 }
 
 tasks {
