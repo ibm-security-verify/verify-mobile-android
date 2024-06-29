@@ -30,13 +30,13 @@ class VerifySdkBuildPlugin : Plugin<Project> {
                 defaultConfig {
                     targetSdk = 34
                     minSdk = 28
-                    versionCode = 101
-                    versionName = "3.0.1"
+                    versionCode = 102
+                    versionName = "3.0.2"
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
                     manifestPlaceholders["auth_redirect_scheme"] = "verifysdk"
                     manifestPlaceholders["auth_redirect_host"] = "callback"
                     manifestPlaceholders["auth_redirect_path"] = ""
-                    buildConfigField("String", "VERSION_NAME", "\"3.0.1\"")
+                    buildConfigField("String", "VERSION_NAME", "\"3.0.2\"")
                 }
 
                 packagingOptions {
