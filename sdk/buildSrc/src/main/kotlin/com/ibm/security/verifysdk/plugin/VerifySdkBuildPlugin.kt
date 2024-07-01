@@ -49,6 +49,7 @@ class VerifySdkBuildPlugin : Plugin<Project> {
                         preferProjectModules()
                         force("com.fasterxml.woodstox:woodstox-core:6.4.0")
                         force("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.1")
+                        force("io.netty:netty-codec-http2:4.1.111.Final") // because of CVE-2023-44487 in netty-codec-http2-4.1.93.Final
                     }
                 }
 

@@ -28,12 +28,6 @@ dependencies {
     implementation("androidx.core:core-ktx:1.13.1")
 }
 
-dependencies {
-}
-
-dependencies {
-}
-
 tasks {
     register("androidJavadocJar", Jar::class) {
         archiveClassifier.set("javadoc")
