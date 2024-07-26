@@ -175,7 +175,7 @@ internal class OIDCMetadataInfoTest {
     fun constructor_withSerializer_happyPath_shouldReturnObject() {
         val oidcMetadataInfo = json.decodeFromString<OIDCMetadataInfo>(openidConfiguration)
         assertEquals(
-            "https://sdk.verify.ibm.com/v1.0/endpoint/default/authorize",
+            "https://sdk.verify.ibm.com/oauth2/authorize",
             oidcMetadataInfo.authorizationEndpoint
         )
         assertEquals(15, oidcMetadataInfo.claimsSupported.size)
@@ -183,13 +183,13 @@ internal class OIDCMetadataInfoTest {
 
     @Test
     fun getIssuer() {
-        assertEquals("https://sdk.verify.ibm.com/oidc/endpoint/default", oidcMetadata.issuer)
+        assertEquals("https://sdk.verify.ibm.com/oauth2", oidcMetadata.issuer)
     }
 
     @Test
     fun getAuthorizationEndpoint() {
         assertEquals(
-            "https://sdk.verify.ibm.com/v1.0/endpoint/default/authorize",
+            "https://sdk.verify.ibm.com/oauth2/authorize",
             oidcMetadata.authorizationEndpoint
         )
     }
@@ -197,7 +197,7 @@ internal class OIDCMetadataInfoTest {
     @Test
     fun getTokenEndpoint() {
         assertEquals(
-            "https://sdk.verify.ibm.com/v1.0/endpoint/default/token",
+            "https://sdk.verify.ibm.com/oauth2/token",
             oidcMetadata.tokenEndpoint
         )
     }
@@ -205,20 +205,20 @@ internal class OIDCMetadataInfoTest {
     @Test
     fun getUserinfoEndpoint() {
         assertEquals(
-            "https://sdk.verify.ibm.com/v1.0/endpoint/default/userinfo",
+            "https://sdk.verify.ibm.com/oauth2/userinfo",
             oidcMetadata.userinfoEndpoint
         )
     }
 
     @Test
     fun getJwksUri() {
-        assertEquals("https://sdk.verify.ibm.com/v1.0/endpoint/default/jwks", oidcMetadata.jwksUri)
+        assertEquals("https://sdk.verify.ibm.com/oauth2/jwks", oidcMetadata.jwksUri)
     }
 
     @Test
     fun getRegistrationEndpoint() {
         assertEquals(
-            "https://sdk.verify.ibm.com/v1.0/endpoint/default/client_registration",
+            "https://sdk.verify.ibm.com/oauth2/client_registration",
             oidcMetadata.registrationEndpoint
         )
     }
@@ -1142,11 +1142,11 @@ internal class OIDCMetadataInfoTest {
     }
 
 
-    // from https://sdk.verify.ibm.com/v1.0/endpoint/default/.well-known/openid-configuration
+    // from https://sdk.verify.ibm.com/oauth2/.well-known/openid-configuration
     private val openidConfiguration = """
         {
           "request_parameter_supported": true,
-          "introspection_endpoint": "https://sdk.verify.ibm.com/v1.0/endpoint/default/introspect",
+          "introspection_endpoint": "https://sdk.verify.ibm.com/oauth2/introspect",
           "claims_parameter_supported": true,
           "scopes_supported": [
             "openid",
@@ -1154,7 +1154,7 @@ internal class OIDCMetadataInfoTest {
             "email",
             "phone"
           ],
-          "issuer": "https://sdk.verify.ibm.com/oidc/endpoint/default",
+          "issuer": "https://sdk.verify.ibm.com/oauth2",
           "id_token_encryption_enc_values_supported": [
             "none",
             "A128GCM",
@@ -1164,11 +1164,11 @@ internal class OIDCMetadataInfoTest {
           "userinfo_encryption_enc_values_supported": [
             "none"
           ],
-          "authorization_endpoint": "https://sdk.verify.ibm.com/v1.0/endpoint/default/authorize",
+          "authorization_endpoint": "https://sdk.verify.ibm.com/oauth2/authorize",
           "request_object_encryption_enc_values_supported": [
             "none"
           ],
-          "device_authorization_endpoint": "https://sdk.verify.ibm.com/v1.0/endpoint/default/device_authorization",
+          "device_authorization_endpoint": "https://sdk.verify.ibm.com/oauth2/device_authorization",
           "userinfo_signing_alg_values_supported": [
             "none"
           ],
@@ -1203,7 +1203,7 @@ internal class OIDCMetadataInfoTest {
             "fragment",
             "form_post"
           ],
-          "token_endpoint": "https://sdk.verify.ibm.com/v1.0/endpoint/default/token",
+          "token_endpoint": "https://sdk.verify.ibm.com/oauth2/token",
           "response_types_supported": [
             "code",
             "none",
@@ -1214,7 +1214,7 @@ internal class OIDCMetadataInfoTest {
             "code token",
             "code token id_token"
           ],
-          "user_authorization_endpoint": "https://sdk.verify.ibm.com/v1.0/endpoint/default/user_authorization",
+          "user_authorization_endpoint": "https://sdk.verify.ibm.com/oauth2/user_authorization",
           "request_uri_parameter_supported": false,
           "userinfo_encryption_alg_values_supported": [
             "none"
@@ -1229,14 +1229,14 @@ internal class OIDCMetadataInfoTest {
             "urn:ietf:params:oauth:grant-type:device_code",
             "policyauth"
           ],
-          "revocation_endpoint": "https://sdk.verify.ibm.com/v1.0/endpoint/default/revoke",
-          "userinfo_endpoint": "https://sdk.verify.ibm.com/v1.0/endpoint/default/userinfo",
+          "revocation_endpoint": "https://sdk.verify.ibm.com/oauth2/revoke",
+          "userinfo_endpoint": "https://sdk.verify.ibm.com/oauth2/userinfo",
           "id_token_encryption_alg_values_supported": [
             "none",
             "RSA-OAEP",
             "RSA-OAEP-256"
           ],
-          "jwks_uri": "https://sdk.verify.ibm.com/v1.0/endpoint/default/jwks",
+          "jwks_uri": "https://sdk.verify.ibm.com/oauth2/jwks",
           "subject_types_supported": [
             "public"
           ],
@@ -1255,7 +1255,7 @@ internal class OIDCMetadataInfoTest {
             "ES384",
             "ES512"
           ],
-          "registration_endpoint": "https://sdk.verify.ibm.com/v1.0/endpoint/default/client_registration",
+          "registration_endpoint": "https://sdk.verify.ibm.com/oauth2/client_registration",
           "request_object_signing_alg_values_supported": [
             "none"
           ],
