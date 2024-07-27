@@ -8,7 +8,6 @@ import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
-import androidx.annotation.Nullable
 import androidx.biometric.BiometricPrompt
 import org.slf4j.LoggerFactory
 import java.security.*
@@ -218,7 +217,6 @@ object KeystoreHelper {
      *
      * @return the private key or null if the key is not found
      */
-    @Nullable
     fun getPrivateKey(keyName: String): PrivateKey? {
 
         log.entering()
@@ -238,7 +236,6 @@ object KeystoreHelper {
         }
     }
 
-    @Nullable
     fun getSecretKey(keyName: String): SecretKey? {
 
         var key: SecretKey? = null

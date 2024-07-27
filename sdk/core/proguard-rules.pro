@@ -19,13 +19,3 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-
-# Keep SLF4J classes and methods
--dontwarn org.slf4j.**
--keep class org.slf4j.** { *; }
--keep interface org.slf4j.** { *; }
-
-# Keep Log4j 2 classes and methods
--dontwarn org.apache.logging.log4j.**
--keep class org.apache.logging.log4j.** { *; }
--keep interface org.apache.logging.log4j.** { *; }

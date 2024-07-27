@@ -3,6 +3,11 @@
  */
 package com.ibm.security.verifysdk.fido2.model
 
+import com.ibm.security.verifysdk.fido2.model.AuthenticatorTransport.BLE
+import com.ibm.security.verifysdk.fido2.model.AuthenticatorTransport.HYBRID
+import com.ibm.security.verifysdk.fido2.model.AuthenticatorTransport.INTERNAL
+import com.ibm.security.verifysdk.fido2.model.AuthenticatorTransport.NFC
+import com.ibm.security.verifysdk.fido2.model.AuthenticatorTransport.USB
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

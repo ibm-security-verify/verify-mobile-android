@@ -3,6 +3,9 @@
  */
 package com.ibm.security.verifysdk.fido2.model
 
+import com.ibm.security.verifysdk.fido2.model.UserVerificationRequirement.DISCOURAGED
+import com.ibm.security.verifysdk.fido2.model.UserVerificationRequirement.PREFERRED
+import com.ibm.security.verifysdk.fido2.model.UserVerificationRequirement.REQUIRED
 import kotlinx.serialization.Serializable
 
 /**

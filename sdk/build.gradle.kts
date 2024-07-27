@@ -1,53 +1,29 @@
-/*
- * Copyright contributors to the IBM Security Verify SDK for Android project
- */
+import com.android.ide.common.resources.fileNameToResourceName
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
+plugins {
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.jetbrains.kotlin.android) apply false
+    alias(libs.plugins.jetbrains.dokka)
+    java
+    jacoco
+}
 
-    val kotlinVersion by extra { "2.0.0" }
-    val dokkaVersion by extra { "1.9.20" }
+subprojects {
 
-    repositories {
-        google()
-        mavenCentral()
-        mavenLocal()
-        maven {
-            url = uri("https://plugins.gradle.org/m2/")
-            url = uri("https://jitpack.io")
-        }
-        gradlePluginPortal()
+    apply(from = "$rootDir/jacoco.gradle")
+
+    apply {
+        plugin("maven-publish")
+        plugin("org.jetbrains.dokka")
     }
-
+    val dokkaPlugin by configurations
     dependencies {
-        classpath("com.android.tools.build:gradle:8.4.1")
-        classpath("com.github.ben-manes:gradle-versions-plugin:0.51.0")
-        classpath("org.jetbrains.dokka:dokka-base:$dokkaVersion")
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-        classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
-        classpath("org.owasp:dependency-check-gradle:9.0.9")
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        dokkaPlugin("org.jetbrains.dokka:versioning-plugin:1.9.0")
     }
-}
 
-tasks {
-    val clean by registering(Delete::class) {
-        delete(project.layout.buildDirectory)
-    }
-}
-
-tasks.withType<Test>().configureEach  {
-    maxParallelForks = 1
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
-    kotlinOptions.freeCompilerArgs = kotlinOptions.freeCompilerArgs.plus("'-opt-in=kotlin.RequiresOptIn")
-}
-
-allprojects {
-    tasks.register<DependencyReportTask>("allDeps")
+//    tasks.jacocoTestReport {
+//        dependsOn(tasks.test)
+//    }
 }

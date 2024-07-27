@@ -3,6 +3,9 @@
  */
 package com.ibm.security.verifysdk.fido2.model
 
+import com.ibm.security.verifysdk.fido2.model.AttestationConveyancePreference.DIRECT
+import com.ibm.security.verifysdk.fido2.model.AttestationConveyancePreference.INDIRECT
+import com.ibm.security.verifysdk.fido2.model.AttestationConveyancePreference.NONE
 import kotlinx.serialization.Serializable
 
 /**

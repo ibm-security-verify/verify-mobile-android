@@ -4,14 +4,14 @@
 package com.ibm.security.verifysdk.core
 
 import io.ktor.http.HttpStatusCode
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.assertEquals
 
 internal class AuthorizationExceptionTest {
 
     @Test
     fun constructor_happyPath_shouldReturnObject() {
-        val e = AuthorizationException(HttpStatusCode.BadRequest, "ErrorDescription")
+        val e = AuthorizationException(HttpStatusCode.BadRequest, "ErrorId", "ErrorDescription")
 
         assertEquals("ErrorId", e.error)
         assertEquals("ErrorDescription", e.errorDescription)

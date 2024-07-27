@@ -1,10 +1,10 @@
 package com.ibm.security.verifysdk.core
 
+import junit.framework.TestCase.assertEquals
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.assertEquals
 
 @OptIn(ExperimentalSerializationApi::class)
 internal class ErrorMessageTest {

@@ -10,7 +10,9 @@
         android:theme="@style/Theme.IBMSecurityVerifySDK">
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:label="MainActivity"
+            android:theme="@style/Theme.IBMSecurityVerifySDK" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
