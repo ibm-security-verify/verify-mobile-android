@@ -203,7 +203,7 @@ internal class OAuthProviderTest {
     fun authorize_codeHappyPath_shouldReturnSuccess() = runTest {
         addMockResponse(
             HttpMethod.Post,
-            "/v1.0/endpoint/default/token",
+            "/oauth2/token",
             HttpStatusCode.OK,
             defaultHeaders,
             responseAuthorizeOk
@@ -211,7 +211,7 @@ internal class OAuthProviderTest {
 
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost/v1.0/endpoint/default/token"),
+                URL("http://localhost/oauth2/token"),
                 URL("https://callback"),
                 "authorizationCode",
                 "codeVerifier",
@@ -228,7 +228,7 @@ internal class OAuthProviderTest {
     fun authorize_codeVerifierIsNull_shouldReturnSuccess() = runTest {
         addMockResponse(
             HttpMethod.Post,
-            "/v1.0/endpoint/default/token",
+            "/oauth2/token",
             HttpStatusCode.OK,
             defaultHeaders,
             responseAuthorizeOk
@@ -236,7 +236,7 @@ internal class OAuthProviderTest {
 
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost/v1.0/endpoint/default/token"),
+                URL("http://localhost/oauth2/token"),
                 URL("https://callback"),
                 "authorizationCode",
                 null,
@@ -256,7 +256,7 @@ internal class OAuthProviderTest {
 //        addMockResponse(200, responseAuthorizeOk)
 //        val result =
 //            oAuthProviderSecretNull.authorize(
-//                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+//                URL("http://localhost:44444/oauth2/token)"),
 //                URL("https://callback"),
 //                "authorizationCode",
 //                "codeVerifier",
@@ -281,7 +281,7 @@ internal class OAuthProviderTest {
 //        addMockResponse(500, "Server error")
 //        val result =
 //            oAuthProvider.authorize(
-//                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+//                URL("http://localhost:44444/oauth2/token)"),
 //                URL("https://callback"),
 //                "authorizationCode",
 //                "codeVerifier",
@@ -305,7 +305,7 @@ internal class OAuthProviderTest {
 //        addMockResponse(200, "")
 //        val result =
 //            oAuthProvider.authorize(
-//                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+//                URL("http://localhost:44444/oauth2/token)"),
 //                URL("https://callback"),
 //                "authorizationCode",
 //                "codeVerifier",
@@ -335,7 +335,7 @@ internal class OAuthProviderTest {
 //        addMockResponse(200, responseAuthorizeOk)
 //        val result =
 //            oAuthProvider.authorize(
-//                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+//                URL("http://localhost:44444/oauth2/token)"),
 //                "username",
 //                "password"
 //            )
@@ -359,7 +359,7 @@ internal class OAuthProviderTest {
 //        addMockResponse(200, responseAuthorizeOk)
 //        val result =
 //            oAuthProvider.authorize(
-//                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+//                URL("http://localhost:44444/oauth2/token)"),
 //                "username",
 //                "password",
 //                arrayOf("name", "age")
@@ -387,7 +387,7 @@ internal class OAuthProviderTest {
 //        addMockResponse(200, responseAuthorizeOk)
 //        val result =
 //            oAuthProviderSecretNull.authorize(
-//                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+//                URL("http://localhost:44444/oauth2/token)"),
 //                "username",
 //                "password",
 //                arrayOf("name", "age")
@@ -414,7 +414,7 @@ internal class OAuthProviderTest {
 //        addMockResponse(200, "")
 //        val result =
 //            oAuthProvider.authorize(
-//                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+//                URL("http://localhost:44444/oauth2/token)"),
 //                "username",
 //                "password"
 //            )
@@ -436,7 +436,7 @@ internal class OAuthProviderTest {
 //        addMockResponse(500, "Server error")
 //        val result =
 //            oAuthProvider.authorize(
-//                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+//                URL("http://localhost:44444/oauth2/token)"),
 //                "username",
 //                "password"
 //            )
@@ -466,7 +466,7 @@ internal class OAuthProviderTest {
 //        )
 //        val result =
 //            oAuthProvider.authorize(
-//                URL("http://localhost:44444/v1.0/endpoint/default/token)"),
+//                URL("http://localhost:44444/oauth2/token)"),
 //                "username",
 //                "password"
 //            )
@@ -508,7 +508,7 @@ internal class OAuthProviderTest {
 //        assertTrue(result.isSuccess)
 //        result.onSuccess {
 //            assertEquals(13, it.idTokenSigningAlgValuesSupported.size)
-//            assertEquals("https://sdk.verify.ibm.com/v1.0/endpoint/default/token", it.tokenEndpoint)
+//            assertEquals("https://sdk.verify.ibm.com/oauth2/token", it.tokenEndpoint)
 //        }
 //    }
 //
@@ -617,7 +617,7 @@ internal class OAuthProviderTest {
     private val responseDiscoveryOk = """
         {
            "request_parameter_supported":true,
-           "introspection_endpoint":"https://sdk.verify.ibm.com/v1.0/endpoint/default/introspect",
+           "introspection_endpoint":"https://sdk.verify.ibm.com/oauth2/introspect",
            "claims_parameter_supported":true,
            "scopes_supported":[
               "openid",
@@ -625,7 +625,7 @@ internal class OAuthProviderTest {
               "email",
               "phone"
            ],
-           "issuer":"https://sdk.verify.ibm.com/oidc/endpoint/default",
+           "issuer":"https://sdk.verify.ibm.com/oauth2",
            "id_token_encryption_enc_values_supported":[
               "none",
               "A128GCM",
@@ -635,11 +635,11 @@ internal class OAuthProviderTest {
            "userinfo_encryption_enc_values_supported":[
               "none"
            ],
-           "authorization_endpoint":"https://sdk.verify.ibm.com/v1.0/endpoint/default/authorize",
+           "authorization_endpoint":"https://sdk.verify.ibm.com/oauth2/authorize",
            "request_object_encryption_enc_values_supported":[
               "none"
            ],
-           "device_authorization_endpoint":"https://sdk.verify.ibm.com/v1.0/endpoint/default/device_authorization",
+           "device_authorization_endpoint":"https://sdk.verify.ibm.com/oauth2/device_authorization",
            "userinfo_signing_alg_values_supported":[
               "none"
            ],
@@ -674,7 +674,7 @@ internal class OAuthProviderTest {
               "fragment",
               "form_post"
            ],
-           "token_endpoint":"https://sdk.verify.ibm.com/v1.0/endpoint/default/token",
+           "token_endpoint":"https://sdk.verify.ibm.com/oauth2/token",
            "response_types_supported":[
               "code",
               "none",
@@ -685,7 +685,7 @@ internal class OAuthProviderTest {
               "code token",
               "code token id_token"
            ],
-           "user_authorization_endpoint":"https://sdk.verify.ibm.com/v1.0/endpoint/default/user_authorization",
+           "user_authorization_endpoint":"https://sdk.verify.ibm.com/oauth2/user_authorization",
            "request_uri_parameter_supported":false,
            "userinfo_encryption_alg_values_supported":[
               "none"
@@ -700,14 +700,14 @@ internal class OAuthProviderTest {
               "urn:ietf:params:oauth:grant-type:device_code",
               "policyauth"
            ],
-           "revocation_endpoint":"https://sdk.verify.ibm.com/v1.0/endpoint/default/revoke",
-           "userinfo_endpoint":"https://sdk.verify.ibm.com/v1.0/endpoint/default/userinfo",
+           "revocation_endpoint":"https://sdk.verify.ibm.com/oauth2/revoke",
+           "userinfo_endpoint":"https://sdk.verify.ibm.com/oauth2/userinfo",
            "id_token_encryption_alg_values_supported":[
               "none",
               "RSA-OAEP",
               "RSA-OAEP-256"
            ],
-           "jwks_uri":"https://sdk.verify.ibm.com/v1.0/endpoint/default/jwks",
+           "jwks_uri":"https://sdk.verify.ibm.com/oauth2/jwks",
            "subject_types_supported":[
               "public"
            ],
@@ -726,7 +726,7 @@ internal class OAuthProviderTest {
               "ES384",
               "ES512"
            ],
-           "registration_endpoint":"https://sdk.verify.ibm.com/v1.0/endpoint/default/client_registration",
+           "registration_endpoint":"https://sdk.verify.ibm.com/oauth2/client_registration",
            "request_object_signing_alg_values_supported":[
               "none"
            ],
