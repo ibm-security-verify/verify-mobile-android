@@ -9,7 +9,8 @@ apply(from = "$rootDir/common-publish.gradle")
 
 android {
     defaultConfig {
-        buildConfigField("String", "VERSION_NAME", "\"3.0.2\"")
+        buildConfigField("String", "VERSION_NAME", "\"3.0.3\"")
+        buildConfigField("String", "VERSION_CODE", "\"103\"")
     }
 
     buildFeatures.buildConfig = true
