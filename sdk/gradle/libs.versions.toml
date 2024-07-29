@@ -29,6 +29,7 @@ loggingInterceptor = "4.12.0"
 material = "1.12.0"
 mockitoKotlin = "5.3.1"
 mockwebserver = "4.12.0"
+nettyCodecHttp2 = "4.1.111.Final"
 rootbeerLib = "0.1.0"
 rules = "1.6.0"
 runtimeLivedata = "1.6.8"
@@ -85,6 +86,7 @@ logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", ver
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockwebserver" }
+netty-codec-http2 = { module = "io.netty:netty-codec-http2", version.ref = "nettyCodecHttp2" }
 rootbeer-lib = { module = "com.scottyab:rootbeer-lib", version.ref = "rootbeerLib" }
 slf4j-jdk14 = { module = "org.slf4j:slf4j-jdk14", version.ref = "slf4jJdk14" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }

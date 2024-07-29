@@ -25,6 +25,7 @@ subprojects {
         resolutionStrategy {
             failOnVersionConflict()
             preferProjectModules()
+            force(rootProject.libs.netty.codec.http2) // CVE-2023-44487 in netty-codec-http2-4.1.93.Final
             force(rootProject.libs.jackson.woodstox.core)  // https://mvnrepository.com/artifact/com.fasterxml.woodstox/woodstox-core/6.2.4
         }
     }
