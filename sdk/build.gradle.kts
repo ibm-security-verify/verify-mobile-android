@@ -1,5 +1,3 @@
-import com.android.ide.common.resources.fileNameToResourceName
-
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     alias(libs.plugins.android.library) apply false
@@ -20,7 +18,15 @@ subprojects {
     }
     val dokkaPlugin by configurations
     dependencies {
-        dokkaPlugin("org.jetbrains.dokka:versioning-plugin:1.9.0")
+        dokkaPlugin(rootProject.libs.versioning.plugin)
+    }
+
+    project.configurations.all {
+        resolutionStrategy {
+            failOnVersionConflict()
+            preferProjectModules()
+            force(rootProject.libs.jackson.woodstox.core)  // https://mvnrepository.com/artifact/com.fasterxml.woodstox/woodstox-core/6.2.4
+        }
     }
 
 //    tasks.jacocoTestReport {
