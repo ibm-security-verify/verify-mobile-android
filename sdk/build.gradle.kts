@@ -8,6 +8,14 @@ plugins {
     jacoco
 }
 
+configurations.all {
+    resolutionStrategy {
+        failOnVersionConflict()
+        preferProjectModules()
+        force(rootProject.libs.jackson.dataformat.xml) // transitive dependency on woodstox-core:6.2.4
+    }
+}
+
 subprojects {
 
     apply(from = "$rootDir/jacoco.gradle")
@@ -21,7 +29,7 @@ subprojects {
         dokkaPlugin(rootProject.libs.versioning.plugin)
     }
 
-    project.configurations.all {
+    configurations.all {
         resolutionStrategy {
             failOnVersionConflict()
             preferProjectModules()
