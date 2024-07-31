@@ -11,6 +11,14 @@ android {
     defaultConfig {
         applicationId = "com.ibm.security.verifysdk.fido2.demoapp"
     }
+
+    project.configurations.all {
+        resolutionStrategy {
+            failOnVersionConflict()
+            preferProjectModules()
+            force("io.netty:netty-codec-http2:4.1.111.Final") // because of CVE-2023-44487 in netty-codec-http2-4.1.93.Final
+        }
+    }
 }
 
 dependencies {
