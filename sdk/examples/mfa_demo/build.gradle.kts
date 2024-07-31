@@ -15,6 +15,14 @@ android {
         manifestPlaceholders["auth_redirect_host"] = "callback"
         manifestPlaceholders["auth_redirect_path"] = ""
     }
+
+    project.configurations.all {
+        resolutionStrategy {
+            failOnVersionConflict()
+            preferProjectModules()
+            force("io.netty:netty-codec-http2:4.1.111.Final") // because of CVE-2023-44487 in netty-codec-http2-4.1.93.Final
+        }
+    }
 }
 
 dependencies {
