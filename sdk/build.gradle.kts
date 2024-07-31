@@ -1,53 +1,44 @@
-/*
- * Copyright contributors to the IBM Security Verify SDK for Android project
- */
-
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
+plugins {
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.jetbrains.kotlin.android) apply false
+    alias(libs.plugins.jetbrains.dokka)
+    java
+    jacoco
+}
 
-    val kotlinVersion by extra { "2.0.0" }
-    val dokkaVersion by extra { "1.9.20" }
-
-    repositories {
-        google()
-        mavenCentral()
-        mavenLocal()
-        maven {
-            url = uri("https://plugins.gradle.org/m2/")
-            url = uri("https://jitpack.io")
-        }
-        gradlePluginPortal()
+configurations.all {
+    resolutionStrategy {
+        failOnVersionConflict()
+        preferProjectModules()
+        force(rootProject.libs.jackson.dataformat.xml) // transitive dependency on woodstox-core:6.2.4
     }
+}
 
+subprojects {
+
+    apply(from = "$rootDir/jacoco.gradle")
+
+    apply {
+        plugin("maven-publish")
+        plugin("org.jetbrains.dokka")
+    }
+    val dokkaPlugin by configurations
     dependencies {
-        classpath("com.android.tools.build:gradle:8.4.1")
-        classpath("com.github.ben-manes:gradle-versions-plugin:0.51.0")
-        classpath("org.jetbrains.dokka:dokka-base:$dokkaVersion")
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin:$dokkaVersion")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-        classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
-        classpath("org.owasp:dependency-check-gradle:9.0.9")
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        dokkaPlugin(rootProject.libs.versioning.plugin)
     }
-}
 
-tasks {
-    val clean by registering(Delete::class) {
-        delete(project.layout.buildDirectory)
+    configurations.all {
+        resolutionStrategy {
+            failOnVersionConflict()
+            preferProjectModules()
+            force(rootProject.libs.netty.codec.http2) // CVE-2023-44487 in netty-codec-http2-4.1.93.Final
+            force(rootProject.libs.jackson.woodstox.core)  // https://mvnrepository.com/artifact/com.fasterxml.woodstox/woodstox-core/6.2.4
+        }
     }
-}
 
-tasks.withType<Test>().configureEach  {
-    maxParallelForks = 1
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
-    kotlinOptions.freeCompilerArgs = kotlinOptions.freeCompilerArgs.plus("'-opt-in=kotlin.RequiresOptIn")
-}
-
-allprojects {
-    tasks.register<DependencyReportTask>("allDeps")
+//    tasks.jacocoTestReport {
+//        dependsOn(tasks.test)
+//    }
 }

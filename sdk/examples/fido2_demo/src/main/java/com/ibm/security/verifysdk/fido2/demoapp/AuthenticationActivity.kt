@@ -14,11 +14,11 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.ibm.security.verifysdk.core.KeystoreHelper
 import com.ibm.security.verifysdk.fido2.Fido2Api
 import com.ibm.security.verifysdk.fido2.model.AssertionOptions
 import com.ibm.security.verifysdk.fido2.model.AuthenticatorAssertionResponse
 import com.ibm.security.verifysdk.fido2.model.PublicKeyCredentialRequestOptions
-import com.ibm.security.verifysdk.core.KeystoreHelper
 import io.ktor.http.Url
 import io.ktor.http.hostWithPort
 import kotlinx.coroutines.Dispatchers

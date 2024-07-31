@@ -4,7 +4,11 @@
 
 package com.ibm.security.verifysdk.core
 
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 
 fun Any?.toJsonElement(): JsonElement = when (this) {
     is Array<*> -> this.toJsonArray()

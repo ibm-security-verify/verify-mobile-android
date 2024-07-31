@@ -2,29 +2,18 @@ package com.ibm.security.verifysdk.authentication.test
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ibm.security.verifysdk.authentication.OAuthProvider
-import com.ibm.security.verifysdk.core.AuthenticationException
 import com.ibm.security.verifysdk.core.AuthorizationException
 import com.ibm.security.verifysdk.core.NetworkHelper
-import io.ktor.client.engine.mock.MockEngine
-import io.ktor.client.engine.mock.MockRequestHandleScope
-import io.ktor.client.engine.mock.MockRequestHandler
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
-import io.ktor.client.engine.mock.respondOk
-import io.ktor.client.request.accept
-import io.ktor.client.request.get
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerializationException
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.SocketPolicy
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -33,9 +22,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.net.MalformedURLException
 import java.net.URL
-import java.util.concurrent.TimeUnit
 
 
 @ExperimentalSerializationApi
@@ -572,7 +559,7 @@ internal class OAuthProviderTest {
     @Test
     fun setAdditionalHeaders() {
         assertEquals(0, oAuthProvider.additionalHeaders.size)
-        oAuthProvider.additionalHeaders["key1"] = "value1"
+//        oAuthProvider.additionalHeaders["key1"] = "value1"
         assertEquals(1, oAuthProvider.additionalHeaders.size)
         assertEquals("value1", oAuthProvider.additionalHeaders["key1"])
 
@@ -592,7 +579,7 @@ internal class OAuthProviderTest {
     @Test
     fun setAdditionalParameters() {
         assertEquals(0, oAuthProvider.additionalParameters.size)
-        oAuthProvider.additionalParameters["key1"] = "value1"
+//        oAuthProvider.additionalParameters["key1"] = "value1"
         assertEquals(1, oAuthProvider.additionalParameters.size)
         assertEquals("value1", oAuthProvider.additionalParameters["key1"])
 

@@ -73,6 +73,15 @@ class CloudAuthenticatorService(
         PENDING_BY_IDENTIFIER("?filter=id,creationTime,transactionData,authenticationMethods&search=state=\\u{22}PENDING\\u{22}&id=\\u{22}%@\\u{22}")
     }
 
+    /**
+     * Refreshes the token by making a network request to the refresh URI.
+     *
+     * @param refreshToken The refresh token to be used.
+     * @param accountName Optional account name to be included in the request attributes.
+     * @param pushToken Optional push token to be included in the request attributes.
+     * @param additionalData Additional data to be included in the request (currently unused).
+     * @return A [Result] containing the new [TokenInfo] if the request is successful, or an error if it fails.
+     */
     override suspend fun refreshToken(
         refreshToken: String,
         accountName: String?,
@@ -81,75 +90,153 @@ class CloudAuthenticatorService(
     ): Result<TokenInfo> {
 
         return try {
-            val attributes = mutableMapOf<String, Any>().apply {
-                putAll(MFAAttributeInfo.dictionary())
-                remove("applicationName")
-            }
+            val attributes = refreshTokenPrepareAttributes(accountName, pushToken)
+            val data = refreshTokenPrepareRequestData(refreshToken, attributes)
+            val response = refreshTokenMakeNetworkRequest(data)
 
-            accountName?.let { attributes["accountName"] = it }
-            pushToken?.let { attributes["pushToken"] = it }
-
-            val data = mapOf(
-                "refreshToken" to refreshToken,
-                "attributes" to attributes
-            )
-
-            val response = NetworkHelper.getInstance.post {
-                url(refreshUri.toString())
-                contentType(ContentType.Application.Json)
-                accept(ContentType.Application.Json)
-                parameter("metadataInResponse", true)
-                setBody(data)
-            }
-
-            if (response.status.isSuccess()) {
-                Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
-            } else {
-                val errorResponse = response.body<ErrorResponse>()
-                Result.failure(
-                    AuthorizationException(
-                        response.status,
-                        errorResponse.error,
-                        errorResponse.errorDescription
-                    )
-                )
-            }
+            refreshTokenHandleResponse(response)
         } catch (e: Throwable) {
             Result.failure(e)
         }
     }
 
+    /**
+     * Prepares the attributes map to be included in the request.
+     *
+     * @param accountName Optional account name to be included in the attributes.
+     * @param pushToken Optional push token to be included in the attributes.
+     * @return A mutable map of attributes with the provided account name and push token.
+     */
+    internal fun refreshTokenPrepareAttributes(
+        accountName: String?,
+        pushToken: String?
+    ): MutableMap<String, Any> {
+        return mutableMapOf<String, Any>().apply {
+            putAll(MFAAttributeInfo.dictionary())
+            remove("applicationName")
+            accountName?.let { this["accountName"] = it }
+            pushToken?.let { this["pushToken"] = it }
+        }
+    }
 
+    /**
+     * Makes a network request to refresh the token.
+     *
+     * @param data The request data to be sent.
+     * @return The HTTP response from the server.
+     */
+    private suspend fun refreshTokenMakeNetworkRequest(data: Map<String, Any>): HttpResponse {
+        return NetworkHelper.getInstance.post {
+            url(refreshUri.toString())
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            parameter("metadataInResponse", true)
+            setBody(data)
+        }
+    }
+
+    /**
+     * Handles the response from the token refresh request.
+     *
+     * @param response The HTTP response from the server.
+     * @return A [Result] containing the new [TokenInfo] if the response indicates success, or an error if it fails.
+     */
+    private suspend fun refreshTokenHandleResponse(response: HttpResponse): Result<TokenInfo> {
+        return if (response.status.isSuccess()) {
+            Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
+        } else {
+            val errorResponse = response.body<ErrorResponse>()
+            Result.failure(
+                AuthorizationException(
+                    response.status,
+                    errorResponse.error,
+                    errorResponse.errorDescription
+                )
+            )
+        }
+    }
+
+    /**
+     * Prepares the request data to be sent in the network request.
+     *
+     * @param refreshToken The refresh token to be included in the request.
+     * @param attributes The attributes to be included in the request.
+     * @return A map containing the refresh token and attributes.
+     */
+    private fun refreshTokenPrepareRequestData(
+        refreshToken: String,
+        attributes: Map<String, Any>
+    ): Map<String, Any> {
+        return mapOf(
+            "refreshToken" to refreshToken,
+            "attributes" to attributes
+        )
+    }
+
+    /**
+     * Retrieves the next pending transaction from the server.
+     *
+     * @param transactionID The ID of the transaction to retrieve. If null, retrieves the next pending transaction.
+     * @return A [Result] containing the [NextTransactionInfo] if successful, or an error if unsuccessful.
+     */
     override suspend fun nextTransaction(transactionID: String?): Result<NextTransactionInfo> {
-
         return try {
-            var transactionUri = URL("${transactionUri}${TransactionFilter.NEXT_PENDING.value}")
-            if (transactionID != null) {
-                transactionUri =
-                    URL("${transactionUri}/${TransactionFilter.PENDING_BY_IDENTIFIER.value}/${transactionID}")
-            }
+            val uri = nextTransactionBuildTransactionUri(transactionID)
+            val response = nextTransactionMakeNetworkRequest(uri)
 
-            val response = NetworkHelper.getInstance.get {
-                url(transactionUri.toString())
-                contentType(ContentType.Application.Json)
-                accept(ContentType.Application.Json)
-                bearerAuth(accessToken)
-            }
-
-            if (response.status.isSuccess()) {
-                parsePendingTransaction(response)
-                    .fold(
-                        onSuccess = {
-                            Result.success(it)
-                        },
-                        onFailure = {
-                            Result.failure(it)
-                        })
-            } else {
-                Result.failure(MFAServiceError.General(response.bodyAsText()))
-            }
+            nextTransactionHandleResponse(response)
         } catch (e: Throwable) {
             Result.failure(e)
+        }
+    }
+
+    /**
+     * Builds the URI for retrieving the next pending transaction.
+     *
+     * @param transactionID The ID of the transaction to retrieve. If null, retrieves the next pending transaction.
+     * @return The URI for retrieving the next pending transaction.
+     */
+    private fun nextTransactionBuildTransactionUri(transactionID: String?): URL {
+        return if (transactionID != null) {
+            URL("${transactionUri}${TransactionFilter.PENDING_BY_IDENTIFIER.value}/${transactionID}")
+        } else {
+            URL("${transactionUri}${TransactionFilter.NEXT_PENDING.value}")
+        }
+    }
+
+    /**
+     * Makes a network request using the given [uri] and returns the response.
+     *
+     * @param uri The URI to make the request to.
+     * @return The HTTP response.
+     */
+    private suspend fun nextTransactionMakeNetworkRequest(uri: URL): HttpResponse {
+        return NetworkHelper.getInstance.get {
+            url(uri.toString())
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            bearerAuth(accessToken)
+        }
+    }
+
+    /**
+     * Handles the response from the server after making a request to retrieve the next pending transaction.
+     *
+     * @param response The HTTP response from the server.
+     * @return A [Result] containing the [NextTransactionInfo] if successful, or an error if unsuccessful.
+     */
+    private suspend fun nextTransactionHandleResponse(response: HttpResponse): Result<NextTransactionInfo> {
+        return if (response.status.isSuccess()) {
+            parsePendingTransaction(response)
+                .fold(
+                    onSuccess = {
+                        Result.success(it)
+                    },
+                    onFailure = {
+                        Result.failure(it)
+                    })
+        } else {
+            Result.failure(MFAServiceError.General(response.bodyAsText()))
         }
     }
 

@@ -3,6 +3,8 @@
  */
 package com.ibm.security.verifysdk.fido2.model
 
+import com.ibm.security.verifysdk.fido2.model.AuthenticatorAttachment.CROSS_PLATFORM
+import com.ibm.security.verifysdk.fido2.model.AuthenticatorAttachment.PLATFORM
 import kotlinx.serialization.Serializable
 
 /**

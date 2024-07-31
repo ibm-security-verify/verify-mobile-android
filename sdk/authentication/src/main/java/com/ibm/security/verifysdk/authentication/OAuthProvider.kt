@@ -8,10 +8,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import com.ibm.security.verifysdk.core.AuthenticationException
 import com.ibm.security.verifysdk.core.AuthorizationException
-import com.ibm.security.verifysdk.core.ErrorMessage
 import com.ibm.security.verifysdk.core.ErrorResponse
 import com.ibm.security.verifysdk.core.NetworkHelper
 import com.ibm.security.verifysdk.core.NetworkHelper.trustManager
@@ -35,7 +33,6 @@ import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.net.MalformedURLException
 import java.net.URL
-import javax.net.ssl.X509TrustManager
 import kotlin.coroutines.resume
 
 

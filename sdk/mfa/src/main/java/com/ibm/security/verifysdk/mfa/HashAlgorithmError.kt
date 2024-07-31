@@ -4,10 +4,21 @@
 
 package com.ibm.security.verifysdk.mfa
 
+/**
+ * Represents errors related to hash algorithm operations.
+ *
+ * @since 3.0.2
+ */
 sealed class HashAlgorithmError : Error() {
 
+    /**
+     * Indicates that the hash type is invalid.
+     */
     data object InvalidHash : HashAlgorithmError()
 
+    /**
+     * Provides a description of the error.
+     */
     val errorDescription: String
         get() = localizedDescription
 

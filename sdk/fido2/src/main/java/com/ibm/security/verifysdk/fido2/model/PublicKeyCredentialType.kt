@@ -3,6 +3,7 @@
  */
 package com.ibm.security.verifysdk.fido2.model
 
+import com.ibm.security.verifysdk.fido2.model.PublicKeyCredentialType.PUBLIC_KEY
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

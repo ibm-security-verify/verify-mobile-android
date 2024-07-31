@@ -1,127 +1,39 @@
 plugins {
-    id("com.android.library")
-    id("ibm-verifysdk-plugin")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
     id("kotlin-parcelize")
-    id("org.jetbrains.kotlin.android")
 }
 
-val moduleArtifactId = "authentication"
-val moduleGroupId = "com.ibm.security.verifysdk"
-val moduleVersion = android.defaultConfig.versionName
-val moduleName = "IBM Security Verify SDK"
-val moduleNameUrl = "https://github.com/ibm-security-verify/verify-sdk-android"
-val moduleLicenseName = "MIT License"
-val moduleLicenseUrl = "https://github.com/ibm-security-verify/verify-sdk-android/blob/main/LICENSE"
-val moduleScmConnection = "scm:git:git://github.com/ibm-security-verify/verify-sdk-android.git"
-val moduleScmDeveloperConnection =
-    "scm:git:ssh://github.com/ibm-security-verify/verify-sdk-android.git"
-val moduleScmUrl = "https://github.com/ibm-security-verify/verify-sdk-android"
-
-apply {
-    from("../jacoco.gradle")
-}
-android {
-    namespace = "com.ibm.security.verifysdk.authentication"
-    testNamespace = "com.ibm.security.verifysdk.authentication.test"
-}
+apply(from = "$rootDir/common-config.gradle")
+apply(from = "$rootDir/common-publish.gradle")
 
 dependencies {
+
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.biometric)
+    implementation(libs.androidx.browser)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.ktor.client.auth)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.serialization)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.logging.interceptor)
+    implementation(libs.material)
     implementation(project(":core"))
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.core:core-ktx:1.13.1")
-}
 
-tasks {
-    register("androidJavadocJar", Jar::class) {
-        archiveClassifier.set("javadoc")
-        from("${layout.buildDirectory}/javadoc")
-        dependsOn(dokkaJavadoc)
-    }
-    register("androidSourcesJar", Jar::class) {
-        archiveClassifier.set("sources")
-        from(android.sourceSets.getByName("main").java.srcDirs)
-    }
-    withType<Test> {
-        useJUnitPlatform()
-    }
-}
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.slf4j.jdk14)
+    androidTestImplementation(libs.ktor.client.mock)
+    androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
 
-// To-do: move to VerifySdkBuildPlugin
-tasks.withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>().configureEach {
-    outputFormatter = "html"
-    outputDir = "build/dependencyUpdates"
-    reportfileName = "dependencyUpdatesTask"
-
-    rejectVersionIf {
-        isNonStable(candidate.version)
-    }
-}
-
-fun isNonStable(version: String): Boolean {
-    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
-    val regex = "^[0-9,.v-]+(-r)?$".toRegex()
-    val isStable = stableKeyword || regex.matches(version)
-    return isStable.not()
-}
-
-configure<PublishingExtension> {
-    publications {
-        register<MavenPublication>("mavenAndroid") {
-            artifactId = moduleArtifactId
-            groupId = moduleGroupId
-            version = moduleVersion
-
-            afterEvaluate { artifact(tasks.getByName("bundleReleaseAar")) }
-            artifact(tasks.getByName("androidJavadocJar"))
-            artifact(tasks.getByName("androidSourcesJar"))
-
-            pom {
-                name.set(moduleName)
-                description.set("Description")
-                url.set(moduleNameUrl)
-
-                licenses {
-                    license {
-                        name.set(moduleLicenseName)
-                        url.set(moduleLicenseUrl)
-                    }
-                }
-                scm {
-                    connection.set(moduleScmConnection)
-                    developerConnection.set(moduleScmDeveloperConnection)
-                    url.set(moduleScmUrl)
-                }
-
-                withXml {
-                    fun groovy.util.Node.addDependency(dependency: Dependency, scope: String) {
-                        appendNode("dependency").apply {
-                            if (dependency.version != "unspecified") {
-                                appendNode("groupId", dependency.group)
-                                appendNode("artifactId", dependency.name)
-                                appendNode("version", dependency.version)
-                            } else {
-                                appendNode("groupId", groupId)
-                                appendNode("artifactId", dependency.name)
-                                appendNode("version", version)
-                            }
-                            appendNode("scope", scope)
-                        }
-                    }
-
-                    asNode().appendNode("dependencies").let { dependencies ->
-                        // List all "api" dependencies as "compile" dependencies
-                        configurations.api.get().allDependencies.forEach {
-                            dependencies.addDependency(it, "compile")
-                        }
-                        // List all "implementation" dependencies as "runtime" dependencies
-                        configurations.implementation.get().allDependencies.forEach {
-                            dependencies.addDependency(it, "runtime")
-                        }
-                    }
-                }
-            }
-        }
-    }
+    testImplementation(libs.junit)
 }

@@ -4,7 +4,6 @@
 package com.ibm.security.verifysdk.core
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.lang.System.getProperty
 

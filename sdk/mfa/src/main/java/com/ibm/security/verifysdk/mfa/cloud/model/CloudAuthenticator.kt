@@ -11,6 +11,22 @@ import com.ibm.security.verifysdk.mfa.URLSerializer
 import kotlinx.serialization.Serializable
 import java.net.URL
 
+/**
+ * `CloudAuthenticator` enables authenticators to be able to perform transaction and token refresh
+ * operations.
+ *
+ * @property refreshUri The URI used to refresh the authenticator, serialized with [URLSerializer].
+ * @property transactionUri The URI used for transaction operations, serialized with [URLSerializer].
+ * @property theme A map representing the theme settings for the authenticator.
+ * @property token Information about the token associated with the authenticator.
+ * @property id The unique identifier of the authenticator.
+ * @property serviceName The name of the service using the authenticator.
+ * @property accountName The name of the account associated with the authenticator.
+ * @property allowedFactors A list of allowed factor types for multi-factor authentication.
+ * @property customAttributes A key value pair for configuring custom attributes of the authenticator.
+ *
+ * @since 3.0.2
+ */
 @Serializable
 data class CloudAuthenticator(
     @Serializable(with = URLSerializer::class)

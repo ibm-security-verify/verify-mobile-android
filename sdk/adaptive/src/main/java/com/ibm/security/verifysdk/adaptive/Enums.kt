@@ -5,7 +5,7 @@
 package com.ibm.security.verifysdk.adaptive
 
 import java.io.Serializable
-import java.util.*
+import java.util.Locale
 
 /**
  * The assessment response status type.
