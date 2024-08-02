@@ -183,7 +183,7 @@ internal class OIDCMetadataInfoTest {
 
     @Test
     fun getIssuer() {
-        assertEquals("https://sdk.verify.ibm.com/oidc/endpoint/default", oidcMetadata.issuer)
+        assertEquals("https://sdk.verify.ibm.com/oauth2", oidcMetadata.issuer)
     }
 
     @Test
@@ -1154,7 +1154,7 @@ internal class OIDCMetadataInfoTest {
             "email",
             "phone"
           ],
-          "issuer": "https://sdk.verify.ibm.com/oidc/endpoint/default",
+          "issuer": "https://sdk.verify.ibm.com/oauth2",
           "id_token_encryption_enc_values_supported": [
             "none",
             "A128GCM",
