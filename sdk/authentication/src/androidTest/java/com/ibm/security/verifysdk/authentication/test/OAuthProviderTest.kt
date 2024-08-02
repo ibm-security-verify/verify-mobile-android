@@ -612,7 +612,7 @@ internal class OAuthProviderTest {
               "email",
               "phone"
            ],
-           "issuer":"https://sdk.verify.ibm.com/oidc/endpoint/default",
+           "issuer":"https://sdk.verify.ibm.com/oauth2",
            "id_token_encryption_enc_values_supported":[
               "none",
               "A128GCM",
