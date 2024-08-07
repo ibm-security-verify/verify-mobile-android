@@ -2,7 +2,7 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.core
+package com.ibm.security.verifysdk.core.extension
 
 import java.net.URL
 

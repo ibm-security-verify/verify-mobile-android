@@ -2,7 +2,7 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.core
+package com.ibm.security.verifysdk.core.helper
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
@@ -41,19 +41,10 @@ object NetworkHelper {
     var certificatePinner: CertificatePinner? = null
     var sslContext: SSLContext? = null
     var hostnameVerifier: HostnameVerifier? = null
-        set(value) {
-            field = value
-            initialize(null)
-        }
-
     var trustManager: X509TrustManager? = null
-        set(value) {
-            field = value
-            initialize(null)
-        }
 
     init {
-        initialize(null)
+        initialize()
     }
 
     val getInstance: HttpClient
@@ -87,17 +78,16 @@ object NetworkHelper {
                     config {
                         followRedirects(NetworkHelper.followRedirects)
                         followSslRedirects(followSslRedirects)
-
-                        customInterceptor?.let { customInterceptor ->
-                            addInterceptor(customInterceptor)
-                        }
-
-                        customLoggingInterceptor?.let { httpLoggingInterceptor ->
-                            addInterceptor(httpLoggingInterceptor)
-                        }
-
-                        preconfigured = createOkHttpClient()
                     }
+                    customInterceptor?.let { customInterceptor ->
+                        addInterceptor(customInterceptor)
+                    }
+
+                    customLoggingInterceptor?.let { httpLoggingInterceptor ->
+                        addInterceptor(httpLoggingInterceptor)
+                    }
+
+                    preconfigured = createOkHttpClient()
                 }
 
                 install(Logging) {

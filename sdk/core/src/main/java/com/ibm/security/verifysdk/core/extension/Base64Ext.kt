@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalUnsignedTypes::class)
 
-package com.ibm.security.verifysdk.core
+package com.ibm.security.verifysdk.core.extension
 
 
 import java.util.Base64

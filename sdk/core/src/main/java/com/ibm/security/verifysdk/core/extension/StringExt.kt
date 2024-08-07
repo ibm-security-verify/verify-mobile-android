@@ -2,9 +2,9 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.core
+package com.ibm.security.verifysdk.core.extension
 
-import com.ibm.security.verifysdk.core.KeystoreHelper.hash
+import com.ibm.security.verifysdk.core.helper.KeystoreHelper.hash
 import java.util.Locale
 
 val camelRegex = "(?<=[a-zA-Z])[A-Z]".toRegex()

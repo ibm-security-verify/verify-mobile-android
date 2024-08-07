@@ -2,13 +2,15 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.core
+package com.ibm.security.verifysdk.core.helper
 
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.biometric.BiometricPrompt
+import com.ibm.security.verifysdk.core.extension.entering
+import com.ibm.security.verifysdk.core.extension.exiting
 import org.slf4j.LoggerFactory
 import java.security.*
 import java.security.spec.ECGenParameterSpec
