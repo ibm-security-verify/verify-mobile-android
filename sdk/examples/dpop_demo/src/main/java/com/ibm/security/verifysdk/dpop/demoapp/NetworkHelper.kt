@@ -4,7 +4,7 @@
 package com.ibm.security.verifysdk.dpop.demoapp
 
 
-import com.ibm.security.verifysdk.core.ContextHelper
+import com.ibm.security.verifysdk.core.helper.ContextHelper
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout

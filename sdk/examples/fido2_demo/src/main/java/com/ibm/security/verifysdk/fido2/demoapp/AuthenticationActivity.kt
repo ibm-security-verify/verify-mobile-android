@@ -14,7 +14,7 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.ibm.security.verifysdk.core.KeystoreHelper
+import com.ibm.security.verifysdk.core.helper.KeystoreHelper
 import com.ibm.security.verifysdk.fido2.Fido2Api
 import com.ibm.security.verifysdk.fido2.model.AssertionOptions
 import com.ibm.security.verifysdk.fido2.model.AuthenticatorAssertionResponse

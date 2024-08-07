@@ -13,7 +13,7 @@ android {
 
         manifestPlaceholders["auth_redirect_scheme"] = "verifysdk"
         manifestPlaceholders["auth_redirect_host"] = "callback"
-        manifestPlaceholders["auth_redirect_path"] = ""
+        manifestPlaceholders["auth_redirect_path"] = "/redirect"
     }
 
     project.configurations.all {
@@ -30,12 +30,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":mfa"))
 
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.material)
-    implementation(libs.kotlinx.serialization.json)
     implementation(libs.zxing.android.embedded)
-    implementation(libs.slf4j.jdk14)
 
     testImplementation(libs.junit)
 
