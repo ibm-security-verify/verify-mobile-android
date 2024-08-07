@@ -4,7 +4,7 @@
 
 package com.ibm.security.verifysdk.mfa.onprem.model
 
-import com.ibm.security.verifysdk.mfa.DateSerializer
+import com.ibm.security.verifysdk.core.serializer.DateSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement

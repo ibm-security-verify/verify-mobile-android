@@ -8,7 +8,7 @@ import com.ibm.security.verifysdk.mfa.EnrollableFactor
 import com.ibm.security.verifysdk.mfa.EnrollableType
 import com.ibm.security.verifysdk.mfa.HashAlgorithmType
 import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
-import com.ibm.security.verifysdk.mfa.URLSerializer
+import com.ibm.security.verifysdk.core.serializer.URLSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

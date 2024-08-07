@@ -7,7 +7,7 @@ package com.ibm.security.verifysdk.mfa.cloud
 import com.ibm.security.verifysdk.authentication.TokenInfo
 import com.ibm.security.verifysdk.core.AuthorizationException
 import com.ibm.security.verifysdk.core.ErrorResponse
-import com.ibm.security.verifysdk.core.NetworkHelper
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.mfa.MFAAttributeInfo
 import com.ibm.security.verifysdk.mfa.MFAServiceDescriptor
 import com.ibm.security.verifysdk.mfa.MFAServiceError

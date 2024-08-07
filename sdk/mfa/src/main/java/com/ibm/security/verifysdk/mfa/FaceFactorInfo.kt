@@ -4,6 +4,7 @@
 
 package com.ibm.security.verifysdk.mfa
 
+import com.ibm.security.verifysdk.core.serializer.UUIDSerializer
 import kotlinx.serialization.Serializable
 import java.util.UUID
 

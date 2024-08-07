@@ -6,7 +6,7 @@ package com.ibm.security.verifysdk.mfa
 
 import android.util.Base64
 import com.ibm.security.verifysdk.authentication.TokenInfo
-import com.ibm.security.verifysdk.core.NetworkHelper
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.post

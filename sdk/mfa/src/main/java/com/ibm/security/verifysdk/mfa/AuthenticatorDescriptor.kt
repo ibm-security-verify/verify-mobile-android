@@ -6,7 +6,7 @@ package com.ibm.security.verifysdk.mfa
 import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.biometric.BiometricPrompt
-import com.ibm.security.verifysdk.core.KeystoreHelper
+import com.ibm.security.verifysdk.core.helper.KeystoreHelper
 
 /**
  * An interface that defines the authenticator identifier and it's metadata.

@@ -4,7 +4,7 @@
 
 package com.ibm.security.verifysdk.mfa
 
-import com.ibm.security.verifysdk.core.decodeBase32
+import com.ibm.security.verifysdk.core.extension.decodeBase32
 import java.util.Date
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
