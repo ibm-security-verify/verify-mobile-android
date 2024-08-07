@@ -11,8 +11,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.ibm.security.verifysdk.core.AuthenticationException
 import com.ibm.security.verifysdk.core.AuthorizationException
 import com.ibm.security.verifysdk.core.ErrorResponse
-import com.ibm.security.verifysdk.core.NetworkHelper
-import com.ibm.security.verifysdk.core.NetworkHelper.trustManager
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.core.helper.NetworkHelper.hostnameVerifier
+import com.ibm.security.verifysdk.core.helper.NetworkHelper.sslContext
+import com.ibm.security.verifysdk.core.helper.NetworkHelper.trustManager
 import io.ktor.client.call.body
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
@@ -33,6 +35,8 @@ import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.net.MalformedURLException
 import java.net.URL
+import javax.net.ssl.HostnameVerifier
+import javax.net.ssl.SSLContext
 import kotlin.coroutines.resume
 
 
@@ -66,7 +70,16 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
         set(value) {
             field = value
             if (value) {
-                trustManager = NetworkHelper.insecureTrustManager()
+                trustManager = trustManager ?: NetworkHelper.insecureTrustManager()
+                sslContext = sslContext ?: SSLContext.getInstance("SSL").apply {
+                    init(
+                        null,
+                        arrayOf(trustManager),
+                        java.security.SecureRandom()
+                    )
+                }
+                hostnameVerifier = hostnameVerifier ?: HostnameVerifier { _, _ -> true }
+                NetworkHelper.initialize()
             }
         }
 
@@ -261,7 +274,13 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
                 Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
             } else {
                 val errorResponse = response.body<ErrorResponse>()
-                Result.failure(AuthorizationException(response.status, errorResponse.error, errorResponse.errorDescription))
+                Result.failure(
+                    AuthorizationException(
+                        response.status,
+                        errorResponse.error,
+                        errorResponse.errorDescription
+                    )
+                )
             }
         } catch (e: Throwable) {
             Result.failure(e)
@@ -287,7 +306,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
     ): Result<TokenInfo> {
 
         return try {
-            val formData = mapOf(
+            val formData = listOf(
                 "client_id" to clientId,
                 "client_secret" to (clientSecret ?: ""),
                 "username" to username,
@@ -305,14 +324,20 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
                 }
                 contentType(ContentType.Application.FormUrlEncoded)
                 accept(ContentType.Application.Json)
-                setBody(formData + additionalParameters)
+                setBody((formData + additionalParameters.toList()).formUrlEncode())
             }
 
             if (response.status.isSuccess()) {
                 Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
             } else {
                 val errorResponse = response.body<ErrorResponse>()
-                Result.failure(AuthorizationException(response.status, errorResponse.error, errorResponse.errorDescription))
+                Result.failure(
+                    AuthorizationException(
+                        response.status,
+                        errorResponse.error,
+                        errorResponse.errorDescription
+                    )
+                )
             }
         } catch (e: Throwable) {
             Result.failure(e)
@@ -342,7 +367,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
     ): Result<TokenInfo> {
 
         return try {
-            val formData = mapOf(
+            val formData = listOf(
                 "refresh_token" to refreshToken,
                 "grant_type" to "refresh_token",
                 "scope" to (scope?.joinToString(" ") ?: ""),
@@ -357,14 +382,20 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
                 }
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
-                setBody(formData + additionalParameters)
+                setBody((formData + additionalParameters.toList()).formUrlEncode())
             }
 
             if (response.status.isSuccess()) {
                 Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
             } else {
                 val errorResponse = response.body<ErrorResponse>()
-                Result.failure(AuthorizationException(response.status, errorResponse.error, errorResponse.errorDescription))
+                Result.failure(
+                    AuthorizationException(
+                        response.status,
+                        errorResponse.error,
+                        errorResponse.errorDescription
+                    )
+                )
             }
         } catch (e: Throwable) {
             Result.failure(e)

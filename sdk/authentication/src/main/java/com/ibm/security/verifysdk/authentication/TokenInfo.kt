@@ -5,9 +5,9 @@ package com.ibm.security.verifysdk.authentication
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.ibm.security.verifysdk.core.toJsonElement
-import com.ibm.security.verifysdk.core.toJsonObject
-import com.ibm.security.verifysdk.core.toNumberOrNull
+import com.ibm.security.verifysdk.core.extension.toJsonElement
+import com.ibm.security.verifysdk.core.extension.toJsonObject
+import com.ibm.security.verifysdk.core.extension.toNumberOrNull
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.parcelize.Parceler
