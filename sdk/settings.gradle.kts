@@ -23,12 +23,16 @@ rootProject.name = "IBM Security Verify SDK"
 include(":adaptive")
 include(":authentication")
 include(":core")
+include(":di")
 include(":dpop_demo")
 include(":fido2")
 include(":fido2_demo")
 include(":mfa")
 include(":mfa_demo")
+include(":di_demo")
 
 project(":fido2_demo").projectDir = File("examples/fido2_demo")
 project(":dpop_demo").projectDir = File("examples/dpop_demo")
 project(":mfa_demo").projectDir = File("examples/mfa_demo")
+project(":di_demo").projectDir = File("examples/di_demo")
+
