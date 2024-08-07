@@ -8,6 +8,7 @@ import android.os.Build
 import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import com.ibm.security.verifysdk.core.helper.KeystoreHelper
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Ignore

@@ -1,5 +1,6 @@
 package com.ibm.security.verifysdk.core
 
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import okhttp3.CertificatePinner
 import okhttp3.Interceptor
 import okhttp3.logging.HttpLoggingInterceptor

@@ -3,6 +3,8 @@
  */
 package com.ibm.security.verifysdk.core
 
+import com.ibm.security.verifysdk.core.extension.toNumberOrDefault
+import com.ibm.security.verifysdk.core.extension.toNumberOrNull
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 
