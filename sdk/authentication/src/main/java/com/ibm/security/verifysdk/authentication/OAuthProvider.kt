@@ -66,12 +66,20 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
         isLenient = true
     }
 
+    /**
+     * If set to `true`, SSL validation checks will be disabled.
+     *
+     * Be careful when turning this on, as it will be valid for all subsequent calls until set
+     * to `false`. If set to `false`, to engine will always be the default provided.
+     *
+     * @version 3.0.0
+     */
     var ignoreSsl: Boolean = false
         set(value) {
             field = value
             if (value) {
                 trustManager = trustManager ?: NetworkHelper.insecureTrustManager()
-                sslContext = sslContext ?: SSLContext.getInstance("SSL").apply {
+                sslContext = sslContext ?: SSLContext.getInstance("TLS").apply {
                     init(
                         null,
                         arrayOf(trustManager),
@@ -79,8 +87,12 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
                     )
                 }
                 hostnameVerifier = hostnameVerifier ?: HostnameVerifier { _, _ -> true }
-                NetworkHelper.initialize()
+            } else {
+                trustManager = null
+                sslContext = null
+                hostnameVerifier = null
             }
+            NetworkHelper.initialize()
         }
 
     var additionalHeaders: Map<String, String> = HashMap()
