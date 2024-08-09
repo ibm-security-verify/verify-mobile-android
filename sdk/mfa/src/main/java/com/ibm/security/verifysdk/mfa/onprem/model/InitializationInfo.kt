@@ -4,7 +4,7 @@
 
 package com.ibm.security.verifysdk.mfa.onprem.model
 
-import com.ibm.security.verifysdk.mfa.URLSerializer
+import com.ibm.security.verifysdk.core.serializer.URLSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.net.URL

@@ -5,14 +5,14 @@
 package com.ibm.security.verifysdk.mfa.cloud
 
 import com.ibm.security.verifysdk.authentication.TokenInfo
-import com.ibm.security.verifysdk.core.ContextHelper
-import com.ibm.security.verifysdk.core.NetworkHelper
-import com.ibm.security.verifysdk.core.camelToSnakeCase
-import com.ibm.security.verifysdk.core.entering
-import com.ibm.security.verifysdk.core.exiting
-import com.ibm.security.verifysdk.core.replace
-import com.ibm.security.verifysdk.core.snakeToCamelCase
-import com.ibm.security.verifysdk.core.toJsonObject
+import com.ibm.security.verifysdk.core.helper.ContextHelper
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.core.extension.camelToSnakeCase
+import com.ibm.security.verifysdk.core.extension.entering
+import com.ibm.security.verifysdk.core.extension.exiting
+import com.ibm.security.verifysdk.core.extension.replace
+import com.ibm.security.verifysdk.core.extension.snakeToCamelCase
+import com.ibm.security.verifysdk.core.extension.toJsonObject
 import com.ibm.security.verifysdk.mfa.EnrollableSignature
 import com.ibm.security.verifysdk.mfa.EnrollableType
 import com.ibm.security.verifysdk.mfa.FaceFactorInfo

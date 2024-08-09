@@ -1,5 +1,8 @@
 package com.ibm.security.verifysdk.core
 
+import com.ibm.security.verifysdk.core.extension.toJsonArray
+import com.ibm.security.verifysdk.core.extension.toJsonElement
+import com.ibm.security.verifysdk.core.extension.toJsonObject
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject

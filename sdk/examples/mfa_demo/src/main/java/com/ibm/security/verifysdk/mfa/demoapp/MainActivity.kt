@@ -6,7 +6,6 @@ package com.ibm.security.verifysdk.mfa.demoapp
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,35 +13,23 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
-import com.ibm.security.verifysdk.core.ContextHelper
-import com.ibm.security.verifysdk.core.threadInfo
+import com.ibm.security.verifysdk.core.extension.threadInfo
+import com.ibm.security.verifysdk.core.helper.ContextHelper
 import com.ibm.security.verifysdk.mfa.EnrollableType
 import com.ibm.security.verifysdk.mfa.FactorType
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
 import com.ibm.security.verifysdk.mfa.MFARegistrationController
 import com.ibm.security.verifysdk.mfa.MFAServiceController
 import com.ibm.security.verifysdk.mfa.MFAServiceDescriptor
-import com.ibm.security.verifysdk.mfa.TOTPFactorInfo
 import com.ibm.security.verifysdk.mfa.UserAction
-import com.ibm.security.verifysdk.mfa.UserPresenceFactorInfo
-import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticatorService
 import com.ibm.security.verifysdk.mfa.cloud.model.CloudAuthenticator
 import com.ibm.security.verifysdk.mfa.completeTransaction
 import com.ibm.security.verifysdk.mfa.onprem.model.OnPremiseAuthenticator
-
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.JsonTransformingSerializer
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.event.Level
 
 class MainActivity : ComponentActivity() {
 
@@ -67,7 +54,6 @@ class MainActivity : ComponentActivity() {
 
         ContextHelper.init(applicationContext)
         setContentView(R.layout.activity_main)
-        log.atLevel(Level.DEBUG).log("XXX DEBUG2")
 
         log.debug("XXX DEBUG")
         log.error("XXX ERROR")
@@ -109,6 +95,7 @@ class MainActivity : ComponentActivity() {
     }
 
 
+    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>, grantResults: IntArray

@@ -6,6 +6,7 @@ package com.ibm.security.verifysdk.fido2.demoapp.model
 
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 data class IvCreds(
     val name: String = "ivcreds-name",

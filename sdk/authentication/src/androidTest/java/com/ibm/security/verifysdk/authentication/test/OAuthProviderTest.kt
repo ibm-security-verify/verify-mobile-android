@@ -3,7 +3,7 @@ package com.ibm.security.verifysdk.authentication.test
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ibm.security.verifysdk.authentication.OAuthProvider
 import com.ibm.security.verifysdk.core.AuthorizationException
-import com.ibm.security.verifysdk.core.NetworkHelper
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
 import io.ktor.http.ContentType

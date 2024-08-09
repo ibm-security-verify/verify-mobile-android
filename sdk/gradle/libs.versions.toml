@@ -33,7 +33,7 @@ nettyCodecHttp2 = "4.1.111.Final"
 rootbeerLib = "0.1.0"
 rules = "1.6.0"
 runtimeLivedata = "1.6.8"
-slf4jJdk14 = "2.0.13"
+slf4jAndroidVersion = "1.7.36"
 versioningPluginVersion = "1.9.0"
 woodstockCore = "6.6.2"
 zxingAndroidEmbeddedVersion = "4.3.0"
@@ -90,10 +90,10 @@ mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "
 mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockwebserver" }
 netty-codec-http2 = { module = "io.netty:netty-codec-http2", version.ref = "nettyCodecHttp2" }
 rootbeer-lib = { module = "com.scottyab:rootbeer-lib", version.ref = "rootbeerLib" }
-slf4j-jdk14 = { module = "org.slf4j:slf4j-jdk14", version.ref = "slf4jJdk14" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4jAndroidVersion" }
 versioning-plugin = { module = "org.jetbrains.dokka:versioning-plugin", version.ref = "versioningPluginVersion" }
 zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbeddedVersion" }
 

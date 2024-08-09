@@ -5,8 +5,8 @@
 
 package com.ibm.security.verifysdk.fido2.model
 
-import com.ibm.security.verifysdk.core.toJsonElement
-import com.ibm.security.verifysdk.core.toJsonObject
+import com.ibm.security.verifysdk.core.extension.toJsonElement
+import com.ibm.security.verifysdk.core.extension.toJsonObject
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.MapSerializer

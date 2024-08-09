@@ -12,6 +12,9 @@
             <option value="$PROJECT_DIR$/adaptive" />
             <option value="$PROJECT_DIR$/authentication" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/di" />
+            <option value="$PROJECT_DIR$/examples/di_demo" />
+            <option value="$PROJECT_DIR$/examples/dpop_demo" />
             <option value="$PROJECT_DIR$/examples/fido2_demo" />
             <option value="$PROJECT_DIR$/examples/mfa_demo" />
             <option value="$PROJECT_DIR$/fido2" />

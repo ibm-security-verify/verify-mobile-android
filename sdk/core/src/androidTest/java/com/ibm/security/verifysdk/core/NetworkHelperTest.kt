@@ -1,10 +1,11 @@
 package com.ibm.security.verifysdk.core
 
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import okhttp3.CertificatePinner
 import okhttp3.Interceptor
 import okhttp3.logging.HttpLoggingInterceptor
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.assertEquals
 
 @Suppress("KotlinConstantConditions")
 internal class NetworkHelperTest {

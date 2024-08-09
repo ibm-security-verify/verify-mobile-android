@@ -5,9 +5,9 @@
 package com.ibm.security.verifysdk.mfa.cloud.model
 
 import com.ibm.security.verifysdk.authentication.TokenInfo
+import com.ibm.security.verifysdk.core.serializer.URLSerializer
 import com.ibm.security.verifysdk.mfa.FactorType
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
-import com.ibm.security.verifysdk.mfa.URLSerializer
 import kotlinx.serialization.Serializable
 import java.net.URL
 

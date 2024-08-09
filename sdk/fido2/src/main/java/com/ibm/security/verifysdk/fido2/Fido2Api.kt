@@ -10,10 +10,10 @@ import androidx.fragment.app.FragmentActivity
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
 import com.ibm.security.verifysdk.core.AuthorizationException
 import com.ibm.security.verifysdk.core.ErrorResponse
-import com.ibm.security.verifysdk.core.KeystoreHelper
-import com.ibm.security.verifysdk.core.NetworkHelper
-import com.ibm.security.verifysdk.core.base64UrlEncode
-import com.ibm.security.verifysdk.core.sha256
+import com.ibm.security.verifysdk.core.extension.base64UrlEncode
+import com.ibm.security.verifysdk.core.extension.sha256
+import com.ibm.security.verifysdk.core.helper.KeystoreHelper
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.fido2.model.AssertionOptions
 import com.ibm.security.verifysdk.fido2.model.AssertionResultResponse
 import com.ibm.security.verifysdk.fido2.model.AttestationOptions

@@ -4,9 +4,12 @@
 
 package com.ibm.security.verifysdk.mfa
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class TOTPFactorInfoTest {
 
     private val secret = "JBSWY3DPEHPK3PXP"

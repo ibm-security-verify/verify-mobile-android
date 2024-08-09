@@ -24,7 +24,6 @@ dependencies {
 
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.junit.jupiter)
 
     testImplementation(libs.junit)
 }

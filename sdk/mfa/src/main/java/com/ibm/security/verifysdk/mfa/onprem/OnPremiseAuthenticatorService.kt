@@ -7,10 +7,10 @@ package com.ibm.security.verifysdk.mfa.onprem
 import android.net.Uri
 import com.ibm.security.verifysdk.authentication.OAuthProvider
 import com.ibm.security.verifysdk.authentication.TokenInfo
-import com.ibm.security.verifysdk.core.ContextHelper
-import com.ibm.security.verifysdk.core.NetworkHelper
-import com.ibm.security.verifysdk.core.entering
-import com.ibm.security.verifysdk.core.exiting
+import com.ibm.security.verifysdk.core.helper.ContextHelper
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.core.extension.entering
+import com.ibm.security.verifysdk.core.extension.exiting
 import com.ibm.security.verifysdk.mfa.MFAAttributeInfo
 import com.ibm.security.verifysdk.mfa.MFAServiceDescriptor
 import com.ibm.security.verifysdk.mfa.MFAServiceError
