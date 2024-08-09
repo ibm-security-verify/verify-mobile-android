@@ -11,6 +11,8 @@ apply(from = "$rootDir/common-publish.gradle")
 
 dependencies {
 
+    implementation(project(":core"))
+
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.browser)
@@ -19,7 +21,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.logging.interceptor)
     implementation(libs.material)
-    implementation(project(":core"))
 
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
