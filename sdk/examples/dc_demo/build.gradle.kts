@@ -33,7 +33,7 @@ android {
 
 dependencies {
 
-    implementation(project(":di"))
+    implementation(project(":dc"))
     implementation(project(":core"))
     implementation(project(":authentication"))
 
