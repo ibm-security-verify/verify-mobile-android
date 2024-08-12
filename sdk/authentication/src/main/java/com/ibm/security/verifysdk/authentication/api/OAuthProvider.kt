@@ -1,20 +1,22 @@
-//
-// Copyright contributors to the IBM Security Verify Authentication SDK for Android project
-//
-package com.ibm.security.verifysdk.authentication
+/*
+ * Copyright contributors to the IBM Security Verify SDK for Android project
+ */
+package com.ibm.security.verifysdk.authentication.api
 
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import com.ibm.security.verifysdk.authentication.AuthenticationActivity
+import com.ibm.security.verifysdk.authentication.CodeChallengeMethod
+import com.ibm.security.verifysdk.authentication.model.OIDCMetadataInfo
+import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.core.AuthenticationException
 import com.ibm.security.verifysdk.core.AuthorizationException
 import com.ibm.security.verifysdk.core.ErrorResponse
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
-import com.ibm.security.verifysdk.core.helper.NetworkHelper.hostnameVerifier
-import com.ibm.security.verifysdk.core.helper.NetworkHelper.sslContext
-import com.ibm.security.verifysdk.core.helper.NetworkHelper.trustManager
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
@@ -35,8 +37,6 @@ import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.net.MalformedURLException
 import java.net.URL
-import javax.net.ssl.HostnameVerifier
-import javax.net.ssl.SSLContext
 import kotlin.coroutines.resume
 
 
@@ -74,35 +74,35 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
      *
      * @version 3.0.0
      */
-    var ignoreSsl: Boolean = false
-        set(value) {
-            field = value
-            if (value) {
-                trustManager = trustManager ?: NetworkHelper.insecureTrustManager()
-                sslContext = sslContext ?: SSLContext.getInstance("TLS").apply {
-                    init(
-                        null,
-                        arrayOf(trustManager),
-                        java.security.SecureRandom()
-                    )
-                }
-                hostnameVerifier = hostnameVerifier ?: HostnameVerifier { _, _ -> true }
-            } else {
-                trustManager = null
-                sslContext = null
-                hostnameVerifier = null
-            }
-            NetworkHelper.initialize()
-        }
+//    var ignoreSsl: Boolean = false
+//        set(value) {
+//            field = value
+//            if (value) {
+//                trustManager = trustManager ?: NetworkHelper.insecureTrustManager()
+//                sslContext = sslContext ?: SSLContext.getInstance("TLS").apply {
+//                    init(
+//                        null,
+//                        arrayOf(trustManager),
+//                        java.security.SecureRandom()
+//                    )
+//                }
+//                hostnameVerifier = hostnameVerifier ?: HostnameVerifier { _, _ -> true }
+//            } else {
+//                trustManager = null
+//                sslContext = null
+//                hostnameVerifier = null
+//            }
+//            NetworkHelper.initialize()
+//        }
 
-    var additionalHeaders: Map<String, String> = HashMap()
-    var additionalParameters: Map<String, String> = HashMap()
+    var additionalHeaders: MutableMap<String, String> = mutableMapOf()
+    var additionalParameters: MutableMap<String, String> = mutableMapOf()
 
     constructor(
         clientId: String,
         clientSecret: String? = null,
-        additionalHeaders: Map<String, String>? = null,
-        additionalParameters: Map<String, String>?,
+        additionalHeaders: MutableMap<String, String>? = null,
+        additionalParameters: MutableMap<String, String>?,
     ) : this(clientId, clientSecret) {
         additionalHeaders?.let {
             this.additionalHeaders = it
@@ -116,18 +116,19 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
     /**
      * Discover the authorization service configuration from a compliant OpenID Connect endpoint.
      *
+     * @param   httpClient The [HttpClient] used to make the network request.
      * @param   url  The `URL` for the OpenID Connect service provider issuer.
      *
      * @return
      *
      */
-    suspend fun discover(url: URL): Result<OIDCMetadataInfo> {
+    suspend fun discover(url: URL, httpClient: HttpClient = NetworkHelper.getInstance): Result<OIDCMetadataInfo> {
 
         return try {
             if (url.path.endsWith(".well-known/openid-configuration", ignoreCase = true).not()) {
                 Result.failure(MalformedURLException("The URL does not end with the .well-known/openid-configuration path component."))
             } else {
-                val response = NetworkHelper.getInstance.get {
+                val response = httpClient.get {
                     url(url.toString())
                 }.body<OIDCMetadataInfo>()
                 Result.success(response)
@@ -241,6 +242,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
      * The authorization code is obtained by using an authorization server as an intermediary
      * between the client and resource owner.
      *
+     * @param   httpClient  The [HttpClient] used to make the network request.
      * @param   url  The `URL` for the OpenID Connect service provider issuer.
      * @param   redirectUrl  The redirect `URL` that is registered with the OpenID Connect service
      *                      provider. This parameter is required when the code was obtained through
@@ -256,7 +258,8 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
         redirectUrl: URL? = null,
         authorizationCode: String,
         codeVerifier: String? = null,
-        scope: Array<String>?
+        scope: Array<String>?,
+        httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<TokenInfo> {
 
         return try {
@@ -270,7 +273,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
                 "redirect_uri" to (redirectUrl?.toString() ?: "")
             )
 
-            val response = NetworkHelper.getInstance.post {
+            val response = httpClient.post {
                 url(url.toString())
                 headers {
                     additionalHeaders.forEach {
@@ -300,21 +303,27 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
     }
 
     /**
-     * The resource owner password credentials (i.e., username and password) can be used directly
-     * as an authorization grant to obtain an access token.
+     * Asynchronously authorizes a user by making a request to the provided URL using the given credentials.
      *
-     * @param   url  The `URL` for the OpenID Connect service provider issuer.
-     * @param   username  The resource owner username.
-     * @param   password  The resource owner password.
-     * @param   scope  The scope of the access request.
+     * This function sends a POST request to the authorization server with the specified username,
+     * password, and optional scope. It returns a [Result] containing a [TokenInfo] object if the
+     * authorization is successful, or an exception if an error occurs.
      *
-     * @return
+     * @param httpClient The [HttpClient] used to make the network request.
+     * @param url The [URL] of the authorization endpoint.
+     * @param username The username used for authentication.
+     * @param password The password used for authentication.
+     * @param scope An optional array of scopes to request authorization for. If no scopes are provided,
+     *              an empty scope will be used.
+     * @return A [Result] containing a [TokenInfo] object if authorization is successful, or an
+     *         exception if the request fails.
      */
     suspend fun authorize(
         url: URL,
         username: String,
         password: String,
-        scope: Array<String>? = arrayOf("")
+        scope: Array<String>? = arrayOf(""),
+        httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<TokenInfo> {
 
         return try {
@@ -327,7 +336,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
                 "scope" to (scope?.joinToString(" ") ?: ""),
             )
 
-            val response = NetworkHelper.getInstance.post {
+            val response = httpClient.post {
                 url(url.toString())
                 headers {
                     additionalHeaders.forEach {
@@ -364,6 +373,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
      * Because refresh tokens are typically long-lasting credentials used to request additional
      * access tokens, the refresh token is bound to the client to which it was issued.
      *
+     * @param   httpClient The [HttpClient] used to make the network request.
      * @param   url  The `URL` for the OpenID Connect service provider issuer.
      * @param   refreshToken  The refresh token previously issued by the authorization server.
      * @param   scope  The scope of the access request.  The requested scope must not include any
@@ -375,7 +385,8 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
     suspend fun refresh(
         url: URL,
         refreshToken: String,
-        scope: Array<String>? = arrayOf("")
+        scope: Array<String>? = arrayOf(""),
+        httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<TokenInfo> {
 
         return try {
@@ -385,7 +396,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
                 "scope" to (scope?.joinToString(" ") ?: ""),
             )
 
-            val response = NetworkHelper.getInstance.post {
+            val response = httpClient.post {
                 url(url.toString())
                 headers {
                     additionalHeaders.forEach {

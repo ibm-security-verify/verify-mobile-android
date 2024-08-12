@@ -2,17 +2,17 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.mfa.cloud
+package com.ibm.security.verifysdk.mfa.api
 
-import com.ibm.security.verifysdk.authentication.TokenInfo
-import com.ibm.security.verifysdk.core.helper.ContextHelper
-import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.core.extension.camelToSnakeCase
 import com.ibm.security.verifysdk.core.extension.entering
 import com.ibm.security.verifysdk.core.extension.exiting
 import com.ibm.security.verifysdk.core.extension.replace
 import com.ibm.security.verifysdk.core.extension.snakeToCamelCase
 import com.ibm.security.verifysdk.core.extension.toJsonObject
+import com.ibm.security.verifysdk.core.helper.ContextHelper
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.mfa.EnrollableSignature
 import com.ibm.security.verifysdk.mfa.EnrollableType
 import com.ibm.security.verifysdk.mfa.FaceFactorInfo
@@ -26,14 +26,15 @@ import com.ibm.security.verifysdk.mfa.MFARegistrationError
 import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
 import com.ibm.security.verifysdk.mfa.TOTPFactorInfo
 import com.ibm.security.verifysdk.mfa.UserPresenceFactorInfo
-import com.ibm.security.verifysdk.mfa.cloud.model.CloudAuthenticator
-import com.ibm.security.verifysdk.mfa.cloud.model.CloudRegistration
-import com.ibm.security.verifysdk.mfa.cloud.model.CloudRegistrationProviderResultData
-import com.ibm.security.verifysdk.mfa.cloud.model.CloudTOTPEnrollableFactor
-import com.ibm.security.verifysdk.mfa.cloud.model.InitializationInfo
-import com.ibm.security.verifysdk.mfa.cloud.model.Metadata
 import com.ibm.security.verifysdk.mfa.generateKeys
+import com.ibm.security.verifysdk.mfa.model.cloud.CloudAuthenticator
+import com.ibm.security.verifysdk.mfa.model.cloud.CloudRegistration
+import com.ibm.security.verifysdk.mfa.model.cloud.CloudRegistrationProviderResultData
+import com.ibm.security.verifysdk.mfa.model.cloud.CloudTOTPEnrollableFactor
+import com.ibm.security.verifysdk.mfa.model.cloud.InitializationInfo
+import com.ibm.security.verifysdk.mfa.model.cloud.Metadata
 import com.ibm.security.verifysdk.mfa.sign
+import io.ktor.client.HttpClient
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.post
@@ -93,7 +94,8 @@ class CloudRegistrationProvider(data: String) :
     internal suspend fun initiate(
         accountName: String,
         skipTotpEnrollment: Boolean = true,
-        pushToken: String?
+        pushToken: String?,
+        httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<CloudRegistrationProviderResultData> {
         log.entering()
         this.accountName = accountName
@@ -103,7 +105,7 @@ class CloudRegistrationProvider(data: String) :
             val registrationUrl =
                 URL("${initializationInfo.uri}?skipTotpEnrollment=${skipTotpEnrollment}")
 
-            val response = NetworkHelper.getInstance.post {
+            val response = httpClient.post {
                 url(registrationUrl.toString())
                 accept(ContentType.Application.Json)
                 contentType(ContentType.Application.Json)
@@ -204,7 +206,7 @@ class CloudRegistrationProvider(data: String) :
         }
     }
 
-    override suspend fun enroll() {
+    override suspend fun enroll(httpClient: HttpClient) {
 
         currentFactor?.let { signatureEnrollableFactor ->
             val keyName = "${metaData.id}.${signatureEnrollableFactor.type.name}"
@@ -218,13 +220,13 @@ class CloudRegistrationProvider(data: String) :
                     metaData.id,
                     android.util.Base64.NO_WRAP
                 ).let { signedData ->
-                    enroll(keyName, publicKey, signedData)
+                    enroll(keyName, publicKey, signedData, httpClient)
                 }
             }
         }
     }
 
-    override suspend fun enroll(keyName: String, publicKey: String, signedData: String) {
+    override suspend fun enroll(keyName: String, publicKey: String, signedData: String, httpClient: HttpClient) {
 
         val algorithm = HashAlgorithmType.fromString(currentFactor?.algorithm ?: "")
 
@@ -250,7 +252,7 @@ class CloudRegistrationProvider(data: String) :
             }
         }
 
-        val response = NetworkHelper.getInstance.post {
+        val response = httpClient.post {
             url(currentFactor?.uri.toString())
             accept(ContentType.Application.Json)
             contentType(ContentType.Application.Json)
@@ -311,7 +313,7 @@ class CloudRegistrationProvider(data: String) :
         }
     }
 
-    override suspend fun finalize(): Result<MFAAuthenticatorDescriptor> {
+    override suspend fun finalize(httpClient: HttpClient): Result<MFAAuthenticatorDescriptor> {
 
         return try {
 
@@ -319,7 +321,7 @@ class CloudRegistrationProvider(data: String) :
                 URL("${initializationInfo.uri}?metadataInResponse=false")
 
             // Refresh the token, which sets the authenticator state from ENROLLING to ACTIVE.
-            val response = NetworkHelper.getInstance.post {
+            val response = httpClient.post {
                 url(registrationUrl.toString())
                 accept(ContentType.Application.Json)
                 contentType(ContentType.Application.Json)

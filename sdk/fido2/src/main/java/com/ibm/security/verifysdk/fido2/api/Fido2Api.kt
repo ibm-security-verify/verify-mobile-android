@@ -1,7 +1,7 @@
 /*
- *  Copyright contributors to the IBM Security Verify FIDO2 SDK for Android project
+ * Copyright contributors to the IBM Security Verify SDK for Android project
  */
-package com.ibm.security.verifysdk.fido2
+package com.ibm.security.verifysdk.fido2.api
 
 import android.security.keystore.KeyProperties
 import androidx.biometric.BiometricPrompt
@@ -14,6 +14,8 @@ import com.ibm.security.verifysdk.core.extension.base64UrlEncode
 import com.ibm.security.verifysdk.core.extension.sha256
 import com.ibm.security.verifysdk.core.helper.KeystoreHelper
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.fido2.BiometricAuthenticationException
+import com.ibm.security.verifysdk.fido2.COSEKey
 import com.ibm.security.verifysdk.fido2.model.AssertionOptions
 import com.ibm.security.verifysdk.fido2.model.AssertionResultResponse
 import com.ibm.security.verifysdk.fido2.model.AttestationOptions
@@ -26,6 +28,7 @@ import com.ibm.security.verifysdk.fido2.model.PublicKeyCredentialCreationOptions
 import com.ibm.security.verifysdk.fido2.model.PublicKeyCredentialRequestOptions
 import com.ibm.security.verifysdk.fido2.model.ResponseAssertion
 import com.ibm.security.verifysdk.fido2.model.ResponseAttestation
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
@@ -119,6 +122,7 @@ class Fido2Api {
      * This function sends a request to the server to initiate the attestation process
      * with the provided attestation options.
      *
+     * @param httpClient The [HttpClient] used to make the network request.
      * @param attestationOptionsUrl The URL to send the attestation options request to.
      * @param authorization The authorization header value to be included in the request.
      * @param attestationOptions The options for the attestation process.
@@ -130,10 +134,11 @@ class Fido2Api {
     suspend fun initiateAttestation(
         attestationOptionsUrl: String,
         authorization: String,
-        attestationOptions: AttestationOptions
+        attestationOptions: AttestationOptions,
+        httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<PublicKeyCredentialCreationOptions> {
         return try {
-            val response = NetworkHelper.getInstance.post {
+            val response = httpClient.post {
                 url(attestationOptionsUrl)
                 bearerAuth(authorization)
                 contentType(ContentType.Application.Json)
@@ -164,6 +169,7 @@ class Fido2Api {
      * This function sends the attestation result, represented by the
      * AuthenticatorAttestationResponse, to the specified URL on the server.
      *
+     * @param httpClient The [HttpClient] used to make the network request.
      * @param attestationResultUrl The URL to send the attestation result to.
      * @param authorization The authorization header value to be included in the request.
      * @param authenticatorAttestationResponse The response containing the attestation result.
@@ -175,10 +181,11 @@ class Fido2Api {
     suspend fun sendAttestation(
         attestationResultUrl: String,
         authorization: String,
-        authenticatorAttestationResponse: AuthenticatorAttestationResponse
+        authenticatorAttestationResponse: AuthenticatorAttestationResponse,
+        httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<AttestationResultResponse> {
         return try {
-            val response = NetworkHelper.getInstance.post {
+            val response = httpClient.post {
                 url(attestationResultUrl)
                 bearerAuth(authorization)
                 contentType(ContentType.Application.Json)
@@ -209,6 +216,7 @@ class Fido2Api {
      * This function sends the assertion result, represented by the
      * AuthenticatorAssertionResponse, to the specified URL on the server.
      *
+     * @param httpClient The [HttpClient] used to make the network request.
      * @param assertionResultUrl The URL to send the assertion result to.
      * @param authorization The authorization header value to be included in the request.
      * @param authenticatorAssertionResponse The response containing the assertion result.
@@ -220,10 +228,11 @@ class Fido2Api {
     suspend fun sendAssertion(
         assertionResultUrl: String,
         authorization: String,
-        authenticatorAssertionResponse: AuthenticatorAssertionResponse
+        authenticatorAssertionResponse: AuthenticatorAssertionResponse,
+        httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<AssertionResultResponse> {
         return try {
-            val response = NetworkHelper.getInstance.post {
+            val response = httpClient.post {
                 url(assertionResultUrl)
                 bearerAuth(authorization)
                 contentType(ContentType.Application.Json)
@@ -254,6 +263,7 @@ class Fido2Api {
      * This function sends a request to the server to initiate the assertion process
      * with the provided assertion options.
      *
+     * @param httpClient The [HttpClient] used to make the network request.
      * @param assertionOptionsUrl The URL to send the assertion options request to.
      * @param authorization The authorization header value to be included in the request.
      * @param assertionOptions The options for the assertion process.
@@ -265,11 +275,12 @@ class Fido2Api {
     suspend fun initiateAssertion(
         assertionOptionsUrl: String,
         authorization: String,
-        assertionOptions: AssertionOptions
+        assertionOptions: AssertionOptions,
+        httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<PublicKeyCredentialRequestOptions> {
 
         return try {
-            val response = NetworkHelper.getInstance.post {
+            val response = httpClient.post {
                 url(assertionOptionsUrl)
                 bearerAuth(authorization)
                 contentType(ContentType.Application.Json)

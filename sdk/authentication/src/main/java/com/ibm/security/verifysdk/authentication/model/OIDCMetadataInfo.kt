@@ -1,7 +1,7 @@
-//
-// Copyright contributors to the IBM Security Verify Authentication SDK for Android project
-//
-package com.ibm.security.verifysdk.authentication
+/*
+ * Copyright contributors to the IBM Security Verify SDK for Android project
+ */
+package com.ibm.security.verifysdk.authentication.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

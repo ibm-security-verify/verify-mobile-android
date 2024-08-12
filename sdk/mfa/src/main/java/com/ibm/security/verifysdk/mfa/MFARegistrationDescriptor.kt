@@ -4,6 +4,9 @@
 
 package com.ibm.security.verifysdk.mfa
 
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import io.ktor.client.HttpClient
+
 interface MFARegistrationDescriptor<out Authenticator : MFAAuthenticatorDescriptor> {
 
     var pushToken: String
@@ -17,11 +20,11 @@ interface MFARegistrationDescriptor<out Authenticator : MFAAuthenticatorDescript
     fun nextEnrollment(): EnrollableSignature?
 
     @Throws
-    suspend fun enroll()
+    suspend fun enroll(httpClient: HttpClient = NetworkHelper.getInstance)
 
     @Throws
-    suspend fun enroll(name: String, publicKey: String, signedData: String)
+    suspend fun enroll(keyName: String, publicKey: String, signedData: String, httpClient: HttpClient = NetworkHelper.getInstance)
 
     @Throws
-    suspend fun finalize(): Result<MFAAuthenticatorDescriptor>
+    suspend fun finalize(httpClient: HttpClient = NetworkHelper.getInstance): Result<MFAAuthenticatorDescriptor>
 }

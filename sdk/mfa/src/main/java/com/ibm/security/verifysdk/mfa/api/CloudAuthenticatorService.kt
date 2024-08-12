@@ -2,9 +2,9 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.mfa.cloud
+package com.ibm.security.verifysdk.mfa.api
 
-import com.ibm.security.verifysdk.authentication.TokenInfo
+import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.core.AuthorizationException
 import com.ibm.security.verifysdk.core.ErrorResponse
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
@@ -15,7 +15,8 @@ import com.ibm.security.verifysdk.mfa.NextTransactionInfo
 import com.ibm.security.verifysdk.mfa.PendingTransactionInfo
 import com.ibm.security.verifysdk.mfa.TransactionAttribute
 import com.ibm.security.verifysdk.mfa.UserAction
-import com.ibm.security.verifysdk.mfa.cloud.model.TransactionResult
+import com.ibm.security.verifysdk.mfa.model.cloud.TransactionResult
+import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
@@ -86,13 +87,14 @@ class CloudAuthenticatorService(
         refreshToken: String,
         accountName: String?,
         pushToken: String?,
-        additionalData: Map<String, Any>?
+        additionalData: Map<String, Any>?,
+        httpClient: HttpClient
     ): Result<TokenInfo> {
 
         return try {
             val attributes = refreshTokenPrepareAttributes(accountName, pushToken)
             val data = refreshTokenPrepareRequestData(refreshToken, attributes)
-            val response = refreshTokenMakeNetworkRequest(data)
+            val response = refreshTokenMakeNetworkRequest(data, httpClient)
 
             refreshTokenHandleResponse(response)
         } catch (e: Throwable) {
@@ -107,7 +109,7 @@ class CloudAuthenticatorService(
      * @param pushToken Optional push token to be included in the attributes.
      * @return A mutable map of attributes with the provided account name and push token.
      */
-    internal fun refreshTokenPrepareAttributes(
+    private fun refreshTokenPrepareAttributes(
         accountName: String?,
         pushToken: String?
     ): MutableMap<String, Any> {
@@ -125,8 +127,11 @@ class CloudAuthenticatorService(
      * @param data The request data to be sent.
      * @return The HTTP response from the server.
      */
-    private suspend fun refreshTokenMakeNetworkRequest(data: Map<String, Any>): HttpResponse {
-        return NetworkHelper.getInstance.post {
+    private suspend fun refreshTokenMakeNetworkRequest(
+        data: Map<String, Any>,
+        httpClient: HttpClient = NetworkHelper.getInstance
+    ): HttpResponse {
+        return httpClient.post {
             url(refreshUri.toString())
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
@@ -179,10 +184,13 @@ class CloudAuthenticatorService(
      * @param transactionID The ID of the transaction to retrieve. If null, retrieves the next pending transaction.
      * @return A [Result] containing the [NextTransactionInfo] if successful, or an error if unsuccessful.
      */
-    override suspend fun nextTransaction(transactionID: String?): Result<NextTransactionInfo> {
+    override suspend fun nextTransaction(
+        transactionID: String?,
+        httpClient: HttpClient
+    ): Result<NextTransactionInfo> {
         return try {
             val uri = nextTransactionBuildTransactionUri(transactionID)
-            val response = nextTransactionMakeNetworkRequest(uri)
+            val response = nextTransactionMakeNetworkRequest(uri, httpClient)
 
             nextTransactionHandleResponse(response)
         } catch (e: Throwable) {
@@ -210,8 +218,11 @@ class CloudAuthenticatorService(
      * @param uri The URI to make the request to.
      * @return The HTTP response.
      */
-    private suspend fun nextTransactionMakeNetworkRequest(uri: URL): HttpResponse {
-        return NetworkHelper.getInstance.get {
+    private suspend fun nextTransactionMakeNetworkRequest(
+        uri: URL,
+        httpClient: HttpClient = NetworkHelper.getInstance
+    ): HttpResponse {
+        return httpClient.get {
             url(uri.toString())
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
@@ -242,7 +253,8 @@ class CloudAuthenticatorService(
 
     override suspend fun completeTransaction(
         userAction: UserAction,
-        signedData: String
+        signedData: String,
+        httpClient: HttpClient
     ): Result<Unit> {
 
         return try {
@@ -257,7 +269,7 @@ class CloudAuthenticatorService(
                 )
             )
 
-            val response = NetworkHelper.getInstance.post {
+            val response = httpClient.post {
                 url(pendingTransaction.postbackUri.toString())
                 accept(ContentType.Application.Json)
                 contentType(ContentType.Application.Json)
@@ -331,7 +343,7 @@ class CloudAuthenticatorService(
     private fun createAdditionalData(transactionInfo: String): Map<TransactionAttribute, String> {
         val result: MutableMap<TransactionAttribute, String> = mutableMapOf()
 
-        // Add the default type (of request) to the result.  Might be overriden if specified in additionalData.
+        // Add the default type (of request) to the result.  Might be overridden if specified in additionalData.
         result.putIfAbsent(TransactionAttribute.Type, "PendingRequestTypeDefault")
 
         JSONObject(transactionInfo).let { transactionData ->

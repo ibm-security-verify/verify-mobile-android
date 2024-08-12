@@ -2,7 +2,7 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.mfa.onprem.model
+package com.ibm.security.verifysdk.mfa.model.onprem
 
 import kotlinx.serialization.Serializable
 

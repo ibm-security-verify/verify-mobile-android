@@ -2,12 +2,12 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.mfa.onprem.model
+package com.ibm.security.verifysdk.mfa.model.onprem
 
-import com.ibm.security.verifysdk.authentication.TokenInfo
+import com.ibm.security.verifysdk.authentication.model.TokenInfo
+import com.ibm.security.verifysdk.core.serializer.URLSerializer
 import com.ibm.security.verifysdk.mfa.FactorType
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
-import com.ibm.security.verifysdk.core.serializer.URLSerializer
 import kotlinx.serialization.Serializable
 import java.net.URL
 

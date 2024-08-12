@@ -2,14 +2,14 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.mfa.cloud.model
+package com.ibm.security.verifysdk.mfa.model.cloud
 
+import com.ibm.security.verifysdk.core.serializer.URLSerializer
 import com.ibm.security.verifysdk.mfa.EnrollableFactor
 import com.ibm.security.verifysdk.mfa.EnrollableType
 import com.ibm.security.verifysdk.mfa.HashAlgorithmType
 import com.ibm.security.verifysdk.mfa.HashAlgorithmTypeSerializer
 import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
-import com.ibm.security.verifysdk.core.serializer.URLSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

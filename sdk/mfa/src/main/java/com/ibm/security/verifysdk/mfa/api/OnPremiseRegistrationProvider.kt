@@ -2,14 +2,14 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.mfa.onprem
+package com.ibm.security.verifysdk.mfa.api
 
-import com.ibm.security.verifysdk.authentication.OAuthProvider
-import com.ibm.security.verifysdk.authentication.TokenInfo
-import com.ibm.security.verifysdk.core.helper.ContextHelper
-import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.authentication.api.OAuthProvider
+import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.core.extension.entering
 import com.ibm.security.verifysdk.core.extension.exiting
+import com.ibm.security.verifysdk.core.helper.ContextHelper
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.mfa.EnrollableSignature
 import com.ibm.security.verifysdk.mfa.EnrollableType
 import com.ibm.security.verifysdk.mfa.FactorType
@@ -23,15 +23,16 @@ import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
 import com.ibm.security.verifysdk.mfa.TOTPFactorInfo
 import com.ibm.security.verifysdk.mfa.UserPresenceFactorInfo
 import com.ibm.security.verifysdk.mfa.generateKeys
-import com.ibm.security.verifysdk.mfa.onprem.model.DetailsData
-import com.ibm.security.verifysdk.mfa.onprem.model.EnrollmentResult
-import com.ibm.security.verifysdk.mfa.onprem.model.InitializationInfo
-import com.ibm.security.verifysdk.mfa.onprem.model.Metadata
-import com.ibm.security.verifysdk.mfa.onprem.model.OnPremiseAuthenticator
-import com.ibm.security.verifysdk.mfa.onprem.model.OnPremiseRegistrationProviderResultData
-import com.ibm.security.verifysdk.mfa.onprem.model.OnPremiseTOTPEnrollableFactor
-import com.ibm.security.verifysdk.mfa.onprem.model.TotpConfiguration
+import com.ibm.security.verifysdk.mfa.model.onprem.DetailsData
+import com.ibm.security.verifysdk.mfa.model.onprem.EnrollmentResult
+import com.ibm.security.verifysdk.mfa.model.onprem.InitializationInfo
+import com.ibm.security.verifysdk.mfa.model.onprem.Metadata
+import com.ibm.security.verifysdk.mfa.model.onprem.OnPremiseAuthenticator
+import com.ibm.security.verifysdk.mfa.model.onprem.OnPremiseRegistrationProviderResultData
+import com.ibm.security.verifysdk.mfa.model.onprem.OnPremiseTOTPEnrollableFactor
+import com.ibm.security.verifysdk.mfa.model.onprem.TotpConfiguration
 import com.ibm.security.verifysdk.mfa.sign
+import io.ktor.client.HttpClient
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -93,14 +94,15 @@ class OnPremiseRegistrationProvider(data: String) :
         accountName: String,
         skipTotpEnrollment: Boolean = true,
         pushToken: String?,
-        additionalHeaders: HashMap<String, String>?
+        additionalHeaders: HashMap<String, String>?,
+        httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<OnPremiseRegistrationProviderResultData> {
 
         return try {
             log.entering()
             this.accountName = accountName
             this.pushToken = pushToken.orEmpty()
-            val responseDetail = NetworkHelper.getInstance.get {
+            val responseDetail = httpClient.get {
                 url(initializationInfo.uri)
             }
 
@@ -143,15 +145,17 @@ class OnPremiseRegistrationProvider(data: String) :
                 additionalHeaders = additionalHeaders,
                 additionalParameters = attributes.toMap()
                     .mapValues { entry -> entry.value.toString() }
+                    .toMutableMap()
             )
             if (initializationInfo.ignoreSSLCertificate) {
-                oAuthProvider.ignoreSsl = true
+                // disable SSL validations for network client
             }
 
             val responseToken = oAuthProvider.authorize(
                 url = metaData.registrationUri,
                 authorizationCode = initializationInfo.code,
-                scope = arrayOf("mmfaAuthn")
+                scope = arrayOf("mmfaAuthn"),
+                httpClient = httpClient
             )
 
             responseToken.fold(
@@ -171,7 +175,7 @@ class OnPremiseRegistrationProvider(data: String) :
                         (factor as? OnPremiseTOTPEnrollableFactor)?.let { onPremiseTotpEnrollableFactor ->
                             if (skipTotpEnrollment.not()) {
 
-                                val responseTotp = NetworkHelper.getInstance.get {
+                                val responseTotp = httpClient.get {
                                     url(onPremiseTotpEnrollableFactor.uri)
                                     accept(ContentType.Application.Json)
                                     bearerAuth(tokenInfo.accessToken)
@@ -262,7 +266,7 @@ class OnPremiseRegistrationProvider(data: String) :
         }
     }
 
-    override suspend fun enroll() {
+    override suspend fun enroll(httpClient: HttpClient) {
 
         try {
             log.entering()
@@ -285,7 +289,7 @@ class OnPremiseRegistrationProvider(data: String) :
                         authenticatorId,
                         android.util.Base64.NO_WRAP
                     ).let { signedData ->
-                        enroll(keyName, publicKey, signedData)
+                        enroll(keyName, publicKey, signedData, httpClient = httpClient)
                     }
                 }
             }
@@ -295,7 +299,7 @@ class OnPremiseRegistrationProvider(data: String) :
     }
 
 
-    override suspend fun enroll(keyName: String, publicKey: String, signedData: String) {
+    override suspend fun enroll(keyName: String, publicKey: String, signedData: String, httpClient: HttpClient) {
 
         try {
             log.entering()
@@ -337,7 +341,7 @@ class OnPremiseRegistrationProvider(data: String) :
                 })
             }
 
-            val response = NetworkHelper.getInstance.patch {
+            val response = httpClient.patch {
                 url(enrollmentUrl)
                 accept(ContentType.Application.Json)
                 contentType(ContentType.Application.Json)
@@ -394,7 +398,7 @@ class OnPremiseRegistrationProvider(data: String) :
         }
     }
 
-    override suspend fun finalize(): Result<MFAAuthenticatorDescriptor> {
+    override suspend fun finalize(httpClient: HttpClient): Result<MFAAuthenticatorDescriptor> {
         return try {
             log.entering()
 

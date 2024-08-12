@@ -5,8 +5,9 @@
 package com.ibm.security.verifysdk.mfa
 
 import android.util.Base64
-import com.ibm.security.verifysdk.authentication.TokenInfo
+import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import io.ktor.client.HttpClient
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.post
@@ -32,17 +33,18 @@ interface MFAServiceDescriptor {
         refreshToken: String,
         accountName: String?,
         pushToken: String?,
-        additionalData: Map<String, Any>?
+        additionalData: Map<String, Any>?,
+        httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<TokenInfo>
 
-    suspend fun nextTransaction(transactionID: String? = null): Result<NextTransactionInfo>
+    suspend fun nextTransaction(transactionID: String? = null, httpClient: HttpClient = NetworkHelper.getInstance): Result<NextTransactionInfo>
 
-    suspend fun completeTransaction(userAction: UserAction, signedData: String): Result<Unit>
+    suspend fun completeTransaction(userAction: UserAction, signedData: String, httpClient: HttpClient = NetworkHelper.getInstance): Result<Unit>
 }
 
 typealias NextTransactionInfo = Pair<PendingTransactionInfo?, Int>
 
-suspend fun MFAServiceDescriptor.login(loginUri: URL, code: String): Result<Unit> {
+suspend fun MFAServiceDescriptor.login(loginUri: URL, code: String, httpClient: HttpClient = NetworkHelper.getInstance): Result<Unit> {
     val body = buildJsonObject {
         put("lsi", code)
     }
@@ -53,7 +55,7 @@ suspend fun MFAServiceDescriptor.login(loginUri: URL, code: String): Result<Unit
     }
 
     return try {
-        val response = NetworkHelper.getInstance.post {
+        val response = httpClient.post {
             url(loginUri.toString())
             accept(ContentType.Application.Json)
             contentType(ContentType.Application.Json)
@@ -73,7 +75,8 @@ suspend fun MFAServiceDescriptor.login(loginUri: URL, code: String): Result<Unit
 
 suspend fun MFAServiceDescriptor.completeTransaction(
     userAction: UserAction = UserAction.VERIFY,
-    factorType: FactorType
+    factorType: FactorType,
+    httpClient: HttpClient = NetworkHelper.getInstance
 ):Result<Unit> {
     var signedData = ""
     val pendingTransaction =
@@ -89,7 +92,7 @@ suspend fun MFAServiceDescriptor.completeTransaction(
         )
     }
 
-    return completeTransaction(userAction = userAction, signedData = signedData)
+    return completeTransaction(userAction = userAction, signedData = signedData, httpClient = httpClient)
 }
 
 internal fun factorKeyNameAndAlgorithm(factorType: FactorType): Pair<String, HashAlgorithmType> {

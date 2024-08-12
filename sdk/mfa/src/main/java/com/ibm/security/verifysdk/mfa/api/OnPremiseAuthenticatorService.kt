@@ -2,15 +2,15 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.mfa.onprem
+package com.ibm.security.verifysdk.mfa.api
 
 import android.net.Uri
-import com.ibm.security.verifysdk.authentication.OAuthProvider
-import com.ibm.security.verifysdk.authentication.TokenInfo
-import com.ibm.security.verifysdk.core.helper.ContextHelper
-import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.authentication.api.OAuthProvider
+import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.core.extension.entering
 import com.ibm.security.verifysdk.core.extension.exiting
+import com.ibm.security.verifysdk.core.helper.ContextHelper
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.mfa.MFAAttributeInfo
 import com.ibm.security.verifysdk.mfa.MFAServiceDescriptor
 import com.ibm.security.verifysdk.mfa.MFAServiceError
@@ -19,8 +19,9 @@ import com.ibm.security.verifysdk.mfa.PendingTransactionInfo
 import com.ibm.security.verifysdk.mfa.R
 import com.ibm.security.verifysdk.mfa.TransactionAttribute
 import com.ibm.security.verifysdk.mfa.UserAction
-import com.ibm.security.verifysdk.mfa.onprem.model.TransactionResult
-import com.ibm.security.verifysdk.mfa.onprem.model.VerificationInfo
+import com.ibm.security.verifysdk.mfa.model.onprem.TransactionResult
+import com.ibm.security.verifysdk.mfa.model.onprem.VerificationInfo
+import io.ktor.client.HttpClient
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
@@ -86,7 +87,8 @@ class OnPremiseAuthenticatorService(
         refreshToken: String,
         accountName: String?,
         pushToken: String?,
-        additionalData: Map<String, Any>?
+        additionalData: Map<String, Any>?,
+        httpClient: HttpClient
     ): Result<TokenInfo> {
 
         return try {
@@ -109,14 +111,16 @@ class OnPremiseAuthenticatorService(
                 clientId = clientId,
                 additionalParameters = attributes.toMap()
                     .mapValues { entry -> entry.value.toString() }
+                    .toMutableMap()
             )
             if (ignoreSslCertificate) {
-                oAuthProvider.ignoreSsl = true
+                // disable SSL validations for network client
             }
 
             val responseToken = oAuthProvider.refresh(
                 url = refreshUri,
-                refreshToken = refreshToken
+                refreshToken = refreshToken,
+                httpClient = httpClient
             )
 
             responseToken.fold(
@@ -133,11 +137,11 @@ class OnPremiseAuthenticatorService(
         }
     }
 
-    override suspend fun nextTransaction(transactionID: String?): Result<NextTransactionInfo> {
+    override suspend fun nextTransaction(transactionID: String?, httpClient: HttpClient): Result<NextTransactionInfo> {
 
         return try {
             log.entering()
-            val response = NetworkHelper.getInstance.get {
+            val response =httpClient.get {
                 url(transactionUri.toString())
                 accept(ContentType.Application.Json)
                 bearerAuth(accessToken)
@@ -151,7 +155,7 @@ class OnPremiseAuthenticatorService(
                 if (transactionResult.transactions.isEmpty()) {
                     Result.success(NextTransactionInfo(null, 0))
                 } else {
-                    createPendingTransaction(transactionResult, transactionID).fold(
+                    createPendingTransaction(transactionResult, transactionID, httpClient).fold(
                         onSuccess = { pendingTransactionInfo ->
                             _currentPendingTransaction = pendingTransactionInfo
                             Result.success(
@@ -178,7 +182,8 @@ class OnPremiseAuthenticatorService(
 
     override suspend fun completeTransaction(
         userAction: UserAction,
-        signedData: String
+        signedData: String,
+        httpClient: HttpClient
     ): Result<Unit> {
 
         return try {
@@ -192,7 +197,7 @@ class OnPremiseAuthenticatorService(
                 )
             }
 
-            val response = NetworkHelper.getInstance.put {
+            val response = httpClient.put {
                 url(pendingTransaction.postbackUri.toString())
                 accept(ContentType.Application.Json)
                 contentType(ContentType.Application.Json)
@@ -210,7 +215,7 @@ class OnPremiseAuthenticatorService(
         }
     }
 
-    suspend fun remove(): Result<Unit> {
+    suspend fun remove(httpClient: HttpClient = NetworkHelper.getInstance): Result<Unit> {
 
         return try {
             log.entering()
@@ -231,7 +236,7 @@ class OnPremiseAuthenticatorService(
 
             val updateUrl = createUpdateUrl(transactionUri)
 
-            val response = NetworkHelper.getInstance.patch {
+            val response = httpClient.patch {
                 url(updateUrl)
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
@@ -257,7 +262,8 @@ class OnPremiseAuthenticatorService(
 
     private suspend fun createPendingTransaction(
         transactionResult: TransactionResult,
-        transactionId: String? = null
+        transactionId: String? = null,
+        httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<PendingTransactionInfo> {
 
         return try {
@@ -282,7 +288,7 @@ class OnPremiseAuthenticatorService(
                 }
             }
 
-            val response = NetworkHelper.getInstance.post {
+            val response = httpClient.post {
                 url(transactionInfoResult.requestUrl)
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
