@@ -10,7 +10,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.ibm.security.verifysdk.core.helper.KeystoreHelper
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
-import com.ibm.security.verifysdk.fido2.Fido2Api
+import com.ibm.security.verifysdk.fido2.api.Fido2Api
 import okhttp3.logging.HttpLoggingInterceptor
 
 

@@ -15,7 +15,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.ibm.security.verifysdk.core.AuthorizationException
 import com.ibm.security.verifysdk.core.ErrorResponse
-import com.ibm.security.verifysdk.fido2.Fido2Api
+import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.fido2.api.Fido2Api
 import com.ibm.security.verifysdk.fido2.demoapp.model.IvCreds
 import com.ibm.security.verifysdk.fido2.model.AttestationOptions
 import com.ibm.security.verifysdk.fido2.model.AuthenticatorAttestationResponse
@@ -36,7 +37,6 @@ import kotlin.experimental.or
 
 class RegistrationActivity : AppCompatActivity() {
 
-    private val httpClient by lazy { NetworkHelper.getInstance }
     private val fido2Api = Fido2Api()
     private val keyName = "61683285-900f-4bed-87e0-b83b5277ba93"
 
@@ -118,7 +118,7 @@ class RegistrationActivity : AppCompatActivity() {
         }
 
         return try {
-            val response = httpClient.get {
+            val response = NetworkHelper.getInstance.get {
                 url("https://fidointerop.securitypoc.com/ivcreds")
                 bearerAuth(accessToken)
                 contentType(ContentType.Application.Json)
