@@ -184,7 +184,7 @@ internal class LoggerExtKtTest {
     @Test
         (expected = IllegalArgumentException::class)
     fun logThreadInfo_invalid_shouldThrowException() {
-        log.threadInfo(Level.intToLevel(50))
+        log.threadInfo(Level.valueOf("SUPER"))
     }
 
     /**
@@ -194,7 +194,7 @@ internal class LoggerExtKtTest {
      *
      */
     @Test
-    @Ignore("Configuration required")
+    @Ignore("Configuration required for DEBUG level")
     fun logThreadInfo_debug_shouldWriteToLogcat() {
         log.threadInfo(Level.DEBUG)
         val logcatMessage =
@@ -211,7 +211,7 @@ internal class LoggerExtKtTest {
      *
      */
     @Test
-    @Ignore("Configuration required")
+    @Ignore("Configuration required for DEBUG level")
     fun logThreadInfo_trace_shouldWriteToLogcat() {
         log.threadInfo(Level.TRACE)
         val logcatMessage =
@@ -284,7 +284,7 @@ internal class LoggerExtKtTest {
     }
 
     @Test
-    @Ignore("Configuration required")
+    @Ignore("Configuration required for DEBUG level")
     fun log_enteringWithTraceLevel_shouldWriteToLog() {
         log.entering(Level.TRACE)
         log_entryOrExit_shouldWriteToLog(
@@ -294,7 +294,7 @@ internal class LoggerExtKtTest {
     }
 
     @Test
-    @Ignore("Configuration required")
+    @Ignore("Configuration required for DEBUG level")
     fun log_enteringWithDebugLevel_shouldWriteToLog() {
         log.entering(Level.DEBUG)
         log_entryOrExit_shouldWriteToLog(
@@ -324,7 +324,7 @@ internal class LoggerExtKtTest {
     @Test
         (expected = IllegalArgumentException::class)
     fun log_enteringWithInvalidLevel_shouldThrowException() {
-        log.entering(Level.intToLevel(50))
+        log.entering(Level.valueOf("SUPER"))
     }
 
     @Test
@@ -346,7 +346,7 @@ internal class LoggerExtKtTest {
     }
 
     @Test
-    @Ignore("Configuration required")
+    @Ignore("Configuration required for DEBUG level")
     fun log_exitingWithTraceLevel_shouldWriteToLog() {
         log.exiting(Level.TRACE)
         log_entryOrExit_shouldWriteToLog(
@@ -356,7 +356,7 @@ internal class LoggerExtKtTest {
     }
 
     @Test
-    @Ignore("Configuration required")
+    @Ignore("Configuration required for DEBUG level")
     fun log_exitingWithDebugLevel_shouldWriteToLog() {
         log.exiting(Level.DEBUG)
         log_entryOrExit_shouldWriteToLog(
@@ -386,7 +386,7 @@ internal class LoggerExtKtTest {
     @Test
         (expected = IllegalArgumentException::class)
     fun log_exitingWithInvalidLevel_shouldThrowException() {
-        log.exiting(Level.intToLevel(50))
+        log.exiting(Level.valueOf("SUPER"))
     }
 
     private fun log_entryOrExit_shouldWriteToLog(entryOrExit: String, methodName: String) {

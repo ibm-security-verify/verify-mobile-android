@@ -1,17 +1,19 @@
-package com.ibm.security.verifysdk.authentication.test
+package com.ibm.security.verifysdk.authentication
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ibm.security.verifysdk.authentication.OAuthProvider
+import com.ibm.security.verifysdk.authentication.api.OAuthProvider
 import com.ibm.security.verifysdk.core.AuthorizationException
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
+import io.ktor.client.engine.mock.toByteArray
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.headersOf
+import io.ktor.serialization.ContentConvertException
+import io.ktor.serialization.JsonConvertException
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.ExperimentalSerializationApi
 import org.junit.Assert.assertEquals
@@ -22,6 +24,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.net.MalformedURLException
 import java.net.URL
 
 
@@ -31,8 +34,6 @@ internal class OAuthProviderTest {
 
     @Suppress("unused")
     private val log: Logger = LoggerFactory.getLogger(javaClass)
-    
-    private val schema = "http"
 
     companion object {
 
@@ -57,6 +58,7 @@ internal class OAuthProviderTest {
     fun initialize() {
         oAuthProvider = OAuthProvider(clientId, clientSecret)
         apiMockEngine.get().config.requestHandlers.clear()
+        NetworkHelper.initialize(apiMockEngine.get())
     }
 
     @Suppress("unused")
@@ -64,7 +66,7 @@ internal class OAuthProviderTest {
         method: HttpMethod,
         urlPath: String,
         httpCode: HttpStatusCode,
-        headers: Headers = headersOf(),
+        headers: Headers = defaultHeaders,
         responseBody: String
     ) {
         apiMockEngine.get().let {
@@ -96,7 +98,7 @@ internal class OAuthProviderTest {
         val result =
             oAuthProviderSecretNull.refresh(
                 URL("http://localhost/v1.0/authenticators/registration"),
-                "abc123def"
+                "abc123def",
             )
 
         assertTrue(result.isSuccess)
@@ -235,297 +237,326 @@ internal class OAuthProviderTest {
             assertEquals("A7y0nh0aaDpz8g0aTcVVBnr6veTocbYLpH7K8Jqn", token.accessToken)
         }
     }
-//
-//    @Test
-//    fun authorize_codeClientSecretIsNull_shouldReturnSuccess() = runTest {
-//        val oAuthProviderSecretNull =
-//            OAuthProvider(clientId, null)
-//        addMockResponse(200, responseAuthorizeOk)
-//        val result =
-//            oAuthProviderSecretNull.authorize(
-//                URL("http://localhost:44444/oauth2/token)"),
-//                URL("https://callback"),
-//                "authorizationCode",
-//                "codeVerifier",
-//                arrayOf("name", "age")
-//            )
-//
-//        mockWebServer.takeRequest(10, TimeUnit.SECONDS)?.let { request ->
-//            assertEquals("POST", request.method)
-//            val body = request.body.readUtf8()
-//            assertTrue(body.contains("code_verifier=codeVerifier"))
-//            assertTrue(body.contains("grant_type=authorization_code"))
-//        } ?: assert(false) { "Request timed out" }
-//
-//        assertTrue(result.isSuccess)
-//        result.onSuccess { token ->
-//            assertEquals("A7y0nh0aaDpz8g0aTcVVBnr6veTocbYLpH7K8Jqn", token.accessToken)
-//        }
-//    }
-//
-//    @Test
-//    fun authorize_codeServerError_shouldReturnFailure() = runTest {
-//        addMockResponse(500, "Server error")
-//        val result =
-//            oAuthProvider.authorize(
-//                URL("http://localhost:44444/oauth2/token)"),
-//                URL("https://callback"),
-//                "authorizationCode",
-//                "codeVerifier",
-//                arrayOf("name", "age")
-//            )
-//
-//        mockWebServer.takeRequest(10, TimeUnit.SECONDS) // not used
-//
-//        assertTrue(result.isFailure)
-//        result.onFailure { it ->
-//            assertTrue(it is AuthenticationException)
-//            (it as AuthenticationException).let {
-//                assertEquals("IVMCR0001E", it.error)
-//                assertEquals("Server error", it.errorDescription)
-//            }
-//        }
-//    }
-//
-//    @Test
-//    fun authorize_codeEmptyBody_shouldReturnFailure() = runTest {
-//        addMockResponse(200, "")
-//        val result =
-//            oAuthProvider.authorize(
-//                URL("http://localhost:44444/oauth2/token)"),
-//                URL("https://callback"),
-//                "authorizationCode",
-//                "codeVerifier",
-//                arrayOf("name", "age")
-//            )
-//
-//        mockWebServer.takeRequest(10, TimeUnit.SECONDS)?.let { request ->
-//            assertEquals("POST", request.method)
-//            val body = request.body.readUtf8()
-//            assertTrue(body.contains("code_verifier=codeVerifier"))
-//            assertTrue(body.contains("grant_type=authorization_code"))
-//        } ?: assert(false) { "Request timed out" }
-//
-//        assertTrue(result.isFailure)
-//        result.onFailure {
-//            assertTrue(it is SerializationException)
-//            assertTrue(
-//                it.message.toString()
-//                    .contains("Expected start of the object '{', but had 'EOF' instead")
-//            )
-//        }
-//    }
-//
-//
-//    @Test
-//    fun authorize_credsHappyPath_shouldReturnSuccess() = runTest {
-//        addMockResponse(200, responseAuthorizeOk)
-//        val result =
-//            oAuthProvider.authorize(
-//                URL("http://localhost:44444/oauth2/token)"),
-//                "username",
-//                "password"
-//            )
-//
-//        mockWebServer.takeRequest(10, TimeUnit.SECONDS)?.let { request ->
-//            assertEquals("POST", request.method)
-//            val body = request.body.readUtf8()
-//            assertTrue(body.contains("client_id=clientId"))
-//            assertTrue(body.contains("username=username"))
-//            assertTrue(body.contains("grant_type=password"))
-//        } ?: assert(false) { "Request timed out" }
-//
-//        assertTrue(result.isSuccess)
-//        result.onSuccess { token ->
-//            assertEquals("A7y0nh0aaDpz8g0aTcVVBnr6veTocbYLpH7K8Jqn", token.accessToken)
-//        }
-//    }
-//
-//    @Test
-//    fun authorize_credsWithScope_shouldReturnSuccess() = runTest {
-//        addMockResponse(200, responseAuthorizeOk)
-//        val result =
-//            oAuthProvider.authorize(
-//                URL("http://localhost:44444/oauth2/token)"),
-//                "username",
-//                "password",
-//                arrayOf("name", "age")
-//            )
-//
-//        mockWebServer.takeRequest(10, TimeUnit.SECONDS)?.let { request ->
-//            assertEquals("POST", request.method)
-//            val body = request.body.readUtf8()
-//            assertTrue(body.contains("client_id=clientId"))
-//            assertTrue(body.contains("username=username"))
-//            assertTrue(body.contains("grant_type=password"))
-//            assertTrue(body.contains("scope=name%20age"))
-//        } ?: assert(false) { "Request timed out" }
-//
-//        assertTrue(result.isSuccess)
-//        result.onSuccess { token ->
-//            assertEquals("A7y0nh0aaDpz8g0aTcVVBnr6veTocbYLpH7K8Jqn", token.accessToken)
-//        }
-//    }
-//
-//    @Test
-//    fun authorize_credsClientSecretIsNull_shouldReturnSuccess() = runTest {
-//        val oAuthProviderSecretNull =
-//            OAuthProvider(clientId, null)
-//        addMockResponse(200, responseAuthorizeOk)
-//        val result =
-//            oAuthProviderSecretNull.authorize(
-//                URL("http://localhost:44444/oauth2/token)"),
-//                "username",
-//                "password",
-//                arrayOf("name", "age")
-//            )
-//
-//        mockWebServer.takeRequest(10, TimeUnit.SECONDS)?.let { request ->
-//            assertEquals("POST", request.method)
-//            val body = request.body.readUtf8()
-//            assertTrue(body.contains("client_id=clientId"))
-//            assertTrue(body.contains("client_secret=&"))
-//            assertTrue(body.contains("username=username"))
-//            assertTrue(body.contains("grant_type=password"))
-//            assertTrue(body.contains("scope=name%20age"))
-//        } ?: assert(false) { "Request timed out" }
-//
-//        assertTrue(result.isSuccess)
-//        result.onSuccess { token ->
-//            assertEquals("A7y0nh0aaDpz8g0aTcVVBnr6veTocbYLpH7K8Jqn", token.accessToken)
-//        }
-//    }
-//
-//    @Test
-//    fun authorize_credsEmptyBody_shouldReturnFailure() = runTest {
-//        addMockResponse(200, "")
-//        val result =
-//            oAuthProvider.authorize(
-//                URL("http://localhost:44444/oauth2/token)"),
-//                "username",
-//                "password"
-//            )
-//
-//        mockWebServer.takeRequest(10, TimeUnit.SECONDS) // not used
-//
-//        assertTrue(result.isFailure)
-//        result.onFailure {
-//            assertTrue(it is SerializationException)
-//            assertTrue(
-//                it.message.toString()
-//                    .contains("Expected start of the object '{', but had 'EOF' instead")
-//            )
-//        }
-//    }
-//
-//    @Test
-//    fun authorize_credsServerError_shouldReturnFailure() = runTest {
-//        addMockResponse(500, "Server error")
-//        val result =
-//            oAuthProvider.authorize(
-//                URL("http://localhost:44444/oauth2/token)"),
-//                "username",
-//                "password"
-//            )
-//
-//        mockWebServer.takeRequest(10, TimeUnit.SECONDS) // not used
-//
-//        assertTrue(result.isFailure)
-//        result.onFailure { it ->
-//            assertTrue(it is AuthenticationException)
-//            (it as AuthenticationException).let {
-//                assertEquals("IVMCR0001E", it.error)
-//                assertEquals("Server error", it.errorDescription)
-//            }
-//        }
-//    }
-//
-//
-//    /**
-//     * An empty token is returned with the unknown attributes in the response added
-//     * to [TokenInfo.additionalData]
-//     */
-//    @Test
-//    fun authorize_credsResponseUnknownJson_shouldReturnSuccess() = runTest {
-//        addMockResponse(
-//            200,
-//            "{\"foo\":\"bar\"}"
-//        )
-//        val result =
-//            oAuthProvider.authorize(
-//                URL("http://localhost:44444/oauth2/token)"),
-//                "username",
-//                "password"
-//            )
-//
-//        mockWebServer.takeRequest(10, TimeUnit.SECONDS) // not used
-//
-//        assertTrue(result.isSuccess)
-//    }
-//
-//    @Test
-//    fun discover_serverError_shouldReturnFailure() = runTest {
-//
-//        addMockResponse(500, "Server error")
-//        val result =
-//            oAuthProvider.discover(URL("http://localhost:44444/.well-known/openid-configuration"))
-//
-//        mockWebServer.takeRequest(10, TimeUnit.SECONDS)?.let { request ->
-//            assertEquals("GET", request.method)
-//        }
-//
-//        assertTrue(result.isFailure)
-//        result.onFailure { it ->
-//            assertTrue(it is AuthenticationException)
-//            (it as AuthenticationException).let {
-//                assertEquals("IVMCR0001E", it.error)
-//                assertEquals("Server error", it.errorDescription)
-//            }
-//        }
-//    }
-//
-//    @Test
-//    fun discover_happyPath_shouldReturnSuccess() = runTest {
-//        addMockResponse(200, responseDiscoveryOk)
-//        val result =
-//            oAuthProvider.discover((URL("http://localhost:44444/.well-known/openid-configuration")))
-//
-//        mockWebServer.takeRequest(10, TimeUnit.SECONDS)
-//
-//        assertTrue(result.isSuccess)
-//        result.onSuccess {
-//            assertEquals(13, it.idTokenSigningAlgValuesSupported.size)
-//            assertEquals("https://sdk.verify.ibm.com/oauth2/token", it.tokenEndpoint)
-//        }
-//    }
-//
-//    @Test
-//    fun discover_wrongUrlPath_shouldReturnFailure() = runTest {
-//
-//        val result = oAuthProvider.discover(URL("https://localhost"))
-//        assertTrue(result.isFailure)
-//        result.onFailure {
-//            assertTrue(it is MalformedURLException)
-//        }
-//    }
-//
-//    @Test
-//    fun discover_fieldsMissingInResponse_shouldReturnFailure() = runTest {
-//        addMockResponse(
-//            200,
-//            "{\"foo\":\"bar\"}"
-//        )
-//        val result =
-//            oAuthProvider.discover(URL("http://localhost:44444/.well-known/openid-configuration"))
-//
-//        mockWebServer.takeRequest(10, TimeUnit.SECONDS)
-//
-//        assertTrue(result.isFailure)
-//        result.onFailure {
-//            assertTrue(it is SerializationException)
-//            assertTrue(it.message?.endsWith("but they were missing") ?: false)
-//        }
-//    }
+
+    @Test
+    fun authorize_codeClientSecretIsNull_shouldReturnSuccess() = runTest {
+        val oAuthProviderSecretNull =
+            OAuthProvider(clientId, null)
+        addMockResponse(
+            HttpMethod.Post,
+            "/oauth2/token",
+            HttpStatusCode.OK,
+            responseBody = responseAuthorizeOk
+        )
+        val result =
+            oAuthProviderSecretNull.authorize(
+                URL("http://localhost:44444/oauth2/token"),
+                URL("https://callback"),
+                "authorizationCode",
+                "codeVerifier",
+                arrayOf("name", "age")
+            )
+
+        apiMockEngine.get().requestHistory.last().let {requestData ->
+            val requestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
+            assertTrue(requestBody.contains("code_verifier=codeVerifier"))
+            assertTrue(requestBody.contains("grant_type=authorization_code"))
+            assertTrue(requestBody.contains("scope=name+age"))
+        }
+
+        assertTrue(result.isSuccess)
+        result.onSuccess { token ->
+            assertEquals("A7y0nh0aaDpz8g0aTcVVBnr6veTocbYLpH7K8Jqn", token.accessToken)
+        }
+    }
+
+    @Test
+    fun authorize_codeServerError_shouldReturnFailure() = runTest {
+        addMockResponse(
+            HttpMethod.Post,
+            "/oauth2/token",
+            HttpStatusCode.InternalServerError,
+            responseBody = ""
+        )
+        val result =
+            oAuthProvider.authorize(
+                URL("http://localhost:44444/oauth2/token"),
+                URL("https://callback"),
+                "authorizationCode",
+                "codeVerifier",
+                arrayOf("name", "age")
+            )
+
+        assertTrue(result.isFailure)
+        result.onFailure { it ->
+            assertTrue(it is ContentConvertException)
+        }
+    }
+
+    @Test
+    fun authorize_codeEmptyBody_shouldReturnFailure() = runTest {
+        addMockResponse(
+            HttpMethod.Post,
+            "/oauth2/token",
+            HttpStatusCode.OK,
+            responseBody = ""
+        )
+        val result =
+            oAuthProvider.authorize(
+                URL("http://localhost:44444/oauth2/token"),
+                URL("https://callback"),
+                "authorizationCode",
+                "codeVerifier",
+                arrayOf("name", "age")
+            )
+
+        apiMockEngine.get().requestHistory.last().let {requestData ->
+            val requestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
+            assertTrue(requestBody.contains("code_verifier=codeVerifier"))
+            assertTrue(requestBody.contains("grant_type=authorization_code"))
+            assertTrue(requestBody.contains("scope=name+age"))
+        }
+
+        assertTrue(result.isFailure)
+        result.onFailure {
+            assertTrue(
+                it.message.toString()
+                    .contains("Expected start of the object '{', but had 'EOF' instead")
+            )
+        }
+    }
+
+
+    @Test
+    fun authorize_credsHappyPath_shouldReturnSuccess() = runTest {
+        addMockResponse(
+            HttpMethod.Post,
+            "/oauth2/token",
+            HttpStatusCode.OK,
+            responseBody = responseAuthorizeOk
+        )
+        val result =
+            oAuthProvider.authorize(
+                URL("http://localhost:44444/oauth2/token"),
+                "username",
+                "password",
+                arrayOf("name", "age")
+            )
+
+        apiMockEngine.get().requestHistory.last().let {requestData ->
+            val requestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
+            assertTrue(requestBody.contains("client_id=clientId"))
+            assertTrue(requestBody.contains("client_secret=clientSecret"))
+            assertTrue(requestBody.contains("username=username"))
+            assertTrue(requestBody.contains("grant_type=password"))
+            assertTrue(requestBody.contains("scope=name+age"))
+        }
+
+        assertTrue(result.isSuccess)
+        result.onSuccess { token ->
+            assertEquals("A7y0nh0aaDpz8g0aTcVVBnr6veTocbYLpH7K8Jqn", token.accessToken)
+        }
+    }
+
+    @Test
+    fun authorize_credsWithScope_shouldReturnSuccess() = runTest {
+        addMockResponse(
+            HttpMethod.Post,
+            "/oauth2/token",
+            HttpStatusCode.OK,
+            responseBody = responseAuthorizeOk
+        )
+        val result =
+            oAuthProvider.authorize(
+                URL("http://localhost:44444/oauth2/token"),
+                "username",
+                "password",
+                arrayOf("name", "age")
+            )
+
+        apiMockEngine.get().requestHistory.last().let { requestData ->
+            val requestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
+            assertTrue(requestBody.contains("client_id=clientId"))
+            assertTrue(requestBody.contains("client_secret=clientSecret"))
+            assertTrue(requestBody.contains("username=username"))
+            assertTrue(requestBody.contains("grant_type=password"))
+            assertTrue(requestBody.contains("scope=name+age"))
+        }
+
+        assertTrue(result.isSuccess)
+        result.onSuccess { token ->
+            assertEquals("A7y0nh0aaDpz8g0aTcVVBnr6veTocbYLpH7K8Jqn", token.accessToken)
+        }
+    }
+
+    @Test
+    fun authorize_credsClientSecretIsNull_shouldReturnSuccess() = runTest {
+        val oAuthProviderSecretNull =
+            OAuthProvider(clientId, null)
+
+        addMockResponse(
+            HttpMethod.Post,
+            "/oauth2/token",
+            HttpStatusCode.OK,
+            responseBody = responseAuthorizeOk
+        )
+
+        val result =
+            oAuthProviderSecretNull.authorize(
+                URL("http://localhost:44444/oauth2/token"),
+                "username",
+                "password",
+                arrayOf("name", "age")
+            )
+
+        apiMockEngine.get().requestHistory.last().let { requestData ->
+            val requestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
+            assertTrue(requestBody.contains("client_id=clientId"))
+            assertTrue(requestBody.contains("client_secret=&"))
+            assertTrue(requestBody.contains("username=username"))
+            assertTrue(requestBody.contains("grant_type=password"))
+            assertTrue(requestBody.contains("scope=name+age"))
+        }
+
+        assertTrue(result.isSuccess)
+        result.onSuccess { token ->
+            assertEquals("A7y0nh0aaDpz8g0aTcVVBnr6veTocbYLpH7K8Jqn", token.accessToken)
+        }
+    }
+
+    @Test
+    fun authorize_credsEmptyBody_shouldReturnFailure() = runTest {
+        addMockResponse(
+            HttpMethod.Post,
+            "/oauth2/token",
+            HttpStatusCode.OK,
+            responseBody = ""
+        )
+        val result =
+            oAuthProvider.authorize(
+                URL("http://localhost:44444/oauth2/token"),
+                "username",
+                "password"
+            )
+
+        assertTrue(result.isFailure)
+        result.onFailure {
+            assertTrue(
+                it.message.toString()
+                    .contains("Expected start of the object '{', but had 'EOF' instead")
+            )
+        }
+    }
+
+    @Test
+    fun authorize_credsServerError_shouldReturnFailure() = runTest {
+        addMockResponse(
+            HttpMethod.Post,
+            "/oauth2/token",
+            HttpStatusCode.InternalServerError,
+            responseBody = ""
+        )
+
+        val result =
+            oAuthProvider.authorize(
+                URL("http://localhost:44444/oauth2/token"),
+                "username",
+                "password"
+            )
+
+        assertTrue(result.isFailure)
+        result.onFailure { it ->
+            assertTrue(it is ContentConvertException)
+        }
+    }
+
+
+    @Test
+    fun authorize_credsResponseUnknownJson_shouldReturnSuccess() = runTest {
+        addMockResponse(
+            HttpMethod.Post,
+            "/oauth2/token",
+            HttpStatusCode.OK,
+            responseBody = responseAuthorizeOk
+        )
+        val result =
+            oAuthProvider.authorize(
+                URL("http://localhost:44444/oauth2/token"),
+                "username",
+                "password"
+            )
+
+        assertTrue(result.isSuccess)
+        result.onSuccess {
+            assertEquals("A7y0nh0aaDpz8g0aTcVVBnr6veTocbYLpH7K8Jqn", it.accessToken)
+            assertEquals(7200, it.expiresIn)
+        }
+    }
+
+    @Test
+    fun discover_serverError_shouldReturnFailure() = runTest {
+
+        addMockResponse(
+            HttpMethod.Get,
+            "Server error",
+            HttpStatusCode.InternalServerError,
+            responseBody = "{}"
+        )
+        val result =
+            oAuthProvider.discover(URL("http://localhost:44444/.well-known/openid-configuration"))
+
+        assertTrue(result.isFailure)
+        result.onFailure { it ->
+            assertTrue(it is IllegalStateException)
+        }
+    }
+
+
+    @Test
+    fun discover_happyPath_shouldReturnSuccess() = runTest {
+        addMockResponse(
+            HttpMethod.Get,
+            "/.well-known/openid-configuration",
+            HttpStatusCode.OK,
+            responseBody = responseDiscoveryOk
+        )
+        val result =
+            oAuthProvider.discover((URL("http://localhost:44444/.well-known/openid-configuration")))
+
+        assertTrue(result.isSuccess)
+        result.onSuccess {
+            assertEquals(13, it.idTokenSigningAlgValuesSupported.size)
+            assertEquals("https://sdk.verify.ibm.com/oauth2/token", it.tokenEndpoint)
+        }
+    }
+
+    @Test
+    fun discover_wrongUrlPath_shouldReturnFailure() = runTest {
+
+        val result = oAuthProvider.discover(URL("https://localhost"))
+        assertTrue(result.isFailure)
+        result.onFailure {
+            assertTrue(it is MalformedURLException)
+        }
+    }
+
+    @Test
+    fun discover_fieldsMissingInResponse_shouldReturnFailure() = runTest {
+        addMockResponse(
+            HttpMethod.Get,
+            "/.well-known/openid-configuration",
+            HttpStatusCode.OK,
+            responseBody = "{\"foo\":\"bar\"}"
+        )
+        val result =
+            oAuthProvider.discover(URL("http://localhost:44444/.well-known/openid-configuration"))
+
+        assertTrue(result.isFailure)
+        result.onFailure {
+            assertTrue(it is JsonConvertException)
+            assertTrue(it.message?.contains("but they were missing") ?: false)
+        }
+    }
 
     @Test
     fun constructor_withAdditionalData_shouldReturnInstance() {
@@ -559,7 +590,7 @@ internal class OAuthProviderTest {
     @Test
     fun setAdditionalHeaders() {
         assertEquals(0, oAuthProvider.additionalHeaders.size)
-//        oAuthProvider.additionalHeaders["key1"] = "value1"
+        oAuthProvider.additionalHeaders["key1"] = "value1"
         assertEquals(1, oAuthProvider.additionalHeaders.size)
         assertEquals("value1", oAuthProvider.additionalHeaders["key1"])
 
@@ -579,7 +610,7 @@ internal class OAuthProviderTest {
     @Test
     fun setAdditionalParameters() {
         assertEquals(0, oAuthProvider.additionalParameters.size)
-//        oAuthProvider.additionalParameters["key1"] = "value1"
+        oAuthProvider.additionalParameters["key1"] = "value1"
         assertEquals(1, oAuthProvider.additionalParameters.size)
         assertEquals("value1", oAuthProvider.additionalParameters["key1"])
 
@@ -721,7 +752,7 @@ internal class OAuthProviderTest {
               "none"
            ]
         }
-        """.trimIndent()
+        """.trimIndent().trim('\n')
 
     private val responseAuthorizeOk = """
         {

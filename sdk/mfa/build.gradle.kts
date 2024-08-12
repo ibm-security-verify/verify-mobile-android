@@ -42,6 +42,5 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.rootbeer.lib)
 
-    androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

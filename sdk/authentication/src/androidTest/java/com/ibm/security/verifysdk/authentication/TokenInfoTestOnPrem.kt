@@ -1,15 +1,16 @@
-package com.ibm.security.verifysdk.authentication.test
+package com.ibm.security.verifysdk.authentication
 
 import android.os.Bundle
 import android.os.Parcel
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
-import com.ibm.security.verifysdk.authentication.TokenInfo
-import com.ibm.security.verifysdk.authentication.shouldRefresh
-import kotlinx.serialization.decodeFromString
+import com.ibm.security.verifysdk.authentication.model.TokenInfo
+import com.ibm.security.verifysdk.authentication.model.shouldRefresh
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 

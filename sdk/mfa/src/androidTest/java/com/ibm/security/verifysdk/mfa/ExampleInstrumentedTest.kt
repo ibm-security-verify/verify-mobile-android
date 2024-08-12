@@ -17,6 +17,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.ibm.security.verifysdk.mfa", appContext.packageName)
+        assertEquals("com.ibm.security.verifysdk.mfa.test", appContext.packageName)
     }
 }

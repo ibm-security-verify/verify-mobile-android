@@ -1,14 +1,15 @@
-package com.ibm.security.verifysdk.authentication.test
+package com.ibm.security.verifysdk.authentication
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
-import com.ibm.security.verifysdk.authentication.OIDCMetadataInfo
-import kotlinx.serialization.decodeFromString
+import com.ibm.security.verifysdk.authentication.model.OIDCMetadataInfo
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -164,7 +165,7 @@ internal class OIDCMetadataInfoTest {
 
     @Test
     fun testHashCode() {
-        assertEquals(826154382, oidcMetadata.hashCode())
+        assertEquals(684567978, oidcMetadata.hashCode())
 
         val oidcMetadataInfoEmpty =
             json.decodeFromString<OIDCMetadataInfo>(openidConfigurationEmpty)

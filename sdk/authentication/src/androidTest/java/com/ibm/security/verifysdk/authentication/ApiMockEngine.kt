@@ -2,7 +2,7 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-package com.ibm.security.verifysdk.authentication.test
+package com.ibm.security.verifysdk.authentication
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine

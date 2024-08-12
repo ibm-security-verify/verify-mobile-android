@@ -1,18 +1,24 @@
-package com.ibm.security.verifysdk.authentication.test
+/*
+ * Copyright contributors to the IBM Security Verify SDK for Android project
+ */
+
+package com.ibm.security.verifysdk.authentication
 
 import android.os.Bundle
 import android.os.Parcel
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
-import com.ibm.security.verifysdk.authentication.TokenInfo
-import com.ibm.security.verifysdk.authentication.shouldRefresh
+import com.ibm.security.verifysdk.authentication.model.TokenInfo
+import com.ibm.security.verifysdk.authentication.model.shouldRefresh
 import kotlinx.datetime.Clock
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.Instant
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
@@ -99,9 +105,10 @@ internal class TokenInfoTestCloud {
 
         val tokenInfo = json.decodeFromString<TokenInfo>(cloudTokenDefault)
         val tokenInfoJson = tokenInfo.toJson(false)
+        val currentTime = Instant.now().epochSecond
 
-        assertTrue(tokenInfoJson.get("createdOn").toString().startsWith("166"))
-        assertTrue(tokenInfoJson.get("expiresOn").toString().startsWith("166"))
+        assertTrue(tokenInfoJson.get("createdOn").toString().startsWith(currentTime.toString().take(5)))
+        assertTrue(tokenInfoJson.get("expiresOn").toString().startsWith(currentTime.toString().take(5)))
         assertTrue(tokenInfoJson.get("createdOn").toString().length == 10)
         assertTrue(tokenInfoJson.get("expiresOn").toString().length == 10)
     }
@@ -111,9 +118,10 @@ internal class TokenInfoTestCloud {
 
         val tokenInfo = json.decodeFromString<TokenInfo>(cloudTokenDefault)
         val tokenInfoJson = tokenInfo.toJson()
+        val currentTime = Instant.now().epochSecond
 
-        assertTrue(tokenInfoJson.get("createdOn").toString().startsWith("166"))
-        assertTrue(tokenInfoJson.get("expiresOn").toString().startsWith("166"))
+        assertTrue(tokenInfoJson.get("createdOn").toString().startsWith(currentTime.toString().take(5)))
+        assertTrue(tokenInfoJson.get("expiresOn").toString().startsWith(currentTime.toString().take(5)))
         assertTrue(tokenInfoJson.get("createdOn").toString().length == 10)
         assertTrue(tokenInfoJson.get("expiresOn").toString().length == 10)
     }
