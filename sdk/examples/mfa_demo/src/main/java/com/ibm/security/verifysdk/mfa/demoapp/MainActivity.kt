@@ -22,9 +22,9 @@ import com.ibm.security.verifysdk.mfa.MFARegistrationController
 import com.ibm.security.verifysdk.mfa.MFAServiceController
 import com.ibm.security.verifysdk.mfa.MFAServiceDescriptor
 import com.ibm.security.verifysdk.mfa.UserAction
-import com.ibm.security.verifysdk.mfa.cloud.model.CloudAuthenticator
 import com.ibm.security.verifysdk.mfa.completeTransaction
-import com.ibm.security.verifysdk.mfa.onprem.model.OnPremiseAuthenticator
+import com.ibm.security.verifysdk.mfa.model.cloud.CloudAuthenticator
+import com.ibm.security.verifysdk.mfa.model.onprem.OnPremiseAuthenticator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

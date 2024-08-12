@@ -11,16 +11,16 @@ internal class AuthenticationExceptionTest {
 
     @Test
     fun constructor_happyPath_shouldReturnObject() {
-        val e = AuthenticationException(HttpStatusCode.OK, "identifier", "ErrorDescription")
+        val e = AuthenticationException(HttpStatusCode.InternalServerError, "ErrorId", "ErrorDescription")
 
-        assertEquals(HttpStatusCode.OK, e.error)
+        assertEquals("ErrorId", e.error)
         assertEquals("ErrorDescription", e.errorDescription)
-        assertEquals(serializedError, e.errorDescription)
+        assertEquals(HttpStatusCode.InternalServerError, e.code)
         assertEquals("error: ErrorId\nerrorDescription: ErrorDescription", e.toString())
-        assertEquals("TAG $serializedError", e.toString("TAG"))
+        assertEquals("TAG $serializedError", e.toString("TAG "))
     }
 
     private val serializedError = """
-        {"error":"${HttpStatusCode.OK}","errorDescription":"ErrorDescription"}
+        {"error":"ErrorId","errorDescription":"ErrorDescription"}
     """.trimIndent()
 }

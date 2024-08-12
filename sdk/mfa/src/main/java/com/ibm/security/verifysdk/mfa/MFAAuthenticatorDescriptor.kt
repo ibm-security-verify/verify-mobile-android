@@ -4,7 +4,7 @@
 
 package com.ibm.security.verifysdk.mfa
 
-import com.ibm.security.verifysdk.authentication.TokenInfo
+import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import java.net.URL
 
 interface MFAAuthenticatorDescriptor : AuthenticatorDescriptor {

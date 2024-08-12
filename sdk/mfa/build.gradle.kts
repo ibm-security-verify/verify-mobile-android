@@ -9,8 +9,8 @@ apply(from = "$rootDir/common-publish.gradle")
 
 android {
     defaultConfig {
-        buildConfigField("String", "VERSION_NAME", "\"3.0.2\"")
-        buildConfigField("String", "VERSION_CODE", "\"102\"")
+        buildConfigField("String", "VERSION_NAME", "\"3.0.3\"")
+        buildConfigField("String", "VERSION_CODE", "\"104\"")
 
         // for IBM Verify Authentication SDK
         manifestPlaceholders["auth_redirect_scheme"] = "verifysdk"
@@ -42,6 +42,5 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.rootbeer.lib)
 
-    androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

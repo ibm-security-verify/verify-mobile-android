@@ -5,6 +5,7 @@ plugins {
 }
 
 apply(from = "$rootDir/common-config-demos.gradle")
+apply(from = "$rootDir/common-config-ktor.gradle")
 
 android {
     namespace = "com.ibm.security.verifysdk.mfa.demoapp"

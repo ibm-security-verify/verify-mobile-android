@@ -5,11 +5,17 @@
 package com.ibm.security.verifysdk.core
 
 import android.os.Build
+import android.security.keystore.KeyProperties
 import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.ibm.security.verifysdk.core.helper.KeystoreHelper
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -17,7 +23,7 @@ import org.junit.runner.RunWith
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.security.KeyStoreException
-import java.util.*
+import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
@@ -70,7 +76,7 @@ internal class KeystoreHelperTest {
 
         for (algorithm in supportedAlgorithms) {
             val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
-            val publicKey = KeystoreHelper.createKeyPair(keyName, algorithm)
+            val publicKey = KeystoreHelper.createKeyPair(keyName, algorithm, KeyProperties.PURPOSE_SIGN,)
             assertEquals("X.509", publicKey.format)
         }
     }
@@ -87,6 +93,7 @@ internal class KeystoreHelperTest {
             val publicKey = KeystoreHelper.createKeyPair(
                 keyName,
                 algorithm,
+                KeyProperties.PURPOSE_SIGN,
                 authenticationRequired,
                 invalidatedByBiometricEnrollment
             )
@@ -105,6 +112,7 @@ internal class KeystoreHelperTest {
             val publicKey = KeystoreHelper.createKeyPair(
                 keyName,
                 algorithm,
+                KeyProperties.PURPOSE_SIGN,
                 authenticationRequired,
                 invalidatedByBiometricEnrollment
             )
@@ -124,6 +132,7 @@ internal class KeystoreHelperTest {
             val publicKey = KeystoreHelper.createKeyPair(
                 keyName,
                 algorithm,
+                KeyProperties.PURPOSE_SIGN,
                 authenticationRequired,
                 invalidatedByBiometricEnrollment
             )
@@ -141,7 +150,7 @@ internal class KeystoreHelperTest {
         )
         for (algorithm in supportedAlgorithms) {
             val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
-            val publicKey = KeystoreHelper.createKeyPair(keyName, algorithm)
+            val publicKey = KeystoreHelper.createKeyPair(keyName, algorithm, KeyProperties.PURPOSE_SIGN)
             assertEquals("X.509", publicKey.format)
         }
         TestHelper.setFinalStatic(
@@ -160,7 +169,7 @@ internal class KeystoreHelperTest {
         )
         for (algorithm in supportedAlgorithms) {
             val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
-            val publicKey = KeystoreHelper.createKeyPair(keyName, algorithm)
+            val publicKey = KeystoreHelper.createKeyPair(keyName, algorithm, KeyProperties.PURPOSE_SIGN)
             assertEquals("X.509", publicKey.format)
         }
         TestHelper.setFinalStatic(
@@ -174,9 +183,9 @@ internal class KeystoreHelperTest {
 
         val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
         val algorithm = supportedAlgorithms[0]
-        KeystoreHelper.createKeyPair(keyName, algorithm)
+        KeystoreHelper.createKeyPair(keyName, algorithm, KeyProperties.PURPOSE_SIGN)
         val publicKeyFirst = KeystoreHelper.exportPublicKey(keyName)
-        KeystoreHelper.createKeyPair(keyName, algorithm)
+        KeystoreHelper.createKeyPair(keyName, algorithm, KeyProperties.PURPOSE_SIGN)
         val publicKeySecond = KeystoreHelper.exportPublicKey(keyName)
         assertNotEquals(publicKeyFirst, publicKeySecond)
     }
@@ -184,7 +193,7 @@ internal class KeystoreHelperTest {
     @Test(expected = UnsupportedOperationException::class)
     fun createKeyPair_unsupportedAlgorithm_shouldThrowException() {
         val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
-        KeystoreHelper.createKeyPair(keyName, "unsupportedAlgorithm")
+        KeystoreHelper.createKeyPair(keyName, "unsupportedAlgorithm", KeyProperties.PURPOSE_SIGN)
         assertFalse(true)
     }
 
@@ -192,7 +201,7 @@ internal class KeystoreHelperTest {
     fun deleteKeyPair() {
         val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
         val algorithm = supportedAlgorithms[0]
-        KeystoreHelper.createKeyPair(keyName, algorithm)
+        KeystoreHelper.createKeyPair(keyName, algorithm, KeyProperties.PURPOSE_SIGN)
         assertTrue(KeystoreHelper.exists(keyName))
         KeystoreHelper.deleteKeyPair(keyName)
         assertTrue(KeystoreHelper.exists(keyName).not())
@@ -202,7 +211,7 @@ internal class KeystoreHelperTest {
     fun exportPublicKey() {
         val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
         val algorithm = supportedAlgorithms[0]
-        KeystoreHelper.createKeyPair(keyName, algorithm)
+        KeystoreHelper.createKeyPair(keyName, algorithm,KeyProperties.PURPOSE_SIGN)
 
         val publicKey = KeystoreHelper.exportPublicKey(keyName)
         assertNotNull(publicKey)
@@ -224,7 +233,7 @@ internal class KeystoreHelperTest {
     fun exists() {
         val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
         assertTrue(KeystoreHelper.exists(keyName).not())
-        KeystoreHelper.createKeyPair(keyName, supportedAlgorithms[0])
+        KeystoreHelper.createKeyPair(keyName, supportedAlgorithms[0], KeyProperties.PURPOSE_SIGN)
         assertTrue(KeystoreHelper.exists(keyName))
     }
 
@@ -232,7 +241,7 @@ internal class KeystoreHelperTest {
     fun signData_happyPath_shouldReturnData() {
         val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
         val algorithm = supportedAlgorithms[0]
-        KeystoreHelper.createKeyPair(keyName, algorithm)
+        KeystoreHelper.createKeyPair(keyName, algorithm, KeyProperties.PURPOSE_SIGN)
 
         val signedData = KeystoreHelper.signData(keyName, algorithm, "dataToSign")
         assertNotNull(signedData)
@@ -245,7 +254,7 @@ internal class KeystoreHelperTest {
     fun signData_overwriteDefaults_shouldReturnData() {
         val keyName = String.format("myTestKey-%s", UUID.randomUUID().toString())
         val algorithm = supportedAlgorithms[0]
-        KeystoreHelper.createKeyPair(keyName, algorithm)
+        KeystoreHelper.createKeyPair(keyName, algorithm, KeyProperties.PURPOSE_SIGN)
 
         val signedData = KeystoreHelper.signData(keyName, algorithm, "dataToSign", Base64.URL_SAFE)
         assertNotNull(signedData)

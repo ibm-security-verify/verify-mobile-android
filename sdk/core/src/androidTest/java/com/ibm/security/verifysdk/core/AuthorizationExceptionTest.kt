@@ -4,6 +4,7 @@
 package com.ibm.security.verifysdk.core
 
 import io.ktor.http.HttpStatusCode
+import junit.framework.TestCase
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -15,9 +16,9 @@ internal class AuthorizationExceptionTest {
 
         assertEquals("ErrorId", e.error)
         assertEquals("ErrorDescription", e.errorDescription)
-        assertEquals(serializedError, e.toString())
+        TestCase.assertEquals(HttpStatusCode.BadRequest, e.code)
         assertEquals("error: ErrorId\nerrorDescription: ErrorDescription", e.toString())
-        assertEquals("TAG $serializedError", e.toString("TAG"))
+        assertEquals("TAG $serializedError", e.toString("TAG "))
     }
 
     private val serializedError = """

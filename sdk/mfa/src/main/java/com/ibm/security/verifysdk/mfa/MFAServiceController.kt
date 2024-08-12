@@ -4,10 +4,10 @@
 
 package com.ibm.security.verifysdk.mfa
 
-import com.ibm.security.verifysdk.mfa.cloud.CloudAuthenticatorService
-import com.ibm.security.verifysdk.mfa.cloud.model.CloudAuthenticator
-import com.ibm.security.verifysdk.mfa.onprem.OnPremiseAuthenticatorService
-import com.ibm.security.verifysdk.mfa.onprem.model.OnPremiseAuthenticator
+import com.ibm.security.verifysdk.mfa.api.CloudAuthenticatorService
+import com.ibm.security.verifysdk.mfa.api.OnPremiseAuthenticatorService
+import com.ibm.security.verifysdk.mfa.model.cloud.CloudAuthenticator
+import com.ibm.security.verifysdk.mfa.model.onprem.OnPremiseAuthenticator
 
 class MFAServiceController(private val authenticator: MFAAuthenticatorDescriptor) {
 

@@ -16,6 +16,26 @@ configurations.all {
     }
 }
 
+
+/**
+ * Custom task customConnectedAndroidTest that depends on running
+ * connectedAndroidTest in all modules except the listed ones.
+ */
+tasks.register("customConnectedAndroidTest") {
+    dependsOn(
+        subprojects
+            .filter { project ->
+                !project.name.contains("_demo")
+            }
+            .flatMap { project ->
+                project.tasks.matching { task ->
+                    task.name == "connectedAndroidTest"
+                }
+            }
+    )
+}
+
+
 subprojects {
 
     apply(from = "$rootDir/jacoco.gradle")

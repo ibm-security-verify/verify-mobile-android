@@ -55,7 +55,6 @@ import java.security.NoSuchAlgorithmException
 import java.security.interfaces.RSAPublicKey
 import java.security.spec.RSAKeyGenParameterSpec
 import java.util.Base64
-import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
@@ -305,8 +304,8 @@ class MainActivity : ComponentActivity() {
 
         return try {
             val body = Parameters.build {
-                append("client_id", clientId ?: "")
-                append("client_secret", clientSecret ?: "")
+                append("client_id", clientId)
+                append("client_secret", clientSecret)
                 append("grant_type", "client_credentials")
                 append("scope", "openid")
             }

@@ -9,6 +9,14 @@ apply(from = "$rootDir/common-config.gradle")
 apply(from = "$rootDir/common-config-ktor.gradle")
 apply(from = "$rootDir/common-publish.gradle")
 
+android {
+    defaultConfig {
+        manifestPlaceholders["auth_redirect_scheme"] = "verifysdk"
+        manifestPlaceholders["auth_redirect_host"] = "callback"
+        manifestPlaceholders["auth_redirect_path"] = "/redirect"
+    }
+}
+
 dependencies {
 
     implementation(project(":core"))
@@ -23,10 +31,7 @@ dependencies {
     implementation(libs.material)
 
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.ktor.client.mock)
     androidTestImplementation(libs.mockito.kotlin)
-    androidTestImplementation(libs.mockwebserver)
     androidTestImplementation(libs.kotlinx.coroutines.test)
 
     testImplementation(libs.junit)

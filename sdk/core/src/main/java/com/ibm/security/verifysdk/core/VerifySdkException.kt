@@ -56,7 +56,7 @@ abstract class VerifySdkException(
     fun toString(prefix: String): String {
 
         val stringBuilder = StringBuilder()
-        stringBuilder.append("$prefix ")
+        stringBuilder.append(prefix)
         stringBuilder.append(errorMessage)
 
         return stringBuilder.toString()
