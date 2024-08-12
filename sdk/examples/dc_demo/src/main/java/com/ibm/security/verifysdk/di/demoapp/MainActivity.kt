@@ -22,10 +22,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.google.zxing.client.android.BuildConfig
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
-import com.ibm.security.verifysdk.authentication.OAuthProvider
+import com.ibm.security.verifysdk.authentication.api.OAuthProvider
 import com.ibm.security.verifysdk.core.helper.ContextHelper
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.dc.QrCode
@@ -161,13 +160,12 @@ class MainActivity : ComponentActivity() {
                 withContext(Dispatchers.IO) {
                     OAuthProvider(qrCode.data?.clientId ?: "", null).let { oAuthProvider ->
 
-                        // TODO: confirm whether disable SSL checks is needed
-                        oAuthProvider.ignoreSsl = BuildConfig.DEBUG
-
                         oAuthProvider.authorize(
                             url = qrCode.data?.tokenEndpoint ?: URL("https://localhost"),
                             username = qrCode.data?.name ?: "",
-                            password = "secret"
+                            password = "secret",
+                            scope = null,
+                            NetworkHelper.getInstance
                         ).onSuccess {
                                 log.info(it.toString())
                             }.onFailure {
