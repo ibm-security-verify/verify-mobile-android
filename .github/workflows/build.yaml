@@ -111,7 +111,7 @@ jobs:
   coverage_report:
     name: Generate code coverage report
     runs-on: ubuntu-latest
-    needs: setup_environment
+    needs: [setup_environment, mend_scan]
 
     steps:
       - name: Code checkout
@@ -193,7 +193,7 @@ jobs:
   publish:
     name: Publish SDK, reports and documentation
     runs-on: ubuntu-latest
-    needs: [setup_environment, build_and_test, mend_scan]
+    needs: [setup_environment, build_and_test, mend_scan, coverage_report]
 
     steps:
       - name: Verify release title
@@ -206,7 +206,7 @@ jobs:
       - name: Create SDK directory
         run: mkdir -p ./sdk
 
-      - name: Collect alle artificats
+      - name: Collect all artificats
         uses: actions/download-artifact@v4.1.4
         with:
           name: build-and-test
