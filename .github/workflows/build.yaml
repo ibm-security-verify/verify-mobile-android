@@ -264,9 +264,9 @@ jobs:
           mv ./sdk/mfa/build/dokka/javadoc/* ./sdk/documentation/android/mfa/docs/
 
 
-      - name: Zip code coverage report
-        if: false
-        run: cd ./sdk/html && zip -r ../IBM-Verify-SDK_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_code-coverage-report.zip *
+      # - name: Zip code coverage report
+      #   if: false
+      #   run: cd ./sdk/html && zip -r ../IBM-Verify-SDK_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_code-coverage-report.zip *
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@4634c16e79c963813287e889244c50009e7f0981
