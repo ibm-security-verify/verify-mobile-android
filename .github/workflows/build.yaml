@@ -24,9 +24,9 @@ jobs:
       - name: Extract version
         id: set-vars
         run: |
-          name="$(grep -o 'VERSION_NAME[^0-9]\+[0-9\.]\+' ./sdk/mfa/build.gradle.kts | awk '{ print $2 }' | cut -c 4- | cut -c -5)"      
+          name="$(grep -o 'versionName.*' ./sdk/build.gradle.kts  | awk -F'"' '{print $3}'"      
           echo "VersionName=$name" >> $GITHUB_OUTPUT
-          code="$(grep -o 'VERSION_CODE[^0-9]\+[0-9\.]\+' ./sdk/mfa/build.gradle.kts | awk '{ print $2 }' | cut -c 4- | cut -c -3)"      
+          code="$(grep -o 'versionCode.*' ./sdk/build.gradle.kts  | awk -F'"' '{print $3}'"          
           echo "VersionCode=$code" >> $GITHUB_OUTPUT
           date="$(date +'%Y%m%d-%H%M%S')"
           echo "Date=$date" >> $GITHUB_OUTPUT
@@ -224,12 +224,12 @@ jobs:
           name: maven-local
           path: ~/.m2/repository/com/ibm/security
 
-      - name: Collect code coverate result
-        uses: actions/download-artifact@v4.1.4
-        if: false
-        with:
-          name: code-coverage
-          path: ./sdk
+      # - name: Collect code coverate result
+      #   uses: actions/download-artifact@v4.1.4
+      #   if: false
+      #   with:
+      #     name: code-coverage
+      #     path: ./sdk
     
       - name: Rename release files
         run: |

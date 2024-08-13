@@ -42,7 +42,7 @@ afterEvaluate {
                 from components.release
                 artifactId = project.name
                 groupId 'com.ibm.security.verifysdk'
-                version '3.0.2'
+                version "$versionName"
                 pom {
                     name = artifactId
                     description = 'com.ibm.security.verifysdk'

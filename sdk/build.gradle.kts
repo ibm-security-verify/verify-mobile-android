@@ -8,6 +8,9 @@ plugins {
     jacoco
 }
 
+extra["versionName"] = "3.0.3"
+extra["versionCode"] = "104"
+
 configurations.all {
     resolutionStrategy {
         failOnVersionConflict()
