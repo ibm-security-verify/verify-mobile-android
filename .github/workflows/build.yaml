@@ -24,9 +24,9 @@ jobs:
       - name: Extract version
         id: set-vars
         run: |
-          name="$(grep -o 'versionName.*' ./sdk/build.gradle.kts  | awk -F'"' '{print $3}'"      
+          name="$(grep -o 'versionName.*' ./sdk/build.gradle.kts  | awk -F'\"' '{print $3}')"      
           echo "VersionName=$name" >> $GITHUB_OUTPUT
-          code="$(grep -o 'versionCode.*' ./sdk/build.gradle.kts  | awk -F'"' '{print $3}'"          
+          code="$(grep -o 'versionCode.*' ./sdk/build.gradle.kts  | awk -F'\"' '{print $3}')"          
           echo "VersionCode=$code" >> $GITHUB_OUTPUT
           date="$(date +'%Y%m%d-%H%M%S')"
           echo "Date=$date" >> $GITHUB_OUTPUT
