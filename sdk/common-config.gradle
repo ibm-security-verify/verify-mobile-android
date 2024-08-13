@@ -4,9 +4,11 @@ android {
     testNamespace = "com.ibm.security.verifysdk." + project.name + ".test"
 
     compileSdk = 34
+    android.buildFeatures.buildConfig true
 
     defaultConfig {
         minSdk = 26
+        buildConfigField "String", "VERSION_NAME", "\"${rootProject.ext.versionName}\""
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
