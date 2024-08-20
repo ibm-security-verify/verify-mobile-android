@@ -4,19 +4,25 @@ android {
     testNamespace = "com.ibm.security.verifysdk." + project.name + ".test"
 
     compileSdk = 34
+    android.buildFeatures.buildConfig true
 
     defaultConfig {
         minSdk = 26
+        buildConfigField "String", "VERSION_NAME", "\"${rootProject.ext.versionName}\""
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-        getByName("release") {
+        named("release") {
             minifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            // Enables JaCoCo for the debug build
+            testCoverageEnabled = true
         }
     }
 
@@ -43,6 +49,7 @@ java {
 }
 
 dependencies {
+    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.slf4j.android)
 }

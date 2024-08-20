@@ -1,8 +1,10 @@
-package com.ibm.security.verifysdk.dc
+/*
+ * Copyright contributors to the IBM Security Verify Adaptive SDK for Android project
+ */
+package com.ibm.security.verifysdk.mfa
 
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
-import org.junit.Assert.*
 
 /**
  * Example local unit test, which will execute on the development machine (host).

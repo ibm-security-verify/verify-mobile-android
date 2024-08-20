@@ -24,9 +24,9 @@ jobs:
       - name: Extract version
         id: set-vars
         run: |
-          name="$(grep -o 'VERSION_NAME[^0-9]\+[0-9\.]\+' ./sdk/mfa/build.gradle.kts | awk '{ print $2 }' | cut -c 4- | cut -c -5)"      
+          name="$(grep -o 'versionName.*' ./sdk/build.gradle.kts  | awk -F'\"' '{print $3}')"      
           echo "VersionName=$name" >> $GITHUB_OUTPUT
-          code="$(grep -o 'VERSION_CODE[^0-9]\+[0-9\.]\+' ./sdk/mfa/build.gradle.kts | awk '{ print $2 }' | cut -c 4- | cut -c -3)"      
+          code="$(grep -o 'versionCode.*' ./sdk/build.gradle.kts  | awk -F'\"' '{print $3}')"          
           echo "VersionCode=$code" >> $GITHUB_OUTPUT
           date="$(date +'%Y%m%d-%H%M%S')"
           echo "Date=$date" >> $GITHUB_OUTPUT
@@ -111,7 +111,7 @@ jobs:
   coverage_report:
     name: Generate code coverage report
     runs-on: ubuntu-latest
-    needs: setup_environment
+    needs: [setup_environment, mend_scan]
 
     steps:
       - name: Code checkout
@@ -139,22 +139,35 @@ jobs:
           arch: x86_64
           profile: default
 
-      - name: Run instrumentation Tests
+      - name: Generate Jacoco report
         uses: reactivecircus/android-emulator-runner@v2
-        if: false
         with:
           working-directory: ./sdk
           api-level: 28
           target: default
           arch: x86
           profile: Nexus 6
-          script: ./gradlew --no-daemon customConnectedAndroidTest
+          script: ./gradlew --no-daemon jacocoReport
 
-  #     - name: Store code coverage report
-  #       uses: actions/upload-artifact@v4.3.1
-  #       with:
-  #         name: code-coverage
-  #         path: ./sdk/app/build/reports/jacoco/jacocoDebugCoverageReport/
+      - name: Store code coverage report
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: jacoco-report
+          path: ./sdk/build/reports/jacoco/
+
+      - name: Add coverage to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.6.1
+        with:
+          working-directory: ./sdk
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/jacocoReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 0
+          min-coverage-changed-files: 0
+          title: Code Coverage
+          update-comment: true
+          debug-mode: true
 
   mend_scan:
     name: Mend scan
@@ -193,7 +206,7 @@ jobs:
   publish:
     name: Publish SDK, reports and documentation
     runs-on: ubuntu-latest
-    needs: [setup_environment, build_and_test, mend_scan]
+    needs: [setup_environment, build_and_test, mend_scan, coverage_report]
 
     steps:
       - name: Verify release title
@@ -206,7 +219,7 @@ jobs:
       - name: Create SDK directory
         run: mkdir -p ./sdk
 
-      - name: Collect alle artificats
+      - name: Collect all artificats
         uses: actions/download-artifact@v4.1.4
         with:
           name: build-and-test
@@ -226,9 +239,8 @@ jobs:
 
       - name: Collect code coverate result
         uses: actions/download-artifact@v4.1.4
-        if: false
         with:
-          name: code-coverage
+          name: jacoco-report
           path: ./sdk
     
       - name: Rename release files
@@ -265,7 +277,6 @@ jobs:
 
 
       - name: Zip code coverage report
-        if: false
         run: cd ./sdk/html && zip -r ../IBM-Verify-SDK_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_code-coverage-report.zip *
 
       - name: Create GitHub release
@@ -286,7 +297,7 @@ jobs:
             ./sdk/authentication/build/reports/*.html
             ./sdk/mfa/build/outputs/aar/*.aar
             ./sdk/mfa/build/reports/*.html
-            # ./sdk/IBM-Verify-SDK_*_code-coverage-report.zip
+            ./sdk/IBM-Verify-SDK_*_code-coverage-report.zip
 
       - name: Upload documentation to GitHub.io repo
         if: github.ref == 'refs/heads/main'      

@@ -52,7 +52,7 @@ data class TOTPFactorInfo(
     }
 
     @SuppressWarnings
-    override fun generatePasscode(time: Long): String {
-        return super.generatePasscode(time / period / 1000L)
+    override fun generatePasscode(counter: Long): String {
+        return super.generatePasscode(counter = counter / period / 1000L)
     }
 }

@@ -31,8 +31,6 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.logging.interceptor)
 
-    testImplementation(libs.junit)
-
     androidTestImplementation(libs.androidx.junit.v120)
     androidTestImplementation(libs.androidx.espresso.core.v360)
 }

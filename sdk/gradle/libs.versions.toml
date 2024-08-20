@@ -13,7 +13,7 @@ espressoCore = "3.6.1"
 espressoCoreVersion = "3.6.0"
 fuelAndroid = "2.3.1"
 jackson = "2.17.1"
-jose4j = "0.9.3"
+jose4j = "0.9.6"
 junit = "4.13.2"
 junitKtx = "1.2.0"
 junitVersion = "1.2.1"
@@ -103,6 +103,3 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 jetbrains-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-
-
-
