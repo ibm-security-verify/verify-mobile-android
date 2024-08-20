@@ -141,7 +141,6 @@ jobs:
 
       - name: Generate Jacoco report
         uses: reactivecircus/android-emulator-runner@v2
-        if: false
         with:
           working-directory: ./sdk
           api-level: 28
@@ -226,7 +225,6 @@ jobs:
 
       - name: Collect code coverate result
         uses: actions/download-artifact@v4.1.4
-        if: false
         with:
           name: jacoco-report
           path: ./sdk
@@ -265,7 +263,6 @@ jobs:
 
 
       - name: Zip code coverage report
-        if: false
         run: cd ./sdk/html && zip -r ../IBM-Verify-SDK_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_code-coverage-report.zip *
 
       - name: Create GitHub release
