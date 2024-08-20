@@ -155,6 +155,20 @@ jobs:
           name: jacoco-report
           path: ./sdk/build/reports/jacoco/
 
+      - name: Add coverage to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.6.1
+        with:
+          working-directory: ./sdk
+          paths: |
+            ${{ github.workspace }}/**/build/reports/jacoco/jacocoReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 0
+          min-coverage-changed-files: 0
+          title: Code Coverage
+          update-comment: true
+          debug-mode: true
+
   mend_scan:
     name: Mend scan
     runs-on: ubuntu-latest
