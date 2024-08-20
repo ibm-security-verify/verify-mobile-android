@@ -139,7 +139,7 @@ jobs:
           arch: x86_64
           profile: default
 
-      - name: Run instrumentation Tests
+      - name: Generate Jacoco report
         uses: reactivecircus/android-emulator-runner@v2
         if: false
         with:
@@ -148,13 +148,13 @@ jobs:
           target: default
           arch: x86
           profile: Nexus 6
-          script: ./gradlew --no-daemon customConnectedAndroidTest
+          script: ./gradlew --no-daemon jacocoReport
 
-  #     - name: Store code coverage report
-  #       uses: actions/upload-artifact@v4.3.1
-  #       with:
-  #         name: code-coverage
-  #         path: ./sdk/app/build/reports/jacoco/jacocoDebugCoverageReport/
+      - name: Store code coverage report
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: jacoco-report
+          path: ./sdk/build/reports/jacoco/
 
   mend_scan:
     name: Mend scan
@@ -224,12 +224,12 @@ jobs:
           name: maven-local
           path: ~/.m2/repository/com/ibm/security
 
-      # - name: Collect code coverate result
-      #   uses: actions/download-artifact@v4.1.4
-      #   if: false
-      #   with:
-      #     name: code-coverage
-      #     path: ./sdk
+      - name: Collect code coverate result
+        uses: actions/download-artifact@v4.1.4
+        if: false
+        with:
+          name: jacoco-report
+          path: ./sdk
     
       - name: Rename release files
         run: |
@@ -264,9 +264,9 @@ jobs:
           mv ./sdk/mfa/build/dokka/javadoc/* ./sdk/documentation/android/mfa/docs/
 
 
-      # - name: Zip code coverage report
-      #   if: false
-      #   run: cd ./sdk/html && zip -r ../IBM-Verify-SDK_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_code-coverage-report.zip *
+      - name: Zip code coverage report
+        if: false
+        run: cd ./sdk/html && zip -r ../IBM-Verify-SDK_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_code-coverage-report.zip *
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@4634c16e79c963813287e889244c50009e7f0981
@@ -286,7 +286,7 @@ jobs:
             ./sdk/authentication/build/reports/*.html
             ./sdk/mfa/build/outputs/aar/*.aar
             ./sdk/mfa/build/reports/*.html
-            # ./sdk/IBM-Verify-SDK_*_code-coverage-report.zip
+            ./sdk/IBM-Verify-SDK_*_code-coverage-report.zip
 
       - name: Upload documentation to GitHub.io repo
         if: github.ref == 'refs/heads/main'      

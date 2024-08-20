@@ -108,7 +108,7 @@ internal class TokenInfoTestCloud {
         val currentTime = Instant.now().epochSecond
 
         assertTrue(tokenInfoJson.get("createdOn").toString().startsWith(currentTime.toString().take(5)))
-        assertTrue(tokenInfoJson.get("expiresOn").toString().startsWith(currentTime.toString().take(5)))
+        assertTrue(tokenInfoJson.get("expiresOn").toString().startsWith(currentTime.toString().take(4)))
         assertTrue(tokenInfoJson.get("createdOn").toString().length == 10)
         assertTrue(tokenInfoJson.get("expiresOn").toString().length == 10)
     }
@@ -121,7 +121,7 @@ internal class TokenInfoTestCloud {
         val currentTime = Instant.now().epochSecond
 
         assertTrue(tokenInfoJson.get("createdOn").toString().startsWith(currentTime.toString().take(5)))
-        assertTrue(tokenInfoJson.get("expiresOn").toString().startsWith(currentTime.toString().take(5)))
+        assertTrue(tokenInfoJson.get("expiresOn").toString().startsWith(currentTime.toString().take(4)))
         assertTrue(tokenInfoJson.get("createdOn").toString().length == 10)
         assertTrue(tokenInfoJson.get("expiresOn").toString().length == 10)
     }

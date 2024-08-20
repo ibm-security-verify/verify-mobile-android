@@ -34,5 +34,4 @@ dependencies {
     androidTestImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.kotlinx.coroutines.test)
 
-    testImplementation(libs.junit)
 }

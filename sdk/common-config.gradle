@@ -13,12 +13,16 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        named("release") {
             minifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            // Enables JaCoCo for the debug build
+            testCoverageEnabled = true
         }
     }
 
@@ -45,6 +49,7 @@ java {
 }
 
 dependencies {
+    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.slf4j.android)
 }

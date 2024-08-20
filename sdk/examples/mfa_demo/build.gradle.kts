@@ -33,8 +33,5 @@ dependencies {
 
     implementation(libs.zxing.android.embedded)
 
-    testImplementation(libs.junit)
-
-    androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
