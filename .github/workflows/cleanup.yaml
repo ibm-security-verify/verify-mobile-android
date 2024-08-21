@@ -14,8 +14,6 @@ jobs:
 
       - name: Set up GitHub CLI
         uses: cli/cli-action@v2
-        with:
-          gh-version: 'latest'
 
       - name: Install jq
         run: sudo apt-get install jq
