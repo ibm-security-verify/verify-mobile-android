@@ -30,9 +30,9 @@ include(":fido2")
 include(":fido2_demo")
 include(":mfa")
 include(":mfa_demo")
+include(":test_utils")
 
 project(":dc_demo").projectDir = File("examples/dc_demo")
 project(":dpop_demo").projectDir = File("examples/dpop_demo")
 project(":fido2_demo").projectDir = File("examples/fido2_demo")
 project(":mfa_demo").projectDir = File("examples/mfa_demo")
-

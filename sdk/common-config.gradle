@@ -1,10 +1,10 @@
 
 android {
     namespace = "com.ibm.security.verifysdk." + project.name
-    testNamespace = "com.ibm.security.verifysdk." + project.name + ".test"
+//    testNamespace = "com.ibm.security.verifysdk." + project.name + ".test"
 
     compileSdk = 34
-    android.buildFeatures.buildConfig true
+    buildFeatures.buildConfig = true
 
     defaultConfig {
         minSdk = 26
@@ -20,9 +20,9 @@ android {
                 "proguard-rules.pro"
             )
         }
-        debug {
-            // Enables JaCoCo for the debug build
-            testCoverageEnabled = true
+        named("debug") {
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
         }
     }
 
