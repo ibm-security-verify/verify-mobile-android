@@ -8,7 +8,11 @@ import org.junit.Test
 @OptIn(ExperimentalSerializationApi::class)
 internal class ErrorMessageTest {
 
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json =  Json {
+        encodeDefaults = true
+        explicitNulls = false
+        ignoreUnknownKeys = true
+    }
 
     @Test
     fun getError() {

@@ -19,7 +19,11 @@ abstract class VerifySdkException(
     private val throwable: Throwable? = null
 ) : Throwable(throwable) {
 
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json =  Json {
+        encodeDefaults = true
+        explicitNulls = false
+        ignoreUnknownKeys = true
+    }
 
     val error: String
     val errorDescription: String
