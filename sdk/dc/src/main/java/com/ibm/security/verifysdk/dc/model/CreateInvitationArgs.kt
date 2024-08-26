@@ -5,51 +5,51 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.SerialName
 
 @ExperimentalSerializationApi
 @Serializable
 data class CreateInvitationArgs(
 
-    @JsonNames("goal_code")
+    @SerialName("goal_code")
     val goalCode: String? = null,
 
-    @JsonNames("goal")
+    @SerialName("goal")
     val goal: String? = null,
 
-    @JsonNames("label")
+    @SerialName("label")
     val label: String? = null,
 
-    @JsonNames("attach")
+    @SerialName("attach")
     val attach: OutOfBandInvitationAttachArgs? = null,
 
-    @JsonNames("type")
+    @SerialName("type")
     val type: InvitationType? = null,
 
-    @JsonNames("direct_route")
+    @SerialName("direct_route")
     val directRoute: Boolean? = null,
 
-    @JsonNames("manual_accept")
+    @SerialName("manual_accept")
     val manualAccept: Boolean? = null,
 
-    @JsonNames("max_acceptances")
+    @SerialName("max_acceptances")
     val maxAcceptances: Double? = null,
 
-    @JsonNames("max_connections")
+    @SerialName("max_connections")
     val maxConnections: Double? = null,
 
-    @JsonNames("max_queue_count")
+    @SerialName("max_queue_count")
     val maxQueueCount: Double? = null,
 
-    @JsonNames("max_queue_time_ms")
+    @SerialName("max_queue_time_ms")
     val maxQueueTimeMs: Double? = null,
 
-    @JsonNames("invitation_lifetime_ms")
+    @SerialName("invitation_lifetime_ms")
     val invitationLifetimeMs: Double? = null,
 
-    @JsonNames("connection_lifetime_ms")
+    @SerialName("connection_lifetime_ms")
     val connectionLifetimeMs: Double? = null,
 
-    @JsonNames("properties")
+    @SerialName("properties")
     val properties: Map<String, String>? = null
 )

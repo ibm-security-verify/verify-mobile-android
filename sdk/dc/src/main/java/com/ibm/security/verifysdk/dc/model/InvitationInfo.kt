@@ -5,60 +5,61 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.SerialName
 
 @ExperimentalSerializationApi
 @Serializable
 data class InvitationInfo(
 
-    @JsonNames("id")
+    @SerialName("id")
     val id: String,
 
-    @JsonNames("url")
+    @SerialName("url")
     val url: String,
 
-    @JsonNames("short_url")
+    @SerialName("short_url")
     val shortUrl: String,
 
-    @JsonNames("direct_route")
+    @SerialName("direct_route")
     val directRoute: Boolean,
 
-    @JsonNames("manual_accept")
+    @SerialName("manual_accept")
     val manualAccept: Boolean,
 
-    @JsonNames("max_acceptances")
+    @SerialName("max_acceptances")
     val maxAcceptances: Double,
 
-    @JsonNames("cur_acceptances")
+    @SerialName("cur_acceptances")
     val curAcceptances: Double,
 
-    @JsonNames("recipient_key")
+    @SerialName("recipient_key")
     val recipientKey: String,
 
-    @JsonNames("max_connections")
+    @SerialName("max_connections")
     val maxConnections: Double? = null,
 
-    @JsonNames("max_queue_count")
+    @SerialName("max_queue_count")
     val maxQueueCount: Double? = null,
 
-    @JsonNames("max_queue_time_ms")
+    @SerialName("max_queue_time_ms")
     val maxQueueTimeMs: Double? = null,
 
-    @JsonNames("connection_lifetime_ms")
+    @SerialName("connection_lifetime_ms")
     val connectionLifetimeMs: Double? = null,
 
-    @JsonNames("timestamps")
+    @SerialName("timestamps")
     val timestamps: Map<String, TimeStampsValue>? = null,
 
-    @JsonNames("properties")
+    @SerialName("properties")
     val properties: Map<String, String>? = null,
 
-    @JsonNames("attachments")
-    val attachments: List<AriesAttachment>? = null,
+    @SerialName("attachments")
+    val attachments: List<JsonElement>? = null,
 
-    @JsonNames("attach_args")
+    @SerialName("attach_args")
     val attachArgs: OutOfBandInvitationAttachArgs? = null
 )
 
-typealias TimeStampsValue = String
+typealias TimeStampsValue = JsonElement
 

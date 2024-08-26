@@ -1,25 +1,18 @@
-/*
- *  Copyright contributors to the IBM Security Verify DC SDK for Android project
- */
 @file:OptIn(ExperimentalSerializationApi::class)
 
 package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.SerialName
 
-@Serializable
-enum class AriesReturnRouteType(val value: String) {
 
-    @JsonNames("all")
-    ALL("all"),
+enum class CredentialRole(val value: String) {
 
-    @JsonNames("thread")
-    THREAD("thread"),
+    @SerialName("issuer")
+    ISSUER("issuer"),
 
-    @JsonNames("none")
-    NONE("none");
+    @SerialName("holder")
+    HOLDER("holder");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -34,12 +27,12 @@ enum class AriesReturnRouteType(val value: String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: Any?): String? = if (data is AriesReturnRouteType) "$data" else null
+        fun encode(data: Any?): String? = if (data is CredentialRole) "$data" else null
 
         /**
-         * Returns a valid [AriesReturnRouteType] for [data], null otherwise.
+         * Returns a valid [CredentialRole] for [data], null otherwise.
          */
-        fun decode(data: Any?): AriesReturnRouteType? = data?.let {
+        fun decode(data: Any?): CredentialRole? = data?.let {
           val normalizedData = "$it".lowercase()
           entries.firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()

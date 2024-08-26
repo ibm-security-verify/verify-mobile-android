@@ -5,22 +5,22 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.SerialName
 
 @ExperimentalSerializationApi
 @Serializable
 data class CredFilter (
 
-    @JsonNames("attr_name")
+    @SerialName("attr_name")
     val attrName: String,
 
-    @JsonNames("attr_values")
+    @SerialName("attr_values")
     val attrValues: List<String>,
 
-    @JsonNames("proof_request_referent")
+    @SerialName("proof_request_referent")
     val proofRequestReferent: String? = null,
 
-    @JsonNames("exclude")
+    @SerialName("exclude")
     val exclude: Boolean? = null
 
 )

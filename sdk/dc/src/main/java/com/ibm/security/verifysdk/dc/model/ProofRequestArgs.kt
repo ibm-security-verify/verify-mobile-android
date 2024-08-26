@@ -5,37 +5,37 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.SerialName
 
 @ExperimentalSerializationApi
 @Serializable
 data class ProofRequestArgs (
 
-    @JsonNames("name")
+    @SerialName("name")
     val name: String? = null,
 
-    @JsonNames("version")
+    @SerialName("version")
     val version: String? = null,
 
-    @JsonNames("requested_attributes")
+    @SerialName("requested_attributes")
     val requestedAttributes: String? = null,
 
-    @JsonNames("requested_predicates")
+    @SerialName("requested_predicates")
     val requestedPredicates: String? = null,
 
-    @JsonNames("allow_proof_request_override")
+    @SerialName("allow_proof_request_override")
     val allowProofRequestOverride: Boolean? = null,
 
-    @JsonNames("cred_filter")
+    @SerialName("cred_filter")
     val credFilter: List<CredFilter>? = null,
 
-    @JsonNames("properties")
+    @SerialName("properties")
     val properties: Map<String, String>? = null,
 
-    @JsonNames("jsonld")
+    @SerialName("jsonld")
     val jsonld: DifPresentationRequest? = null,
 
-    @JsonNames("bbs")
+    @SerialName("bbs")
     val bbs: DifPresentationRequest? = null
 
 )

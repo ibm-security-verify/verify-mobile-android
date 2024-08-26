@@ -5,28 +5,28 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.SerialName
 
 @ExperimentalSerializationApi
 @Serializable
 data class CreateInteractionRequest (
 
-    @JsonNames("role")
+    @SerialName("role")
     val role: String,
 
-    @JsonNames("idoc_did")
+    @SerialName("idoc_did")
     val idocDid: String,
 
-    @JsonNames("mode")
+    @SerialName("mode")
     val mode: InteractionMode? = null,
 
-    @JsonNames("to")
+    @SerialName("to")
     val to: ToConnection? = null,
 
-    @JsonNames("direct_route")
+    @SerialName("direct_route")
     val directRoute: Boolean? = null,
 
-    @JsonNames("properties")
+    @SerialName("properties")
     val properties: Map<String, String>? = null
 
 )

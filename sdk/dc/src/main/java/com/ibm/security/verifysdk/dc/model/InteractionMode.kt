@@ -7,18 +7,18 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.SerialName
 
 @Serializable
 enum class InteractionMode(val value: String) {
 
-    @JsonNames("approved")
+    @SerialName("approved")
     APPROVED("approved"),
 
-    @JsonNames("rejected")
+    @SerialName("rejected")
     REJECTED("rejected"),
 
-    @JsonNames("manual")
+    @SerialName("manual")
     MANUAL("manual");
 
     /**

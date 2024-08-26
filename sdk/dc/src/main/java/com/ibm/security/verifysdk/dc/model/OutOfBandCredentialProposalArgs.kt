@@ -5,30 +5,31 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.SerialName
 
 @ExperimentalSerializationApi
 @Serializable
 data class OutOfBandCredentialProposalArgs (
 
-    @JsonNames("attributes")
+    @SerialName("attributes")
     val attributes: Map<String, String>,
 
-    @JsonNames("comment")
+    @SerialName("comment")
     val comment: String? = null,
 
-    @JsonNames("credential_proposal")
-    val credentialProposal: AriesCredentialPreview? = null,
+    @SerialName("credential_proposal")
+    val credentialProposal: JsonElement? = null,
 
-    @JsonNames("cred_def_id")
+    @SerialName("cred_def_id")
     val credDefId: String? = null,
 
-    @JsonNames("schema_id")
+    @SerialName("schema_id")
     val schemaId: String? = null,
 
-    @JsonNames("schema_name")
+    @SerialName("schema_name")
     val schemaName: String? = null,
 
-    @JsonNames("schema_version")
+    @SerialName("schema_version")
     val schemaVersion: String? = null
 )

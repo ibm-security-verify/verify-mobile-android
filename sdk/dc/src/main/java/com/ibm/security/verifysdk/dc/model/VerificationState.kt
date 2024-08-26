@@ -7,36 +7,36 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.SerialName
 
 @Serializable
 enum class VerificationState(val value: String) {
 
-    @JsonNames("outbound_verification_request")
+    @SerialName("outbound_verification_request")
     OUTBOUND_VERIFICATION_REQUEST("outbound_verification_request"),
 
-    @JsonNames("inbound_verification_request")
+    @SerialName("inbound_verification_request")
     INBOUND_VERIFICATION_REQUEST("inbound_verification_request"),
 
-    @JsonNames("outbound_proof_request")
+    @SerialName("outbound_proof_request")
     OUTBOUND_PROOF_REQUEST("outbound_proof_request"),
 
-    @JsonNames("inbound_proof_request")
+    @SerialName("inbound_proof_request")
     INBOUND_PROOF_REQUEST("inbound_proof_request"),
 
-    @JsonNames("proof_generated")
+    @SerialName("proof_generated")
     PROOF_GENERATED("proof_generated"),
 
-    @JsonNames("proof_shared")
+    @SerialName("proof_shared")
     PROOF_SHARED("proof_shared"),
 
-    @JsonNames("passed")
+    @SerialName("passed")
     PASSED("passed"),
 
-    @JsonNames("failed")
+    @SerialName("failed")
     FAILED("failed"),
 
-    @JsonNames("deleted")
+    @SerialName("deleted")
     DELETED("deleted");
 
     /**
@@ -52,12 +52,12 @@ enum class VerificationState(val value: String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: kotlin.Any?): String? = if (data is VerificationState) "$data" else null
+        fun encode(data: Any?): String? = if (data is VerificationState) "$data" else null
 
         /**
          * Returns a valid [VerificationState] for [data], null otherwise.
          */
-        fun decode(data: kotlin.Any?): VerificationState? = data?.let {
+        fun decode(data: Any?): VerificationState? = data?.let {
           val normalizedData = "$it".lowercase()
           entries.firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()

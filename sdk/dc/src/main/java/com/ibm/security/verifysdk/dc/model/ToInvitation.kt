@@ -5,22 +5,22 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.SerialName
 
 @ExperimentalSerializationApi
 @Serializable
 data class ToInvitation(
 
-    @JsonNames("url")
+    @SerialName("url")
     val url: String? = null,
 
-    @JsonNames("accept_invitation_manually")
+    @SerialName("accept_invitation_manually")
     val acceptInvitationManually: Boolean? = null,
 
-    @JsonNames("direct_route")
+    @SerialName("direct_route")
     val directRoute: Boolean? = null,
 
-    @JsonNames("properties")
+    @SerialName("properties")
     val properties: Map<String, String>? = null
 
 )

@@ -1,52 +1,65 @@
-/*
- *  Copyright contributors to the IBM Security Verify DC SDK for Android project
- */
-@file:Suppress("unused")
-
 package com.ibm.security.verifysdk.dc.api
 
 import com.ibm.security.verifysdk.core.helper.BaseApi
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
-import com.ibm.security.verifysdk.dc.model.CreateInvitationArgs
-import com.ibm.security.verifysdk.dc.model.InvitationInfo
-import com.ibm.security.verifysdk.dc.model.InvitationList
+import com.ibm.security.verifysdk.dc.model.CredentialInfo
+import com.ibm.security.verifysdk.dc.model.CredentialList
+import com.ibm.security.verifysdk.dc.model.UpdateCredentialArgs
 import io.ktor.client.HttpClient
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.ExperimentalSerializationApi
 import java.net.URL
 
 @OptIn(ExperimentalSerializationApi::class)
-open class InvitationsApi(private val baseUrl: URL) : BaseApi() {
+open class CredentialsApi(private val baseUrl: URL) : BaseApi() {
 
-    open suspend fun create(
+    open suspend fun getAll(
         httpClient: HttpClient = NetworkHelper.getInstance,
         url: URL? = null,
-        accessToken: String? = null,
-        createInvitationArgs: CreateInvitationArgs
-    ): Result<InvitationInfo> {
+        accessToken: String,
+    ): Result<CredentialList> {
 
         val localUrl: URL = url ?: run {
-            URL("$baseUrl/diagency/v1.0/diagency/invitations")
+            URL("$baseUrl/diagency/v1.0/diagency/credentials")
         }
 
         return performRequest(
             httpClient = httpClient,
             url = localUrl,
             accessToken = accessToken,
-            body = createInvitationArgs,
-            method = HttpMethod.Post
+            method = HttpMethod.Get
+        )
+    }
+
+
+    open suspend fun getOne(
+        httpClient: HttpClient = NetworkHelper.getInstance,
+        url: URL? = null,
+        accessToken: String,
+        id: String
+    ): Result<CredentialInfo> {
+
+        val localUrl: URL = url ?: run {
+            URL("$baseUrl/diagency/v1.0/diagency/credentials/${id}")
+        }
+
+        return performRequest(
+            httpClient = httpClient,
+            url = localUrl,
+            accessToken = accessToken,
+            method = HttpMethod.Get
         )
     }
 
     open suspend fun delete(
         httpClient: HttpClient = NetworkHelper.getInstance,
         url: URL? = null,
-        accessToken: String? = null,
+        accessToken: String,
         id: String
     ): Result<Unit> {
 
         val localUrl: URL = url ?: run {
-            URL("$baseUrl/diagency/v1.0/diagency/invitations/${id}")
+            URL("$baseUrl/diagency/v1.0/diagency/credentials/${id}")
         }
 
         return performRequest(
@@ -57,40 +70,24 @@ open class InvitationsApi(private val baseUrl: URL) : BaseApi() {
         )
     }
 
-    open suspend fun getAll(
+    open suspend fun update(
         httpClient: HttpClient = NetworkHelper.getInstance,
         url: URL? = null,
-        accessToken: String? = null
-    ): Result<InvitationList> {
+        accessToken: String,
+        id: String,
+        updateCredentialArgs: UpdateCredentialArgs
+    ): Result<CredentialInfo> {
 
         val localUrl: URL = url ?: run {
-            URL("$baseUrl/diagency/v1.0/diagency/invitations")
+            URL("$baseUrl/diagency/v1.0/diagency/credentials/${id}")
         }
 
         return performRequest(
             httpClient = httpClient,
             url = localUrl,
             accessToken = accessToken,
-            method = HttpMethod.Get
-        )
-    }
-
-    open suspend fun getOne(
-        httpClient: HttpClient = NetworkHelper.getInstance,
-        url: URL? = null,
-        accessToken: String? = null,
-        id: String
-    ): Result<InvitationInfo> {
-
-        val localUrl: URL = url ?: run {
-            URL("$baseUrl/diagency/v1.0/diagency/invitations/${id}")
-        }
-
-        return performRequest(
-            httpClient = httpClient,
-            url = localUrl,
-            accessToken = accessToken,
-            method = HttpMethod.Get
+            body = updateCredentialArgs,
+            method = HttpMethod.Patch
         )
     }
 }

@@ -7,15 +7,15 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.SerialName
 
 @Serializable
 enum class InvitationRole(val value: String) {
 
-    @JsonNames("inviter")
+    @SerialName("inviter")
     INVITER("inviter"),
 
-    @JsonNames("invitee")
+    @SerialName("invitee")
     INVITEE("invitee");
 
     /**

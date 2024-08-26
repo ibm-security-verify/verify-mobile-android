@@ -5,36 +5,36 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.SerialName
 
 @ExperimentalSerializationApi
 @Serializable
 data class CreateVerificationRequestArgs (
 
-    @JsonNames("to")
+    @SerialName("to")
     val to: ToConnection? = null,
 
-    @JsonNames("comment")
+    @SerialName("comment")
     val comment: String? = null,
 
-    @JsonNames("state")
+    @SerialName("state")
     val state: VerificationState? = null,
 
-    @JsonNames("proof_schema_id")
+    @SerialName("proof_schema_id")
     val proofSchemaId: String? = null,
 
-    @JsonNames("proof_request")
+    @SerialName("proof_request")
     val proofRequest: ProofRequestArgs? = null,
 
-    @JsonNames("properties")
+    @SerialName("properties")
     val properties: Map<String, String>? = null,
 
-    @JsonNames("direct_route")
+    @SerialName("direct_route")
     val directRoute: Boolean? = null,
 
-    @JsonNames("aries_version")
+    @SerialName("aries_version")
     val ariesVersion: String? = null,
 
-    @JsonNames("allow_proof_request_override")
+    @SerialName("allow_proof_request_override")
     val allowProofRequestOverride: Boolean? = null
 )

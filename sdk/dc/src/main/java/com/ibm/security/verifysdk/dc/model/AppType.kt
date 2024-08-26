@@ -1,22 +1,21 @@
 /*
- *  Copyright contributors to the IBM Security Verify DC SDK for Android project
+ * Copyright contributors to the IBM Security Verify SDK for Android project
  */
+
 @file:OptIn(ExperimentalSerializationApi::class)
 
 package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
 
-@Serializable
-enum class InvitationType(val value: String) {
+enum class AppType(val value: kotlin.String) {
 
-    @SerialName("connection")
-    CONNECTION("connection"),
+    @SerialName("0")
+    _0("0"),
 
-    @SerialName("oob")
-    OOB("oob");
+    @SerialName("1")
+    _1("1");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -31,17 +30,16 @@ enum class InvitationType(val value: String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: kotlin.Any?): String? = if (data is InvitationType) "$data" else null
+        fun encode(data: Any?): String? = if (data is OSType) "$data" else null
 
         /**
-         * Returns a valid [InvitationType] for [data], null otherwise.
+         * Returns a valid [AppType] for [data], null otherwise.
          */
-        fun decode(data: kotlin.Any?): InvitationType? = data?.let {
-          val normalizedData = "$it".lowercase()
-          entries.firstOrNull { value ->
-            it == value || normalizedData == "$value".lowercase()
-          }
+        fun decode(data: Any?): AppType? = data?.let {
+            val normalizedData = "$it".lowercase()
+            AppType.entries.firstOrNull { value ->
+                it == value || normalizedData == "$value".lowercase()
+            }
         }
     }
 }
-

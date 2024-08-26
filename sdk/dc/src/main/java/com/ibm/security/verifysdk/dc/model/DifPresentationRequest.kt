@@ -4,18 +4,19 @@
 package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.json.JsonElement
 
 @ExperimentalSerializationApi
 @Serializable
 data class DifPresentationRequest (
 
-    @JsonNames("presentation_definition")
+    @SerialName("presentation_definition")
 //    val presentationDefinition: PresentationDefinitionV1,
-    val presentationDefinition: String,
+    val presentationDefinition: JsonElement,
 
-    @JsonNames("options")
+    @SerialName("options")
 //    val options: DifPresentationOptions? = null
-    val options: String
+    val options: JsonElement
 )

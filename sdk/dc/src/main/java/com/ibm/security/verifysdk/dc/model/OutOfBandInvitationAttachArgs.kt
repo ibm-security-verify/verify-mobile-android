@@ -5,30 +5,30 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.SerialName
 
 @ExperimentalSerializationApi
 @Serializable
 data class OutOfBandInvitationAttachArgs (
 
-    @JsonNames("recipient")
+    @SerialName("recipient")
     val recipient: InvitationRole,
 
-    @JsonNames("use_connection")
+    @SerialName("use_connection")
     val useConnection: Boolean,
 
-    @JsonNames("verification_request")
+    @SerialName("verification_request")
     val verificationRequest: CreateVerificationRequestArgs? = null,
 
-    @JsonNames("verification_proposal")
+    @SerialName("verification_proposal")
     val verificationProposal: CreateVerificationProposalArgs? = null,
 
-    @JsonNames("cred_offer")
+    @SerialName("cred_offer")
     val credOffer: OutOfBandCredentialOfferArgs? = null,
 
-    @JsonNames("cred_proposal")
+    @SerialName("cred_proposal")
     val credProposal: OutOfBandCredentialProposalArgs? = null,
 
-    @JsonNames("interaction")
+    @SerialName("interaction")
     val interaction: CreateInteractionRequest? = null
 )
