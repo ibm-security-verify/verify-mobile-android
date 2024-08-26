@@ -5,8 +5,8 @@
 package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
