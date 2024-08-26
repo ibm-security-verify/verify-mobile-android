@@ -13,7 +13,6 @@ import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
 import java.net.URL
 
 @Serializable
@@ -21,7 +20,7 @@ internal data class CloudRegistration @OptIn(ExperimentalSerializationApi::class
     val accessToken: String,
     val expiresIn: Int,
     val id: String,
-    @JsonNames("metadata")
+    @SerialName("metadata")
     val metadataContainer: MetadataContainer,
     val refreshToken: String,
     val version: Version

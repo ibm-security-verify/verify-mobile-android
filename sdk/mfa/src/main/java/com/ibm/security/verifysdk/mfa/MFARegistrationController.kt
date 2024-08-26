@@ -20,7 +20,12 @@ class MFARegistrationController(private var data: String) {
 
     init {
 
-        val json = Json { ignoreUnknownKeys = true }
+        val json =  Json {
+            encodeDefaults = true
+            explicitNulls = false
+            ignoreUnknownKeys = true
+        }
+
         val jsonObject: JsonObject = json.parseToJsonElement(data).jsonObject
 
         jsonObject.let {
