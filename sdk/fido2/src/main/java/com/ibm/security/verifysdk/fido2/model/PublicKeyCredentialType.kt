@@ -7,7 +7,6 @@ import com.ibm.security.verifysdk.fido2.model.PublicKeyCredentialType.PUBLIC_KEY
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
 
 /**
  * An enumeration representing the type of a public key credential according to the WebAuthn specification.
@@ -24,7 +23,6 @@ enum class PublicKeyCredentialType(val value: String) {
      * Represents a public key credential type.
      */
     @OptIn(ExperimentalSerializationApi::class)
-    @JsonNames("public-key")
     @SerialName("public-key")
     PUBLIC_KEY("public-key")
 }
