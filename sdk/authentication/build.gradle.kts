@@ -30,6 +30,7 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.material)
 
+    androidTestImplementation(project(":test_utils"))
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.kotlinx.coroutines.test)

@@ -22,7 +22,11 @@ import org.junit.runner.RunWith
 @SmallTest
 internal class TokenInfoTestOnPrem {
 
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json {
+        encodeDefaults = true
+        explicitNulls = false
+        ignoreUnknownKeys = true
+    }
 
     @Test
     fun constructor_happyPath_shouldReturnObject() {
