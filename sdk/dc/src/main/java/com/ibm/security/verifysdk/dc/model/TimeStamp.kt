@@ -4,20 +4,18 @@
 
 package com.ibm.security.verifysdk.dc.model
 
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class TimeStamp(
 
     @SerialName("created")
-    val created: Int,
+    val created: Long,
     @SerialName("stated")
-    val states: TimeStampStates?,
+    val stated: Long? = null,
     @SerialName("updated")
-    val updated: Int?,
+    val updated: Long? = null,
     @SerialName("deleted")
-    val deleted: Int?
+    val deleted: Long? = null
 )

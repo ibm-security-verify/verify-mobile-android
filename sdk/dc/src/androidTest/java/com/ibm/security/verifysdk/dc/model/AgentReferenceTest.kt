@@ -17,7 +17,7 @@ class AgentReferenceTest {
     private val json = Json {
         encodeDefaults = true
         explicitNulls = false
-        ignoreUnknownKeys = true
+        ignoreUnknownKeys = false
         isLenient = true
     }
 

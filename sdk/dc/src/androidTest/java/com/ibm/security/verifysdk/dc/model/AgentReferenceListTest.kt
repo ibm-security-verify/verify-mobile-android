@@ -17,7 +17,7 @@ class AgentReferenceListTest {
     private val json = Json {
         encodeDefaults = true
         explicitNulls = false
-        ignoreUnknownKeys = true
+        ignoreUnknownKeys = false
         isLenient = true
     }
 
@@ -173,8 +173,7 @@ class AgentReferenceListTest {
                       {
                          "id":"id",
                          "name":"name",
-                         "pass":"pass",
-                         "extraField": "unexpected"
+                         "pass":"pass"
                       },
                       {
                          "id":"id",

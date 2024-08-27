@@ -22,12 +22,12 @@ class ConnectionInfoTest {
     private val json = Json {
         encodeDefaults = true
         explicitNulls = false
-        ignoreUnknownKeys = true
+        ignoreUnknownKeys = false
         isLenient = true
     }
 
     @Before
-    fun setup() {
+    fun setUp() {
 
         val jsonStringEndpointLocal = """
             {
