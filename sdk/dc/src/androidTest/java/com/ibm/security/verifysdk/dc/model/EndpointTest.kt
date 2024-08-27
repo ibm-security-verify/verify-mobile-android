@@ -79,7 +79,7 @@ class EndpointTest {
     }
 
     @Test
-    fun deserialize_with_missing_optional_fields() {
+    fun deserialize_with_required_fields() {
         val jsonString = """
             {
                 "name": "exampleEndpoint",

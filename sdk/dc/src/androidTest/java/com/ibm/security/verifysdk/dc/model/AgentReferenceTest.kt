@@ -40,6 +40,24 @@ class AgentReferenceTest {
         assertEquals(expectedJson, jsonString)
     }
 
+
+    @Test
+    fun serialize_to_JSON_with_required_fields() {
+        val agentReference = AgentReference(
+            id = "id",
+            name = "name"
+        )
+
+        val jsonString = json.encodeToString(agentReference)
+        val expectedJson = """
+            {
+                "id": "id",
+                "name": "name"
+            }
+        """.trimIndent().replace("\n", "").replace(" ", "")
+        assertEquals(expectedJson, jsonString)
+    }
+
     @Test
     fun deserialize_from_JSON() {
         val jsonString = """
@@ -58,7 +76,7 @@ class AgentReferenceTest {
 
 
     @Test
-    fun deserialize_with_missing_optional_fields() {
+    fun deserialize_with_required_fields() {
         val jsonString = """
             {
                 "id": "id",

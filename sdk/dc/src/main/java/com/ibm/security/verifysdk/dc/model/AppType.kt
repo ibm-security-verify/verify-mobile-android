@@ -27,7 +27,7 @@ enum class AppType(val value: kotlin.String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: Any?): String? = if (data is OSType) "$data" else null
+        fun encode(data: Any?): String? = if (data is AppType) "$data" else null
 
         /**
          * Returns a valid [AppType] for [data], null otherwise.

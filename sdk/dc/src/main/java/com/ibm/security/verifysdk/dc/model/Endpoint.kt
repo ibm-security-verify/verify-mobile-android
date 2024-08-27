@@ -4,12 +4,10 @@
 
 package com.ibm.security.verifysdk.dc.model
 
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
-@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class Endpoint(
 
