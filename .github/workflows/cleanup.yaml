@@ -14,22 +14,19 @@ jobs:
 
       - name: Install jq
         run: sudo apt-get install jq
-
-      - name: Authenticate GitHub CLI
-        run: gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
-
-      - name: List and delete old workflow runs
+        
+      - name: List and delete old (>28 days) workflow runs
         run: |
           gh run list --limit 200 --json databaseId,createdAt |
           jq -r '[.[] | select((now - (.createdAt | fromdateiso8601)) > (28 * 24 * 60 * 60))] | .[].databaseId' |
           xargs -I ID gh run delete ID --confirm
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: List and delete failed workflow runs
+      - name: List and delete all failed workflow runs
         run: |
           gh run list --limit 200 --json databaseId,status,conclusion |
           jq -r '[.[] | select(.status == "completed" and .conclusion == "failure")] | .[].databaseId' |
           xargs -I ID gh run delete ID --confirm
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
