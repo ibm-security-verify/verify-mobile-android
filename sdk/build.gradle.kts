@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
+    alias(libs.plugins.jetbrains.kotlin.jvm) apply false
     alias(libs.plugins.jetbrains.dokka)
     java
     jacoco
@@ -59,6 +60,7 @@ tasks.register<JacocoReport>("jacocoReport") {
     val fileFilter = listOf(
         "**/R.class",
         "**/R$*.class",
+        "**/*\$DefaultConstructorMarker.class",
         "**/BuildConfig.*",
         "**/Manifest*.*",
         "**/databinding/*Binding*.*",
@@ -121,7 +123,7 @@ tasks.register<Copy>("mergeJacocoReportFiles") {
     description = "Merge all package directories for Jacoco report"
 
     subprojects.filter { project ->
-        !project.name.contains("_demo")
+        (project.name.contains("_demo").or(project.name == "test_utils").not())
     }.forEach { sp ->
         from("${sp.projectDir}/build/reports/coverage/androidTest/debug/connected") {
             include("com*/**")
@@ -129,7 +131,6 @@ tasks.register<Copy>("mergeJacocoReportFiles") {
     }
 
     into("$rootDir/build/reports/jacoco/html")
-    // Overwrite existing files
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 

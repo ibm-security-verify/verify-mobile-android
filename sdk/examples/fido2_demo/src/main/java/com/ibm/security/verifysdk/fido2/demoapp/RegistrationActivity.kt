@@ -112,8 +112,9 @@ class RegistrationActivity : AppCompatActivity() {
         accessToken: String
     ): Result<IvCreds> {
 
-        val json = Json {
-            isLenient = true
+        val json =  Json {
+            encodeDefaults = true
+            explicitNulls = false
             ignoreUnknownKeys = true
         }
 

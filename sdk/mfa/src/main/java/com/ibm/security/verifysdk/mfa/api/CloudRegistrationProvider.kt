@@ -62,9 +62,10 @@ class CloudRegistrationProvider(data: String) :
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    private val decoder = Json {
+    private val decoder =  Json {
+        encodeDefaults = true
+        explicitNulls = false
         ignoreUnknownKeys = true
-        isLenient = true
     }
 
     private var initializationInfo: InitializationInfo

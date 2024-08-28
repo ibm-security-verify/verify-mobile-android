@@ -8,10 +8,9 @@ import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.PromptInfo.Builder
 import androidx.fragment.app.FragmentActivity
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
-import com.ibm.security.verifysdk.core.AuthorizationException
-import com.ibm.security.verifysdk.core.ErrorResponse
 import com.ibm.security.verifysdk.core.extension.base64UrlEncode
 import com.ibm.security.verifysdk.core.extension.sha256
+import com.ibm.security.verifysdk.core.helper.BaseApi
 import com.ibm.security.verifysdk.core.helper.KeystoreHelper
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.fido2.BiometricAuthenticationException
@@ -29,22 +28,12 @@ import com.ibm.security.verifysdk.fido2.model.PublicKeyCredentialRequestOptions
 import com.ibm.security.verifysdk.fido2.model.ResponseAssertion
 import com.ibm.security.verifysdk.fido2.model.ResponseAttestation
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.accept
-import io.ktor.client.request.bearerAuth
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.request.url
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import io.ktor.http.isSuccess
+import io.ktor.http.HttpMethod
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.Clock
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.security.PublicKey
@@ -65,27 +54,8 @@ import kotlin.math.min
     ExperimentalUnsignedTypes::class,
     ExperimentalCoroutinesApi::class,
     ExperimentalStdlibApi::class,
-    ExperimentalSerializationApi::class
 )
-class Fido2Api {
-
-    /**
-     * JSON configuration for parsing and serializing JSON data.
-     *
-     * This configuration object allows for customization of JSON parsing
-     * and serialization behavior. It includes options to set leniency and
-     * ignore unknown keys during JSON parsing.
-     *
-     * @property isLenient A flag indicating whether lenient parsing is enabled.
-     *                     Lenient parsing allows parsing of malformed JSON by ignoring
-     *                     unexpected tokens.
-     * @property ignoreUnknownKeys A flag indicating whether unknown keys encountered
-     *                              during parsing should be ignored.
-     */
-    private val json = Json {
-        isLenient = true
-        ignoreUnknownKeys = true
-    }
+class Fido2Api : BaseApi() {
 
     /**
      * Creates a new key pair in the Android KeyStore.
@@ -137,30 +107,14 @@ class Fido2Api {
         attestationOptions: AttestationOptions,
         httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<PublicKeyCredentialCreationOptions> {
-        return try {
-            val response = httpClient.post {
-                url(attestationOptionsUrl)
-                bearerAuth(authorization)
-                contentType(ContentType.Application.Json)
-                accept(ContentType.Application.Json)
-                setBody(attestationOptions)
-            }
 
-            if (response.status.isSuccess()) {
-                Result.success(json.decodeFromString<PublicKeyCredentialCreationOptions>(response.bodyAsText()))
-            } else {
-                val errorResponse = response.body<ErrorResponse>()
-                Result.failure(
-                    AuthorizationException(
-                        response.status,
-                        errorResponse.error,
-                        errorResponse.errorDescription
-                    )
-                )
-            }
-        } catch (e: Throwable) {
-            Result.failure(e)
-        }
+        return performRequest(
+            httpClient = httpClient,
+            url = URL(attestationOptionsUrl),
+            accessToken = authorization,
+            body = attestationOptions,
+            method = HttpMethod.Post
+        )
     }
 
     /**
@@ -184,30 +138,14 @@ class Fido2Api {
         authenticatorAttestationResponse: AuthenticatorAttestationResponse,
         httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<AttestationResultResponse> {
-        return try {
-            val response = httpClient.post {
-                url(attestationResultUrl)
-                bearerAuth(authorization)
-                contentType(ContentType.Application.Json)
-                accept(ContentType.Application.Json)
-                setBody(authenticatorAttestationResponse)
-            }
 
-            if (response.status.isSuccess()) {
-                Result.success(json.decodeFromString<AttestationResultResponse>(response.bodyAsText()))
-            } else {
-                val errorResponse = response.body<ErrorResponse>()
-                Result.failure(
-                    AuthorizationException(
-                        response.status,
-                        errorResponse.error,
-                        errorResponse.errorDescription
-                    )
-                )
-            }
-        } catch (e: Throwable) {
-            Result.failure(e)
-        }
+        return performRequest(
+            httpClient = httpClient,
+            url = URL(attestationResultUrl),
+            accessToken = authorization,
+            body = authenticatorAttestationResponse,
+            method = HttpMethod.Post
+        )
     }
 
     /**
@@ -231,30 +169,14 @@ class Fido2Api {
         authenticatorAssertionResponse: AuthenticatorAssertionResponse,
         httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<AssertionResultResponse> {
-        return try {
-            val response = httpClient.post {
-                url(assertionResultUrl)
-                bearerAuth(authorization)
-                contentType(ContentType.Application.Json)
-                accept(ContentType.Application.Json)
-                setBody(authenticatorAssertionResponse)
-            }
 
-            if (response.status.isSuccess()) {
-                Result.success(json.decodeFromString<AssertionResultResponse>(response.bodyAsText()))
-            } else {
-                val errorResponse = response.body<ErrorResponse>()
-                Result.failure(
-                    AuthorizationException(
-                        response.status,
-                        errorResponse.error,
-                        errorResponse.errorDescription
-                    )
-                )
-            }
-        } catch (e: Throwable) {
-            Result.failure(e)
-        }
+        return performRequest(
+            httpClient = httpClient,
+            url = URL(assertionResultUrl),
+            accessToken = authorization,
+            body = authenticatorAssertionResponse,
+            method = HttpMethod.Post
+        )
     }
 
     /**
@@ -279,30 +201,13 @@ class Fido2Api {
         httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<PublicKeyCredentialRequestOptions> {
 
-        return try {
-            val response = httpClient.post {
-                url(assertionOptionsUrl)
-                bearerAuth(authorization)
-                contentType(ContentType.Application.Json)
-                accept(ContentType.Application.Json)
-                setBody(assertionOptions)
-            }
-
-            if (response.status.isSuccess()) {
-                Result.success(json.decodeFromString<PublicKeyCredentialRequestOptions>(response.bodyAsText()))
-            } else {
-                val errorResponse = response.body<ErrorResponse>()
-                Result.failure(
-                    AuthorizationException(
-                        response.status,
-                        errorResponse.error,
-                        errorResponse.errorDescription
-                    )
-                )
-            }
-        } catch (e: Throwable) {
-            Result.failure(e)
-        }
+        return performRequest(
+            httpClient = httpClient,
+            url = URL(assertionOptionsUrl),
+            accessToken = authorization,
+            body = assertionOptions,
+            method = HttpMethod.Post
+        )
     }
 
     /**
@@ -383,7 +288,7 @@ class Fido2Api {
         )
 
         val id = keyName.sha256().hexToByteArray()
-        val clientDataString = json.encodeToString(clientDataJson)
+        val clientDataString = decoder.encodeToString(clientDataJson)
 
         // Build authenticatorData
         val authenticatorDataParams = mutableListOf<Byte>()
@@ -598,7 +503,7 @@ class Fido2Api {
         )
 
         val id = keyName.sha256().hexToByteArray()
-        val clientDataString = json.encodeToString(clientDataJson)
+        val clientDataString = decoder.encodeToString(clientDataJson)
 
         val authenticatorDataParams = mutableListOf<Byte>()
         authenticatorDataParams.addAll(options.rpId.sha256().hexToByteArray().toList())

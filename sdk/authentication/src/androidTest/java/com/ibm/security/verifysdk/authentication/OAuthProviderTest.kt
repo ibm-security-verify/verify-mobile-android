@@ -4,8 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ibm.security.verifysdk.authentication.api.OAuthProvider
 import com.ibm.security.verifysdk.core.AuthorizationException
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
-import io.ktor.client.engine.mock.respond
-import io.ktor.client.engine.mock.respondError
+import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import io.ktor.client.engine.mock.toByteArray
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
@@ -50,7 +49,7 @@ internal class OAuthProviderTest {
         @BeforeClass
         @JvmStatic
         fun setup() {
-            NetworkHelper.initialize(apiMockEngine.get())
+            NetworkHelper.initialize(httpClientEngine = apiMockEngine.get())
         }
     }
 
@@ -58,36 +57,13 @@ internal class OAuthProviderTest {
     fun initialize() {
         oAuthProvider = OAuthProvider(clientId, clientSecret)
         apiMockEngine.get().config.requestHandlers.clear()
-        NetworkHelper.initialize(apiMockEngine.get())
+        NetworkHelper.initialize(httpClientEngine = apiMockEngine.get())
     }
-
-    @Suppress("unused")
-    private fun addMockResponse(
-        method: HttpMethod,
-        urlPath: String,
-        httpCode: HttpStatusCode,
-        headers: Headers = defaultHeaders,
-        responseBody: String
-    ) {
-        apiMockEngine.get().let {
-            it.config.addHandler { request ->
-                if (request.method != method) {
-                    respondError(HttpStatusCode.NotFound)
-                }
-
-                if (request.url.encodedPath == urlPath) {
-                    respond(responseBody, httpCode, headers)
-                } else {
-                    error("Unhandled ${request.url.encodedPath}")
-                }
-            }
-        }
-    }
-
+    
     @Test
     fun refresh_clientSecretIsNull_shouldReturnSuccess() = runTest {
         val oAuthProviderSecretNull = OAuthProvider(clientId, null)
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/v1.0/authenticators/registration",
             HttpStatusCode.OK,
@@ -111,7 +87,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun refresh_withScope_shouldReturnSuccess() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/v1.0/authenticators/registration",
             HttpStatusCode.OK,
@@ -136,7 +112,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun refresh_happyPath_shouldReturnSuccess() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/v1.0/authenticators/registration",
             HttpStatusCode.OK,
@@ -161,7 +137,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun refresh_emptyBody_shouldReturnFailure() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/v1.0/authenticators/registration",
             HttpStatusCode.BadRequest,
@@ -190,7 +166,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun authorize_codeHappyPath_shouldReturnSuccess() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/oauth2/token",
             HttpStatusCode.OK,
@@ -215,7 +191,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun authorize_codeVerifierIsNull_shouldReturnSuccess() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/oauth2/token",
             HttpStatusCode.OK,
@@ -242,7 +218,7 @@ internal class OAuthProviderTest {
     fun authorize_codeClientSecretIsNull_shouldReturnSuccess() = runTest {
         val oAuthProviderSecretNull =
             OAuthProvider(clientId, null)
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/oauth2/token",
             HttpStatusCode.OK,
@@ -272,7 +248,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun authorize_codeServerError_shouldReturnFailure() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/oauth2/token",
             HttpStatusCode.InternalServerError,
@@ -295,7 +271,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun authorize_codeEmptyBody_shouldReturnFailure() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/oauth2/token",
             HttpStatusCode.OK,
@@ -329,7 +305,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun authorize_credsHappyPath_shouldReturnSuccess() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/oauth2/token",
             HttpStatusCode.OK,
@@ -360,7 +336,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun authorize_credsWithScope_shouldReturnSuccess() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/oauth2/token",
             HttpStatusCode.OK,
@@ -394,7 +370,7 @@ internal class OAuthProviderTest {
         val oAuthProviderSecretNull =
             OAuthProvider(clientId, null)
 
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/oauth2/token",
             HttpStatusCode.OK,
@@ -426,7 +402,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun authorize_credsEmptyBody_shouldReturnFailure() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/oauth2/token",
             HttpStatusCode.OK,
@@ -450,7 +426,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun authorize_credsServerError_shouldReturnFailure() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/oauth2/token",
             HttpStatusCode.InternalServerError,
@@ -473,7 +449,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun authorize_credsResponseUnknownJson_shouldReturnSuccess() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Post,
             "/oauth2/token",
             HttpStatusCode.OK,
@@ -496,7 +472,7 @@ internal class OAuthProviderTest {
     @Test
     fun discover_serverError_shouldReturnFailure() = runTest {
 
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Get,
             "Server error",
             HttpStatusCode.InternalServerError,
@@ -514,7 +490,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun discover_happyPath_shouldReturnSuccess() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Get,
             "/.well-known/openid-configuration",
             HttpStatusCode.OK,
@@ -542,7 +518,7 @@ internal class OAuthProviderTest {
 
     @Test
     fun discover_fieldsMissingInResponse_shouldReturnFailure() = runTest {
-        addMockResponse(
+        apiMockEngine.addMockResponse(
             HttpMethod.Get,
             "/.well-known/openid-configuration",
             HttpStatusCode.OK,

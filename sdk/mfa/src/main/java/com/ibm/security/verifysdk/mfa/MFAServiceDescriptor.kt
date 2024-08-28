@@ -49,9 +49,10 @@ suspend fun MFAServiceDescriptor.login(loginUri: URL, code: String, httpClient: 
         put("lsi", code)
     }
 
-    val decoder = Json {
+    val decoder =  Json {
+        encodeDefaults = true
+        explicitNulls = false
         ignoreUnknownKeys = true
-        isLenient = true
     }
 
     return try {

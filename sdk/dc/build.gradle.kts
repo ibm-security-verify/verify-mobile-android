@@ -5,6 +5,7 @@ plugins {
 }
 
 apply(from = "$rootDir/common-config.gradle")
+apply(from = "$rootDir/common-config-ktor.gradle")
 apply(from = "$rootDir/common-publish.gradle")
 
 dependencies {
@@ -15,5 +16,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.material)
 
+    androidTestImplementation(project(":test_utils"))
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
 }

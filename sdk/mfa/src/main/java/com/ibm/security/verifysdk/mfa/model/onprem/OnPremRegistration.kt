@@ -12,7 +12,6 @@ import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
 import java.net.URL
 
 @Serializable
@@ -36,28 +35,28 @@ internal data class Metadata(
 
 @Serializable
 internal data class DetailsData @OptIn(ExperimentalSerializationApi::class) constructor(
-    @JsonNames("authntrxn_endpoint")
+    @SerialName("authntrxn_endpoint")
     @Serializable(with = URLSerializer::class)
     val authntrxnEndpoint: URL,
-    @JsonNames("metadata")
+    @SerialName("metadata")
     val metadataService: MetadataService,
-    @JsonNames("discovery_mechanisms")
+    @SerialName("discovery_mechanisms")
     val discoveryMechanisms: ArrayList<DiscoveredMechanisms> = arrayListOf(),
-    @JsonNames("enrollment_endpoint")
+    @SerialName("enrollment_endpoint")
     @Serializable(with = URLSerializer::class)
     val enrollmentEndpoint: URL,
-    @JsonNames("qrlogin_endpoint")
+    @SerialName("qrlogin_endpoint")
     @Serializable(with = URLSerializer::class)
     var qrloginEndpoint: URL,
-    @JsonNames("hotp_shared_secret_endpoint")
+    @SerialName("hotp_shared_secret_endpoint")
     @Serializable(with = URLSerializer::class)
     val hotpSharedSecretEndpoint: URL,
-    @JsonNames("totp_shared_secret_endpoint")
+    @SerialName("totp_shared_secret_endpoint")
     @Serializable(with = URLSerializer::class)
     val totpSharedSecretEndpoint: URL,
-    @JsonNames("version")
+    @SerialName("version")
     val version: String,
-    @JsonNames("token_endpoint")
+    @SerialName("token_endpoint")
     @Serializable(with = URLSerializer::class)
     val tokenEndpoint: URL,
     val theme: Map<String, String>? = null
@@ -110,6 +109,6 @@ internal enum class DiscoveredMechanisms(val value: String) {
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
 internal data class MetadataService (
-    @JsonNames("service_name" )
+    @SerialName("service_name" )
     val serviceName: String?
 )

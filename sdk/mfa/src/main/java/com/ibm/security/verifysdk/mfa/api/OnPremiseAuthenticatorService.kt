@@ -55,9 +55,10 @@ class OnPremiseAuthenticatorService(
 ) : MFAServiceDescriptor {
 
     private val log = LoggerFactory.getLogger(javaClass)
-    private val decoder = Json {
+    private val decoder =  Json {
+        encodeDefaults = true
+        explicitNulls = false
         ignoreUnknownKeys = true
-        isLenient = true
     }
 
     private lateinit var _currentPendingTransaction: PendingTransactionInfo
