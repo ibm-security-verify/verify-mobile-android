@@ -7,10 +7,9 @@ on:
     types: [closed]
   push:
     branches:
-    - main
     - develop
-    - dev
-    - '**'
+    - 'dev-**'
+    - 'VDEV-**'
 
 jobs:    
   setup_environment:
