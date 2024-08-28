@@ -8,7 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,7 @@ import com.ibm.security.verifysdk.authentication.api.OAuthProvider
 import com.ibm.security.verifysdk.core.helper.ContextHelper
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.dc.QrCode
+import com.ibm.security.verifysdk.dc.api.CredentialsApi
 import com.ibm.security.verifysdk.dc.api.InvitationsApi
 import com.ibm.security.verifysdk.dc.demoapp.ui.theme.IBMSecurityVerifySDKTheme
 import kotlinx.coroutines.Dispatchers
@@ -38,26 +40,29 @@ import kotlinx.serialization.json.Json
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URL
+import javax.net.ssl.HostnameVerifier
+import javax.net.ssl.SSLContext
 
 class MainActivity : ComponentActivity() {
 
     private val log: Logger = LoggerFactory.getLogger(javaClass.name)
     private val requestCameraPermissionCode = 88
 
-    private val json = Json {
-        isLenient = true
+    private val json =  Json {
+        encodeDefaults = true
+        explicitNulls = false
         ignoreUnknownKeys = true
     }
 
-    private val host =
-        "isvavc-default.isvavc-d7ed96fc9dc6db24d2d0bc7a632ccf66-0000.au-syd.containers.appdomain.cloud"
+    private val host = ""
     private val hostUrl = URL("https://$host")
+    private val accessToken = ""
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ContextHelper.init(applicationContext)
-        NetworkHelper.initialize()
+
         enableEdgeToEdge()
         setContent {
             IBMSecurityVerifySDKTheme {
@@ -67,21 +72,18 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-//        val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
-//            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
-//            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
-//            override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
-//        })
-//
-        // Install the all-trusting trust manager
-//        val sslContext = SSLContext.getInstance("SSL").apply {
-//            init(null, arrayOf(NetworkHelper.insecureTrustManager()), java.security.SecureRandom())
-//        }
-//
-//        NetworkHelper.trustManager = NetworkHelper.insecureTrustManager()
-//        NetworkHelper.sslContext = sslContext
-//        NetworkHelper.hostnameVerifier = HostnameVerifier { _, _ -> true }
-//        NetworkHelper.initialize()
+        val trustManager = NetworkHelper.insecureTrustManager()
+        NetworkHelper.trustManager = trustManager
+        NetworkHelper.sslContext = SSLContext.getInstance("TLS").apply {
+            init(
+                null,
+                arrayOf(trustManager),
+                java.security.SecureRandom()
+            )
+        }
+        NetworkHelper.hostnameVerifier = HostnameVerifier { _, _ -> true }
+
+        NetworkHelper.initialize()
 
     }
 
@@ -151,77 +153,111 @@ class MainActivity : ComponentActivity() {
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        val intentResult: IntentResult? =
-            IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (intentResult != null && intentResult.contents != null) {
+    private fun getCredentials() {
 
-            log.info("qrCode: " + intentResult.contents)
-            val qrCode = json.decodeFromString<QrCode>(intentResult.contents)
-            log.info(qrCode.toString())
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+//                CredentialsApi(hostUrl).getAll(accessToken = accessToken)
+//                    .onSuccess {
+//                        log.info(it.toString())
+//                    }
+//                    .onFailure {
+//                        log.error(it.message)
+//                    }
 
-            lifecycleScope.launch {
-                withContext(Dispatchers.IO) {
-                    OAuthProvider(qrCode.data?.clientId ?: "", null).let { oAuthProvider ->
+                CredentialsApi(hostUrl).getOne(accessToken = accessToken, id = "b3f798b4-2b15-45a8-8118-e5d59a838996")
+                    .onSuccess {
+                        log.info(it.toString())
+                    }
+                    .onFailure {
+                        log.info(it.toString())
+                    }
+            }
+        }
+    }
 
-                        oAuthProvider.authorize(
-                            url = qrCode.data?.tokenEndpoint ?: URL("https://localhost"),
-                            username = qrCode.data?.name ?: "",
-                            password = "secret",
-                            scope = null,
-                            NetworkHelper.getInstance
-                        ).onSuccess {
-                            log.info(it.toString())
+        @OptIn(ExperimentalSerializationApi::class)
+        @Deprecated("Deprecated in Java")
+        override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+            super.onActivityResult(requestCode, resultCode, data)
+            val intentResult: IntentResult? =
+                IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+            if (intentResult != null && intentResult.contents != null) {
 
-                            InvitationsApi(hostUrl).getAll(
-                                NetworkHelper.getInstance,
-                                accessToken = it.accessToken
-                            )
-                                .onSuccess { invitationList ->
-                                    log.info(invitationList.toString())
-                                }
-                                .onFailure { throwable ->
-                                    log.error(throwable.message)
-                                }
-                        }.onFailure {
-                            log.error(it.message)
+                log.info("qrCode: " + intentResult.contents)
+                val qrCode = json.decodeFromString<QrCode>(intentResult.contents)
+                log.info(qrCode.toString())
+
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        OAuthProvider(qrCode.data?.clientId ?: "", null).let { oAuthProvider ->
+
+                            oAuthProvider.authorize(
+                                url = qrCode.data?.tokenEndpoint ?: URL("https://localhost"),
+                                username = qrCode.data?.name ?: "",
+                                password = "secret",
+                                scope = null,
+                                NetworkHelper.getInstance
+                            ).onSuccess {
+                                log.info(it.toString())
+
+                                InvitationsApi(hostUrl).getAll(
+                                    NetworkHelper.getInstance,
+                                    accessToken = it.accessToken
+                                )
+                                    .onSuccess { invitationList ->
+                                        log.info(invitationList.toString())
+                                    }
+                                    .onFailure { throwable ->
+                                        log.error(throwable.message)
+                                    }
+                            }.onFailure {
+                                log.error(it.message)
+                            }
                         }
                     }
                 }
+
             }
-
         }
-    }
 
-    @Composable
-    fun Greeting() {
-        ButtonComposableQrScan()
-    }
+        @Composable
+        fun Greeting() {
+            ButtonComposableQrScan()
+        }
 
-    @Composable
-    fun ButtonComposableQrScan() {
-        Box(
-            modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-        ) {
-            Button(
-                onClick = { startQRCodeScanning() },
-                modifier = Modifier
-                    .padding(32.dp)
-                    .align(Alignment.Center)
-                    .fillMaxWidth()
+        @Composable
+        fun ButtonComposableQrScan() {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Scan QR code")
+                Button(
+                    onClick = { startQRCodeScanning() },
+                    modifier = Modifier
+                        .padding(32.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text("Scan QR code")
+                }
+
+                Button(
+                    onClick = { getCredentials() },
+                    modifier = Modifier
+                        .padding(32.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text("Get Credentials")
+                }
+            }
+        }
+
+        @Preview(showBackground = true)
+        @Composable
+        fun GreetingPreview() {
+            IBMSecurityVerifySDKTheme {
+                Greeting()
             }
         }
     }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun GreetingPreview() {
-        IBMSecurityVerifySDKTheme {
-            Greeting()
-        }
-    }
-}
