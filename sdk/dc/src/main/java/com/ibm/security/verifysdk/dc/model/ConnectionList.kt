@@ -1,3 +1,7 @@
+/*
+ * Copyright contributors to the IBM Security Verify SDK for Android project
+ */
+
 package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -6,11 +10,12 @@ import kotlinx.serialization.Serializable
 
 @ExperimentalSerializationApi
 @Serializable
-data class CredentialList(
+data class ConnectionList(
 
     @SerialName("count")
     val count: Int,
 
     @SerialName("items")
-    val items: List<CredentialInfo>
+    val items: List<ConnectionInfo>
 )
+

@@ -2,19 +2,16 @@ package com.ibm.security.verifysdk.authentication
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ibm.security.verifysdk.authentication.api.OAuthProvider
-import com.ibm.security.verifysdk.core.AuthorizationException
+import com.ibm.security.verifysdk.core.extension.HttpResponseException
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import io.ktor.client.engine.mock.toByteArray
-import io.ktor.http.ContentType
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.ContentConvertException
-import io.ktor.serialization.JsonConvertException
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -36,39 +33,34 @@ internal class OAuthProviderTest {
 
     companion object {
 
-        private const val clientId = "clientId"
-        private const val clientSecret = "clientSecret"
-        private var oAuthProvider = OAuthProvider(clientId, clientSecret)
+        private const val CLIENTID = "clientId"
+        private const val CLIENTSECRET = "clientSecret"
+        private var oAuthProvider = OAuthProvider(CLIENTID, CLIENTSECRET)
         private var apiMockEngine = ApiMockEngine()
-
-        private val defaultHeaders = Headers.build {
-            append(HttpHeaders.Accept, ContentType.Application.Json.toString())
-            append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-        }
 
         @BeforeClass
         @JvmStatic
-        fun setup() {
+        fun setUp() {
+            oAuthProvider = OAuthProvider(CLIENTID, CLIENTSECRET)
             NetworkHelper.initialize(httpClientEngine = apiMockEngine.get())
         }
     }
 
     @Before
     fun initialize() {
-        oAuthProvider = OAuthProvider(clientId, clientSecret)
         apiMockEngine.get().config.requestHandlers.clear()
-        NetworkHelper.initialize(httpClientEngine = apiMockEngine.get())
+        oAuthProvider.additionalHeaders.clear()
+        oAuthProvider.additionalParameters.clear()
     }
-    
+
     @Test
     fun refresh_clientSecretIsNull_shouldReturnSuccess() = runTest {
-        val oAuthProviderSecretNull = OAuthProvider(clientId, null)
+        val oAuthProviderSecretNull = OAuthProvider(CLIENTID, null)
         apiMockEngine.addMockResponse(
-            HttpMethod.Post,
-            "/v1.0/authenticators/registration",
-            HttpStatusCode.OK,
-            defaultHeaders,
-            responseRefreshOk
+            method = HttpMethod.Post,
+            urlPath = "/v1.0/authenticators/registration",
+            httpCode = HttpStatusCode.OK,
+            responseBody = responseRefreshOk
         )
 
         val result =
@@ -88,11 +80,10 @@ internal class OAuthProviderTest {
     @Test
     fun refresh_withScope_shouldReturnSuccess() = runTest {
         apiMockEngine.addMockResponse(
-            HttpMethod.Post,
-            "/v1.0/authenticators/registration",
-            HttpStatusCode.OK,
-            defaultHeaders,
-            responseRefreshOk
+            method = HttpMethod.Post,
+            urlPath = "/v1.0/authenticators/registration",
+            httpCode = HttpStatusCode.OK,
+            responseBody = responseRefreshOk
         )
 
         val result =
@@ -113,11 +104,10 @@ internal class OAuthProviderTest {
     @Test
     fun refresh_happyPath_shouldReturnSuccess() = runTest {
         apiMockEngine.addMockResponse(
-            HttpMethod.Post,
-            "/v1.0/authenticators/registration",
-            HttpStatusCode.OK,
-            defaultHeaders,
-            responseRefreshOk
+            method = HttpMethod.Post,
+            urlPath = "/v1.0/authenticators/registration",
+            httpCode = HttpStatusCode.OK,
+            responseBody = responseRefreshOk
         )
 
         val result =
@@ -138,11 +128,10 @@ internal class OAuthProviderTest {
     @Test
     fun refresh_emptyBody_shouldReturnFailure() = runTest {
         apiMockEngine.addMockResponse(
-            HttpMethod.Post,
-            "/v1.0/authenticators/registration",
-            HttpStatusCode.BadRequest,
-            defaultHeaders,
-            responseRefreshFailed
+            method = HttpMethod.Post,
+            urlPath = "/v1.0/authenticators/registration",
+            httpCode = HttpStatusCode.BadRequest,
+            responseBody = responseRefreshFailed
         )
 
         val result =
@@ -154,33 +143,28 @@ internal class OAuthProviderTest {
         assertTrue(result.isFailure)
 
         result.onFailure { throwable ->
-            assertTrue(throwable is AuthorizationException)
-            assertEquals(HttpStatusCode.BadRequest, (throwable as AuthorizationException).code)
-            assertEquals("CSIAK2802E", throwable.error)
-            assertEquals(
-                "The required JSON property [\$/attributes] is missing from the request.",
-                throwable.errorDescription
-            )
+            assertTrue(throwable is HttpResponseException)
+            assertEquals(HttpStatusCode.BadRequest, (throwable as HttpResponseException).response.status)
+            assertTrue(throwable.response.bodyAsText().contains("CSIAK2802E"))
         }
     }
 
     @Test
     fun authorize_codeHappyPath_shouldReturnSuccess() = runTest {
         apiMockEngine.addMockResponse(
-            HttpMethod.Post,
-            "/oauth2/token",
-            HttpStatusCode.OK,
-            defaultHeaders,
-            responseAuthorizeOk
+            method = HttpMethod.Post,
+            urlPath = "/oauth2/token",
+            httpCode = HttpStatusCode.OK,
+            responseBody = responseAuthorizeOk
         )
 
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost/oauth2/token"),
-                URL("https://callback"),
-                "authorizationCode",
-                "codeVerifier",
-                arrayOf("name", "age")
+                url = URL("http://localhost/oauth2/token"),
+                redirectUrl = URL("https://callback"),
+                authorizationCode = "authorizationCode",
+                codeVerifier = "codeVerifier",
+                scope = arrayOf("name", "age")
             )
 
         assertTrue(result.isSuccess)
@@ -192,20 +176,19 @@ internal class OAuthProviderTest {
     @Test
     fun authorize_codeVerifierIsNull_shouldReturnSuccess() = runTest {
         apiMockEngine.addMockResponse(
-            HttpMethod.Post,
-            "/oauth2/token",
-            HttpStatusCode.OK,
-            defaultHeaders,
-            responseAuthorizeOk
+            method = HttpMethod.Post,
+            urlPath = "/oauth2/token",
+            httpCode = HttpStatusCode.OK,
+            responseBody = responseAuthorizeOk
         )
 
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost/oauth2/token"),
-                URL("https://callback"),
-                "authorizationCode",
-                null,
-                arrayOf("name", "age")
+                url = URL("http://localhost/oauth2/token"),
+                redirectUrl = URL("https://callback"),
+                authorizationCode = "authorizationCode",
+                codeVerifier = null,
+                scope = arrayOf("name", "age")
             )
 
         assertTrue(result.isSuccess)
@@ -217,23 +200,23 @@ internal class OAuthProviderTest {
     @Test
     fun authorize_codeClientSecretIsNull_shouldReturnSuccess() = runTest {
         val oAuthProviderSecretNull =
-            OAuthProvider(clientId, null)
+            OAuthProvider(CLIENTID, null)
         apiMockEngine.addMockResponse(
-            HttpMethod.Post,
-            "/oauth2/token",
-            HttpStatusCode.OK,
+            method = HttpMethod.Post,
+            urlPath = "/oauth2/token",
+            httpCode = HttpStatusCode.OK,
             responseBody = responseAuthorizeOk
         )
         val result =
             oAuthProviderSecretNull.authorize(
-                URL("http://localhost:44444/oauth2/token"),
-                URL("https://callback"),
-                "authorizationCode",
-                "codeVerifier",
-                arrayOf("name", "age")
+                url = URL("http://localhost:4444/oauth2/token"),
+                redirectUrl = URL("https://callback"),
+                authorizationCode = "authorizationCode",
+                codeVerifier = "codeVerifier",
+                scope = arrayOf("name", "age")
             )
 
-        apiMockEngine.get().requestHistory.last().let {requestData ->
+        apiMockEngine.get().requestHistory.last().let { requestData ->
             val requestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
             assertTrue(requestBody.contains("code_verifier=codeVerifier"))
             assertTrue(requestBody.contains("grant_type=authorization_code"))
@@ -249,23 +232,23 @@ internal class OAuthProviderTest {
     @Test
     fun authorize_codeServerError_shouldReturnFailure() = runTest {
         apiMockEngine.addMockResponse(
-            HttpMethod.Post,
-            "/oauth2/token",
-            HttpStatusCode.InternalServerError,
+            method = HttpMethod.Post,
+            urlPath = "/oauth2/token",
+            httpCode = HttpStatusCode.InternalServerError,
             responseBody = ""
         )
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/oauth2/token"),
-                URL("https://callback"),
-                "authorizationCode",
-                "codeVerifier",
-                arrayOf("name", "age")
+                url = URL("http://localhost:4444/oauth2/token"),
+                redirectUrl = URL("https://callback"),
+                authorizationCode = "authorizationCode",
+                codeVerifier = "codeVerifier",
+                scope = arrayOf("name", "age")
             )
 
         assertTrue(result.isFailure)
         result.onFailure { it ->
-            assertTrue(it is ContentConvertException)
+            assertTrue(it is HttpResponseException)
         }
     }
 
@@ -279,14 +262,14 @@ internal class OAuthProviderTest {
         )
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/oauth2/token"),
-                URL("https://callback"),
-                "authorizationCode",
-                "codeVerifier",
-                arrayOf("name", "age")
+                url = URL("http://localhost:4444/oauth2/token"),
+                redirectUrl = URL("https://callback"),
+                authorizationCode = "authorizationCode",
+                codeVerifier = "codeVerifier",
+                scope = arrayOf("name", "age")
             )
 
-        apiMockEngine.get().requestHistory.last().let {requestData ->
+        apiMockEngine.get().requestHistory.last().let { requestData ->
             val requestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
             assertTrue(requestBody.contains("code_verifier=codeVerifier"))
             assertTrue(requestBody.contains("grant_type=authorization_code"))
@@ -313,13 +296,13 @@ internal class OAuthProviderTest {
         )
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/oauth2/token"),
-                "username",
-                "password",
-                arrayOf("name", "age")
+                url = URL("http://localhost:44444/oauth2/token"),
+                username = "username",
+                password = "password",
+                scope = arrayOf("name", "age")
             )
 
-        apiMockEngine.get().requestHistory.last().let {requestData ->
+        apiMockEngine.get().requestHistory.last().let { requestData ->
             val requestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
             assertTrue(requestBody.contains("client_id=clientId"))
             assertTrue(requestBody.contains("client_secret=clientSecret"))
@@ -344,10 +327,10 @@ internal class OAuthProviderTest {
         )
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/oauth2/token"),
-                "username",
-                "password",
-                arrayOf("name", "age")
+                url = URL("http://localhost:44444/oauth2/token"),
+                username = "username",
+                password = "password",
+                scope = arrayOf("name", "age")
             )
 
         apiMockEngine.get().requestHistory.last().let { requestData ->
@@ -368,7 +351,7 @@ internal class OAuthProviderTest {
     @Test
     fun authorize_credsClientSecretIsNull_shouldReturnSuccess() = runTest {
         val oAuthProviderSecretNull =
-            OAuthProvider(clientId, null)
+            OAuthProvider(CLIENTID, null)
 
         apiMockEngine.addMockResponse(
             HttpMethod.Post,
@@ -379,10 +362,10 @@ internal class OAuthProviderTest {
 
         val result =
             oAuthProviderSecretNull.authorize(
-                URL("http://localhost:44444/oauth2/token"),
-                "username",
-                "password",
-                arrayOf("name", "age")
+                url = URL("http://localhost:44444/oauth2/token"),
+                username = "username",
+                password = "password",
+                scope = arrayOf("name", "age")
             )
 
         apiMockEngine.get().requestHistory.last().let { requestData ->
@@ -410,9 +393,9 @@ internal class OAuthProviderTest {
         )
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/oauth2/token"),
-                "username",
-                "password"
+                url = URL("http://localhost:44444/oauth2/token"),
+                username = "username",
+                password = "password"
             )
 
         assertTrue(result.isFailure)
@@ -435,14 +418,15 @@ internal class OAuthProviderTest {
 
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/oauth2/token"),
-                "username",
-                "password"
+                url = URL("http://localhost:44444/oauth2/token"),
+                username = "username",
+                password = "password"
             )
 
         assertTrue(result.isFailure)
-        result.onFailure { it ->
-            assertTrue(it is ContentConvertException)
+        result.onFailure { throwable ->
+            assertTrue(throwable is HttpResponseException)
+            assertEquals(HttpStatusCode.InternalServerError, (throwable as HttpResponseException).response.status)
         }
     }
 
@@ -457,9 +441,9 @@ internal class OAuthProviderTest {
         )
         val result =
             oAuthProvider.authorize(
-                URL("http://localhost:44444/oauth2/token"),
-                "username",
-                "password"
+                url = URL("http://localhost:44444/oauth2/token"),
+                username = "username",
+                password = "password"
             )
 
         assertTrue(result.isSuccess)
@@ -479,7 +463,9 @@ internal class OAuthProviderTest {
             responseBody = "{}"
         )
         val result =
-            oAuthProvider.discover(URL("http://localhost:44444/.well-known/openid-configuration"))
+            oAuthProvider.discover(
+                url = URL("http://localhost:44444/.well-known/openid-configuration")
+            )
 
         assertTrue(result.isFailure)
         result.onFailure { it ->
@@ -497,7 +483,9 @@ internal class OAuthProviderTest {
             responseBody = responseDiscoveryOk
         )
         val result =
-            oAuthProvider.discover((URL("http://localhost:44444/.well-known/openid-configuration")))
+            oAuthProvider.discover(
+                url = URL("http://localhost:44444/.well-known/openid-configuration")
+            )
 
         assertTrue(result.isSuccess)
         result.onSuccess {
@@ -509,7 +497,9 @@ internal class OAuthProviderTest {
     @Test
     fun discover_wrongUrlPath_shouldReturnFailure() = runTest {
 
-        val result = oAuthProvider.discover(URL("https://localhost"))
+        val result = oAuthProvider.discover(
+            url = URL("https://localhost")
+        )
         assertTrue(result.isFailure)
         result.onFailure {
             assertTrue(it is MalformedURLException)
@@ -525,12 +515,14 @@ internal class OAuthProviderTest {
             responseBody = "{\"foo\":\"bar\"}"
         )
         val result =
-            oAuthProvider.discover(URL("http://localhost:44444/.well-known/openid-configuration"))
+            oAuthProvider.discover(
+                url = URL("http://localhost:44444/.well-known/openid-configuration")
+            )
 
         assertTrue(result.isFailure)
         result.onFailure {
-            assertTrue(it is JsonConvertException)
-            assertTrue(it.message?.contains("but they were missing") ?: false)
+            assertTrue(it is MissingFieldException)
+            assertTrue(it.message?.contains("but they were missing at path") ?: false)
         }
     }
 
@@ -543,7 +535,7 @@ internal class OAuthProviderTest {
         val parameters = HashMap<String, String>()
         parameters["key2"] = "value2"
 
-        val oAuthProvider = OAuthProvider(clientId, clientSecret, headers, parameters)
+        val oAuthProvider = OAuthProvider(CLIENTID, CLIENTSECRET, headers, parameters)
         assertEquals(1, oAuthProvider.additionalHeaders.size)
         assertEquals(1, oAuthProvider.additionalParameters.size)
         assertEquals("value1", oAuthProvider.additionalHeaders["key1"])
@@ -553,7 +545,7 @@ internal class OAuthProviderTest {
     @Test
     fun constructor_withAdditionalDataAsNull_shouldReturnInstance() {
 
-        val oAuthProvider = OAuthProvider(clientId, clientSecret, null, null)
+        val oAuthProvider = OAuthProvider(CLIENTID, CLIENTSECRET, null, null)
         assertEquals(0, oAuthProvider.additionalHeaders.size)
         assertEquals(0, oAuthProvider.additionalParameters.size)
     }
@@ -575,7 +567,6 @@ internal class OAuthProviderTest {
         oAuthProvider.additionalHeaders = headers
         assertEquals(1, oAuthProvider.additionalHeaders.size)
         assertEquals("value2", oAuthProvider.additionalHeaders["key2"])
-
     }
 
     @Test

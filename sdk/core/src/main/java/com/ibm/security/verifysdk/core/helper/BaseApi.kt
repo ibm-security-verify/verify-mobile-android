@@ -8,6 +8,7 @@ import com.ibm.security.verifysdk.core.extension.toResultFailure
 import io.ktor.client.HttpClient
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.headers
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
@@ -17,9 +18,11 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import java.net.URL
 
+@OptIn(ExperimentalSerializationApi::class)
 abstract class BaseApi() {
 
     /**
@@ -44,20 +47,29 @@ abstract class BaseApi() {
 
     protected suspend inline fun <reified T> performRequest(
         httpClient: HttpClient = NetworkHelper.getInstance,
+        method: HttpMethod = HttpMethod.Get,
         url: URL,
         accessToken: String? = null,
-        method: HttpMethod = HttpMethod.Get,
+        headers: Map<String, String>? = null,
+        contentType: ContentType = ContentType.Application.Json,
         body: Any? = null
     ): Result<T> {
         return try {
             val response = httpClient.request {
+                headers?.let { headers ->
+                    headers {
+                        headers.forEach {
+                            this@headers.append(it.key, it.value)
+                        }
+                    }
+                }
                 url(url)
                 this.method = method
                 accessToken?.let { bearerAuth(it) }
                 accept(ContentType.Application.Json)
-                body?.let {
-                    contentType(ContentType.Application.Json)
-                    setBody(it)
+                body?.let { requestBody ->
+                    contentType(contentType)
+                    setBody(requestBody)
                 }
             }
 

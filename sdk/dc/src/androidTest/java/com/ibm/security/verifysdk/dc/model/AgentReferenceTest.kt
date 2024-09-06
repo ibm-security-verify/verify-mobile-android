@@ -1,9 +1,9 @@
 package com.ibm.security.verifysdk.dc.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -14,15 +14,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AgentReferenceTest {
 
-    private val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = false
-        isLenient = true
-    }
-
     @Test
-    fun serialize_to_JSON() {
+    fun serialize_to_Json() {
         val agentReference = AgentReference(
             id = "id",
             name = "name",
@@ -42,7 +35,7 @@ class AgentReferenceTest {
 
 
     @Test
-    fun serialize_to_JSON_with_required_fields() {
+    fun serialize_withRequiredFields() {
         val agentReference = AgentReference(
             id = "id",
             name = "name"
@@ -59,7 +52,7 @@ class AgentReferenceTest {
     }
 
     @Test
-    fun deserialize_from_JSON() {
+    fun deserialize_from_Json() {
         val jsonString = """
             {
                 "id": "id",
@@ -76,7 +69,7 @@ class AgentReferenceTest {
 
 
     @Test
-    fun deserialize_with_required_fields() {
+    fun deserialize_withRequiredFields() {
         val jsonString = """
             {
                 "id": "id",
@@ -91,7 +84,7 @@ class AgentReferenceTest {
     }
 
     @Test
-    fun deserialize_with_null_values() {
+    fun deserialize_withNullValues() {
         val jsonString = """
             {
                 "id": "id",

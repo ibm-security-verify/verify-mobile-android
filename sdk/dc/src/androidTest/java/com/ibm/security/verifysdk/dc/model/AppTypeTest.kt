@@ -16,26 +16,26 @@ class AppTypeTest {
     }
 
     @Test
-    fun encode_method_with_valid_enum() {
+    fun encode_withValidEnum() {
         assertEquals("0", AppType.encode(AppType._0))
         assertEquals("1", AppType.encode(AppType._1))
     }
 
     @Test
-    fun encode_method_with_invalid_data() {
+    fun encode_withInvalidData() {
         assertNull(AppType.encode("invalid"))
         assertNull(AppType.encode(123))
         assertNull(AppType.encode(null))
     }
 
     @Test
-    fun decode_method_with_valid_values() {
+    fun decode_withValidData() {
         assertEquals(AppType._0, AppType.decode("0"))
         assertEquals(AppType._1, AppType.decode("1"))
     }
 
     @Test
-    fun decode_method_with_invalid_values() {
+    fun decode_withInvalidData() {
         assertNull(AppType.decode("invalid"))
         assertNull(AppType.decode("2"))
         assertNull(AppType.decode(null))

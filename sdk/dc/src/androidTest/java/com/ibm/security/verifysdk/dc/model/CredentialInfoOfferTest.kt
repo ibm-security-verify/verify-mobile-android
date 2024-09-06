@@ -14,14 +14,14 @@ import org.junit.runner.RunWith
 class CredentialInfoOfferTest {
 
     @Test
-    fun constructor_with_null_values() {
+    fun initialize_withNullValues() {
         val credentialInfoOffer = CredentialInfoOffer()
         assertNull(credentialInfoOffer.jsonld)
         assertNull(credentialInfoOffer.attributes)
     }
 
     @Test
-    fun constructor_with_jsonld_only() {
+    fun initialize_withJsonLdOnly() {
         val jsonld: JsonElement = JsonPrimitive("Sample JSON-LD")
         val credentialInfoOffer = CredentialInfoOffer(jsonld = jsonld)
 
@@ -30,7 +30,7 @@ class CredentialInfoOfferTest {
     }
 
     @Test
-    fun constructor_with_attributes_only() {
+    fun initialize_withMapAttributes() {
         val attributes: Map<String, JsonElement> = mapOf(
             "attribute1" to JsonPrimitive("value1"),
             "attribute2" to JsonPrimitive("value2")
@@ -42,7 +42,7 @@ class CredentialInfoOfferTest {
     }
 
     @Test
-    fun constructor_happy_path() {
+    fun initialize() {
         val jsonld: JsonElement = JsonPrimitive("Sample JSON-LD")
         val attributes: Map<String, JsonElement> = mapOf(
             "attribute1" to JsonPrimitive("value1"),
@@ -55,7 +55,7 @@ class CredentialInfoOfferTest {
     }
 
     @Test
-    fun constructor_with_empty_attributes() {
+    fun initialize_withEmptyAttributes() {
         val attributes: Map<String, JsonElement> = emptyMap()
         val credentialInfoOffer = CredentialInfoOffer(attributes = attributes)
 
@@ -64,7 +64,7 @@ class CredentialInfoOfferTest {
     }
 
     @Test
-    fun constructor_with_with_nested_JSON_elements() {
+    fun initialize_withNestedJsonElements() {
         val jsonld: JsonElement = JsonPrimitive("Sample JSON-LD")
         val nestedJson: JsonObject = buildJsonObject {
             put("nestedKey", JsonPrimitive("nestedValue"))

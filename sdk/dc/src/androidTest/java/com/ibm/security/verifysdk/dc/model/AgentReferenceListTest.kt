@@ -1,28 +1,19 @@
 package com.ibm.security.verifysdk.dc.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import kotlinx.serialization.ExperimentalSerializationApi
+import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalSerializationApi::class)
 @RunWith(AndroidJUnit4::class)
 class AgentReferenceListTest {
 
-    private val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = false
-        isLenient = true
-    }
-
     @Test
-    fun serialize_to_JSON() {
+    fun serialize_to_Json() {
         val agentReference = AgentReference(
             id = "id",
             name = "name",
@@ -56,7 +47,7 @@ class AgentReferenceListTest {
     }
 
     @Test
-    fun deserialize_from_JSON() {
+    fun deserialize_from_Json() {
         val jsonString = """
             {
                "count":2,
@@ -83,7 +74,7 @@ class AgentReferenceListTest {
 
 
     @Test
-    fun deserialize_with_required_fields() {
+    fun deserialize_withRequiredFields() {
         val jsonString = """
             {
                "count":2,
@@ -107,7 +98,7 @@ class AgentReferenceListTest {
     }
 
     @Test
-    fun deserialize_with_null_values() {
+    fun deserialize_withNullValues() {
         val jsonString = """
             {
                "count":2,
@@ -134,7 +125,7 @@ class AgentReferenceListTest {
     }
 
     @Test
-    fun serialize_empty_list() {
+    fun serialize_withEmptyList() {
         val agentReferenceList = AgentReferenceList(
             count = 0,
             items = emptyList()
@@ -151,7 +142,7 @@ class AgentReferenceListTest {
     }
 
     @Test
-    fun deserialize_empty_list() {
+    fun deserialize_withEmptyList() {
         val jsonString = """
                 {
                    "count":0,
@@ -165,7 +156,7 @@ class AgentReferenceListTest {
     }
 
     @Test
-    fun deserialize_with_extra_fields() {
+    fun deserialize_withExtraFields() {
         val jsonString = """
                 {
                    "count":2,
@@ -191,7 +182,7 @@ class AgentReferenceListTest {
     }
 
     @Test(expected = Throwable::class)
-    fun deserialize_with_wrong_type_for_count_should_fail() {
+    fun deserialize_withWrongTypeForCount_shouldFail() {
         val jsonString = """
                 {
                    "count":"two",

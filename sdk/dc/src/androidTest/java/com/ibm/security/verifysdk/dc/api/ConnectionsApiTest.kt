@@ -1,7 +1,12 @@
+/*
+ * Copyright contributors to the IBM Security Verify SDK for Android project
+ */
+
 package com.ibm.security.verifysdk.dc.api
 
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
-import com.ibm.security.verifysdk.dc.model.UpdateCredentialArgs
+import com.ibm.security.verifysdk.dc.model.CreateConnectionArgs
+import com.ibm.security.verifysdk.dc.model.UpdateConnectionArgs
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import com.ibm.security.verifysdk.testutils.loadJsonFromRawResource
 import io.ktor.client.engine.mock.toByteArray
@@ -25,7 +30,7 @@ import java.net.URL
 
 @ExperimentalSerializationApi
 @RunWith(Parameterized::class)
-class CredentialsApiTest(private val inputUrl: String?) {
+class ConnectionsApiTest(private val inputUrl: String?) {
 
     @Suppress("unused")
     private val log: Logger = LoggerFactory.getLogger(javaClass)
@@ -41,7 +46,7 @@ class CredentialsApiTest(private val inputUrl: String?) {
         @Parameterized.Parameters
         fun data(): Collection<Array<String?>> {
             return listOf(
-                arrayOf("/diagency/v1.0/diagency/credentials/"),
+                arrayOf("/diagency/v1.0/diagency/connections/"),
                 arrayOf(null)
             )
         }
@@ -64,17 +69,13 @@ class CredentialsApiTest(private val inputUrl: String?) {
     }
 
     @Test
-    fun getDecoder() {
-    }
-
-    @Test
     fun getAll() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.credentials_get_all_response)
+            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_get_all_response)
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,
-            urlPath = "/diagency/v1.0/diagency/credentials",
+            urlPath = "/diagency/v1.0/diagency/connections",
             httpCode = HttpStatusCode.OK,
             responseBody = responseBody.toString()
         )
@@ -85,16 +86,17 @@ class CredentialsApiTest(private val inputUrl: String?) {
                 url = URL("${baseUrl}${inputUrl}")
             )
         } ?: run {
-            CredentialsApi(baseUrl = baseUrl).getAll(
+            ConnectionsApi(baseUrl = baseUrl).getAll(
                 accessToken = accessToken
             )
         }
             .onSuccess {
-                log.info(it.toString())
+                assertEquals(1, it.count)
+                assertEquals("string", it.items[0].id)
             }
             .onFailure {
                 log.info(it.toString())
-                throw(it)
+                throw (it)
             }
     }
 
@@ -102,62 +104,61 @@ class CredentialsApiTest(private val inputUrl: String?) {
     fun getOne() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.credentials_get_one_response)
+            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_get_one_response)
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,
-            urlPath = "/diagency/v1.0/diagency/credentials/${id}",
+            urlPath = "/diagency/v1.0/diagency/connections/${id}",
             httpCode = HttpStatusCode.OK,
             responseBody = responseBody.toString()
         )
 
-        CredentialsApi(baseUrl = baseUrl).getOne(
-            accessToken = accessToken,
-            id = id
-        )
-
         inputUrl?.let {
-            CredentialsApi(baseUrl = baseUrl).getOne(
+            ConnectionsApi(baseUrl = baseUrl).getOne(
                 accessToken = accessToken,
-                url = URL("${baseUrl}${inputUrl}${id}"),
+                url = URL("${baseUrl}${inputUrl}"),
                 id = id
             )
         } ?: run {
-            CredentialsApi(baseUrl = baseUrl).getOne(
+            ConnectionsApi(baseUrl = baseUrl).getOne(
                 accessToken = accessToken,
                 id = id
             )
         }
-            .onSuccess { credential ->
-                assertEquals("string", credential.id)
-                assertEquals("string", credential.issuerDid)
+            .onSuccess {
+                assertEquals("string", it.id)
             }
             .onFailure {
-                log.error(it.toString())
+                log.info(it.toString())
                 throw (it)
             }
     }
 
     @Test
     fun delete() = runTest {
+
         apiMockEngine.addMockResponse(
             method = HttpMethod.Delete,
-            urlPath = "/diagency/v1.0/diagency/credentials/${id}",
+            urlPath = "/diagency/v1.0/diagency/connections/${id}",
             httpCode = HttpStatusCode.NoContent
         )
 
         inputUrl?.let {
-            CredentialsApi(baseUrl = baseUrl).delete(
+            ConnectionsApi(baseUrl = baseUrl).delete(
                 accessToken = accessToken,
                 url = URL("${baseUrl}${inputUrl}${id}"),
                 id = id
             )
         } ?: run {
-            CredentialsApi(baseUrl = baseUrl).delete(
+            ConnectionsApi(baseUrl = baseUrl).delete(
                 accessToken = accessToken,
                 id = id
             )
         }
+            .onSuccess {
+                assert(it === Unit)
+            }
             .onFailure {
+                log.info(it.toString())
                 throw (it)
             }
 
@@ -165,8 +166,52 @@ class CredentialsApiTest(private val inputUrl: String?) {
             val requestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
             assertTrue(requestBody.isEmpty())
             assertEquals(
-                "/diagency/v1.0/diagency/credentials/${id}",
+                "/diagency/v1.0/diagency/connections/${id}",
                 requestData.url.encodedPath
+            )
+        }
+    }
+
+    @Test
+    fun create() = runTest {
+
+        val responseBody =
+            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_post_response)
+        val requestBody =
+            json.decodeFromJsonElement<CreateConnectionArgs>(loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_post_request))
+
+        apiMockEngine.addMockResponse(
+            method = HttpMethod.Post,
+            urlPath = "/diagency/v1.0/diagency/connections/",
+            httpCode = HttpStatusCode.Created,
+            responseBody = responseBody.toString()
+        )
+
+        inputUrl?.let {
+            ConnectionsApi(baseUrl = baseUrl).create(
+                accessToken = accessToken,
+                url = URL("${baseUrl}${inputUrl}"),
+                createConnectionArgs = requestBody
+            )
+        } ?: run {
+            ConnectionsApi(baseUrl = baseUrl).create(
+                accessToken = accessToken,
+                createConnectionArgs = requestBody
+            )
+        }
+            .onSuccess {
+                assertEquals("string", it.invitation?.id)
+            }.onFailure {
+                log.info(it.toString())
+                throw (it)
+            }
+
+        apiMockEngine.get().requestHistory.last().let { requestData ->
+            val localRequestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
+            assertTrue(localRequestBody.isEmpty().not())
+            assertEquals(
+                "/diagency/v1.0/diagency/connections",
+                requestData.url.encodedPath.trimEnd('/')
             )
         }
     }
@@ -175,37 +220,35 @@ class CredentialsApiTest(private val inputUrl: String?) {
     fun update() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.credentials_patch_response)
+            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_patch_response)
         val requestBody =
-            json.decodeFromJsonElement<UpdateCredentialArgs>(loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.credentials_patch_request))
+            json.decodeFromJsonElement<UpdateConnectionArgs>(loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_patch_request))
 
         apiMockEngine.addMockResponse(
             method = HttpMethod.Patch,
-            urlPath = "/diagency/v1.0/diagency/credentials/${id}",
+            urlPath = "/diagency/v1.0/diagency/connections/${id}",
             httpCode = HttpStatusCode.OK,
             responseBody = responseBody.toString()
         )
 
         inputUrl?.let {
-            CredentialsApi(baseUrl = baseUrl).update(
+            ConnectionsApi(baseUrl = baseUrl).update(
                 accessToken = accessToken,
                 url = URL("${baseUrl}${inputUrl}${id}"),
-                id = id,
-                updateCredentialArgs = requestBody
+                updateConnectionArgs = requestBody,
+                id = id
             )
         } ?: run {
-            CredentialsApi(baseUrl = baseUrl).update(
+            ConnectionsApi(baseUrl = baseUrl).update(
                 accessToken = accessToken,
-                id = id,
-                updateCredentialArgs = requestBody
+                updateConnectionArgs = requestBody,
+                id = id
             )
         }
-            .onSuccess { credential ->
-                assertEquals("string", credential.id)
-                assertEquals("string", credential.issuerDid)
-            }
-            .onFailure {
-                log.error(it.toString())
+            .onSuccess { connection ->
+                assertEquals("string", connection.invitation?.id)
+            }.onFailure {
+                log.info(it.toString())
                 throw (it)
             }
 
@@ -213,7 +256,7 @@ class CredentialsApiTest(private val inputUrl: String?) {
             val localRequestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
             assertTrue(localRequestBody.isEmpty().not())
             assertEquals(
-                "/diagency/v1.0/diagency/credentials/${id}",
+                "/diagency/v1.0/diagency/connections/${id}",
                 requestData.url.encodedPath.trimEnd('/')
             )
         }

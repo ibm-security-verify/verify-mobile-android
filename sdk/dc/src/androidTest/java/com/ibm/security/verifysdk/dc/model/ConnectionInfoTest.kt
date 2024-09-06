@@ -1,6 +1,7 @@
 package com.ibm.security.verifysdk.dc.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -18,13 +19,6 @@ class ConnectionInfoTest {
 
     private lateinit var endpointLocal: Endpoint
     private lateinit var endpointRemote: Endpoint
-
-    private val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = false
-        isLenient = true
-    }
 
     @Before
     fun setUp() {
@@ -54,7 +48,7 @@ class ConnectionInfoTest {
     }
 
     @Test
-    fun constructor_with_required_fields() {
+    fun initialize_withRequiredFields() {
         val id = "connectionId"
         val state = "active"
         val role = ConnectionRole.INVITER
@@ -82,7 +76,7 @@ class ConnectionInfoTest {
     }
 
     @Test
-    fun constructor_with_all_fields() {
+    fun initialize_withAllFields() {
         val id = "connectionId"
         val state = "active"
         val role = ConnectionRole.INVITEE
@@ -150,7 +144,7 @@ class ConnectionInfoTest {
     }
 
     @Test
-    fun serialization_to_JSON() {
+    fun serialize_to_Json() {
         val id = "connectionId"
         val state = "active"
         val role = ConnectionRole.INVITER
@@ -184,7 +178,7 @@ class ConnectionInfoTest {
     }
 
     @Test
-    fun deserialize_from_JSON() {
+    fun deserialize_from_Json() {
         val jsonString = """
             {
                 "id": "connectionId",
