@@ -197,7 +197,7 @@ class MainActivity : ComponentActivity() {
                                 username = qrCode.data?.name ?: "",
                                 password = "secret",
                                 scope = null,
-                                NetworkHelper.getInstance
+                                httpClient = NetworkHelper.getInstance
                             ).onSuccess {
                                 log.info(it.toString())
 
