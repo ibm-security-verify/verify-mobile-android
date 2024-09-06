@@ -79,7 +79,7 @@ class ApiMockEngine {
                     respondError(HttpStatusCode.NotFound)
                 }
 
-                if (request.url.encodedPath == urlPath) {
+                if (request.url.encodedPath.trimEnd('/') == urlPath.trimEnd('/')) {
                     respond(responseBody ?: "", httpCode, headers)
                 } else {
                     error("Unhandled ${request.url.encodedPath}")
