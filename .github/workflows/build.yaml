@@ -219,25 +219,25 @@ jobs:
         run: mkdir -p ./sdk
 
       - name: Collect all artificats
-        uses: actions/download-artifact@v4.1.4
+        uses: actions/download-artifact@v4.1.7
         with:
           name: build-and-test
           path: ./sdk
 
       - name: Collect documentation artificats
-        uses: actions/download-artifact@v4.1.4
+        uses: actions/download-artifact@v4.1.7
         with:
           name: documentation
           path: ./sdk     
 
       - name: Collect maven-local artificats
-        uses: actions/download-artifact@v4.1.4
+        uses: actions/download-artifact@v4.1.7
         with:
           name: maven-local
           path: ~/.m2/repository/com/ibm/security
 
       - name: Collect code coverate result
-        uses: actions/download-artifact@v4.1.4
+        uses: actions/download-artifact@v4.1.7
         with:
           name: jacoco-report
           path: ./sdk
