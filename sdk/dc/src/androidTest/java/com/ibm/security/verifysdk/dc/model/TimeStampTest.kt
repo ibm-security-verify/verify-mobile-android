@@ -1,8 +1,8 @@
 package com.ibm.security.verifysdk.dc.model
 
+import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -17,20 +17,13 @@ class TimeStampTest {
     private val timestamp1 = 1234567800L
     private val timestamp2 = 1234567890L
 
-    private val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = false
-        isLenient = true
-    }
-
     @Test
-    fun serialize_to_JSON() {
+    fun serialize_to_Json() {
 
         val instant = Instant.now().toEpochMilli()
         val timeStamp = TimeStamp(
             created = timestamp1,
-            stated =  instant,
+            stated = instant,
             updated = timestamp2,
             deleted = instant
         )
@@ -49,7 +42,7 @@ class TimeStampTest {
     }
 
     @Test
-    fun deserialize_from_JSON() {
+    fun deserialize_from_Json() {
         val instant = Instant.now().toEpochMilli()
         val jsonString = """
                 {
@@ -68,7 +61,7 @@ class TimeStampTest {
     }
 
     @Test
-    fun deserialize_with_required_fields() {
+    fun deserialize_withRequiredAttributes() {
         val instant = Instant.now().toEpochMilli()
         val jsonString = """
                 {
@@ -84,7 +77,7 @@ class TimeStampTest {
     }
 
     @Test
-    fun deserialize_with_null_values() {
+    fun deserialize_withNullValues() {
         val jsonString = """
                 {
                     "created": $timestamp1,

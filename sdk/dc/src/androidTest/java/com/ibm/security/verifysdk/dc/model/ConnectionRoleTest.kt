@@ -10,19 +10,19 @@ import org.junit.runner.RunWith
 class ConnectionRoleTest {
 
     @Test
-    fun toString_for_inviter() {
+    fun toString_forInviter() {
         val inviter = ConnectionRole.INVITER
         assertEquals("inviter", inviter.toString())
     }
 
     @Test
-    fun toString_for_invitee() {
+    fun toString_forInvitee() {
         val invitee = ConnectionRole.INVITEE
         assertEquals("invitee", invitee.toString())
     }
 
     @Test
-    fun encode_with_valid_connection_role() {
+    fun encode_withValidConnectionRole() {
         val inviter = ConnectionRole.INVITER
         val invitee = ConnectionRole.INVITEE
 
@@ -31,18 +31,18 @@ class ConnectionRoleTest {
     }
 
     @Test
-    fun encode_with_null() {
+    fun encode_withNull() {
         assertNull(ConnectionRole.encode(null))
     }
 
     @Test
-    fun encode_with_valid_type() {
+    fun encode_withValidType() {
         val invalidData = "someInvalidData"
         assertNull(ConnectionRole.encode(invalidData))
     }
 
     @Test
-    fun decode_with_valid_string() {
+    fun decode_withValidString() {
         val inviterString = "inviter"
         val inviteeString = "invitee"
 
@@ -51,13 +51,13 @@ class ConnectionRoleTest {
     }
 
     @Test
-    fun decode_with_invalid_string() {
+    fun decode_withInvalidString() {
         val invalidString = "invalid"
         assertNull(ConnectionRole.decode(invalidString))
     }
 
     @Test
-    fun decode_with_null() {
+    fun decode_withNull() {
         assertNull(ConnectionRole.decode(null))
     }
 }

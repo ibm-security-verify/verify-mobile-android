@@ -1,9 +1,9 @@
 package com.ibm.security.verifysdk.dc.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Assert.assertEquals
@@ -15,15 +15,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class EndpointTest {
 
-    private val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = false
-        isLenient = true
-    }
-
     @Test
-    fun serialize_to_JSON() {
+    fun serialize_to_Json() {
         val endpoint = Endpoint(
             name = "exampleEndpoint",
             url = "https://example.com",
@@ -52,7 +45,7 @@ class EndpointTest {
     }
 
     @Test
-    fun deserialize_from_JSON() {
+    fun deserialize_from_Json() {
         val jsonString = """
             {
                 "name": "exampleEndpoint",
@@ -79,7 +72,7 @@ class EndpointTest {
     }
 
     @Test
-    fun deserialize_with_required_fields() {
+    fun deserialize_withRequiredAttributes() {
         val jsonString = """
             {
                 "name": "exampleEndpoint",
@@ -103,7 +96,7 @@ class EndpointTest {
     }
 
     @Test
-    fun deserialize_with_null_values() {
+    fun deserialize_withNullValues() {
         val jsonString = """
             {
                 "name": "exampleEndpoint",

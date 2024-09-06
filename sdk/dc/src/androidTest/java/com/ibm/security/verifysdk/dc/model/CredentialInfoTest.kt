@@ -1,9 +1,9 @@
 package com.ibm.security.verifysdk.dc.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -16,15 +16,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class CredentialInfoTest {
 
-    private val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = false
-        isLenient = true
-    }
-
     @Test
-    fun serialize_to_JSON() {
+    fun serialize_to_Json() {
         val credentialInfo = CredentialInfo(
             id = "123",
             role = CredentialRole.ISSUER,
@@ -35,7 +28,12 @@ class CredentialInfoTest {
                 id = "connId",
                 state = "active",
                 role = ConnectionRole.INVITER,
-                local = Endpoint(name = "local", url = "https://localhost", pairwise = DidInfo(did = "did1", verkey = "verkey1"), ext = true),
+                local = Endpoint(
+                    name = "local",
+                    url = "https://localhost",
+                    pairwise = DidInfo(did = "did1", verkey = "verkey1"),
+                    ext = true
+                ),
                 didExchange = true
             )
         )
@@ -65,11 +63,11 @@ class CredentialInfoTest {
                     }
                 }
             """.trimIndent().replace("\n", "").replace(" ", "")
-        assertEquals(expectedJson,jsonString)
+        assertEquals(expectedJson, jsonString)
     }
 
     @Test
-    fun deserialize_from_JSON() {
+    fun deserialize_from_Json() {
         val jsonString = """
                 {
                     "id":"123",
@@ -105,7 +103,7 @@ class CredentialInfoTest {
     }
 
     @Test
-    fun serialize_with_optional_fields() {
+    fun serialize_withOptionalAttributes() {
         val jsonElement: JsonElement = buildJsonObject {
             put("key", "value")
         }
@@ -120,7 +118,12 @@ class CredentialInfoTest {
                 id = "connId",
                 state = "active",
                 role = ConnectionRole.INVITER,
-                local = Endpoint(name = "local", url = "https://localhost", pairwise = DidInfo(did = "did1", verkey = "verkey1"), ext = true),
+                local = Endpoint(
+                    name = "local",
+                    url = "https://localhost",
+                    pairwise = DidInfo(did = "did1", verkey = "verkey1"),
+                    ext = true
+                ),
                 didExchange = true
             ),
             schemaName = "Test Schema",
@@ -137,7 +140,7 @@ class CredentialInfoTest {
     }
 
     @Test
-    fun deserialize_with_null_values() {
+    fun deserialize_withNullValues() {
         val jsonString = """
                 {
                     "id":"123",
