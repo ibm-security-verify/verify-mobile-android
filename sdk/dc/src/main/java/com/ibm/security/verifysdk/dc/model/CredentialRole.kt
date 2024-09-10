@@ -4,8 +4,9 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 enum class CredentialRole(val value: String) {
 
     @SerialName("issuer")

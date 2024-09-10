@@ -8,8 +8,10 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-enum class EnvType(val value: kotlin.String) {
+@Serializable
+enum class EnvType(val value: String) {
 
     @SerialName("0")
     _0("0"),
@@ -30,7 +32,7 @@ enum class EnvType(val value: kotlin.String) {
         /**
          * Converts the provided [data] to a [String] on success, null otherwise.
          */
-        fun encode(data: Any?): String? = if (data is OSType) "$data" else null
+        fun encode(data: Any?): String? = if (data is EnvType) "$data" else null
 
         /**
          * Returns a valid [EnvType] for [data], null otherwise.
@@ -42,5 +44,4 @@ enum class EnvType(val value: kotlin.String) {
             }
         }
     }
-
 }

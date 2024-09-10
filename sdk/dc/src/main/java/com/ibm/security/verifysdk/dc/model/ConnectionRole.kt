@@ -8,7 +8,9 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class ConnectionRole(val value: String) {
 
     @SerialName("inviter")
