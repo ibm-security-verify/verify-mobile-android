@@ -1,6 +1,7 @@
 package com.ibm.security.verifysdk.dc.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ibm.security.verifysdk.testutils.json
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -72,5 +73,23 @@ class ToAgentTest {
 
         // The url is stored as-is, no URL validation is expected here.
         assertEquals("invalid-url", toAgent.url)
+    }
+
+    @Test
+    fun deserialization() {
+        val jsonString = """{"name":"Agent Name","id":"1234","url":"https://example.com"}"""
+        val agent = json.decodeFromString<ToAgent>(jsonString)
+        assertEquals("Agent Name", agent.name)
+        assertEquals("1234", agent.id)
+        assertEquals("https://example.com", agent.url)
+    }
+
+    @Test
+    fun deserialization_withEmptyStrings() {
+        val jsonString = """{"name":"","id":"","url":""}"""
+        val agent = json.decodeFromString<ToAgent>(jsonString)
+        assertEquals("", agent.name)
+        assertEquals("", agent.id)
+        assertEquals("", agent.url)
     }
 }

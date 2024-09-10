@@ -4,7 +4,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -194,7 +193,7 @@ class ConnectionInfoTest {
             }
         """.trimIndent().replace("\n", "").replace(" ", "")
 
-        val connectionInfo = Json.decodeFromString(ConnectionInfo.serializer(), jsonString)
+        val connectionInfo = json.decodeFromString<ConnectionInfo>(jsonString)
 
         assertEquals("connectionId", connectionInfo.id)
         assertEquals("active", connectionInfo.state)

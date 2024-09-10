@@ -1,7 +1,455 @@
 {
-  "count": 33,
-  "items": [
-    {
+  "id": "string",
+  "role": "verifier",
+  "state": "outbound_verification_request",
+  "allow_proof_request_override": true,
+  "verifier_did": "string",
+  "proof_schema_id": "string",
+  "proof_request": {
+    "name": "string",
+    "version": "string",
+    "requested_attributes": "string",
+    "requested_predicates": "string",
+    "allow_proof_request_override": true,
+    "cred_filter": [
+      {
+        "attr_name": "string",
+        "attr_values": [
+          "string"
+        ],
+        "proof_request_referent": "string",
+        "exclude": true
+      }
+    ],
+    "properties": {
+      "additionalProp1": "string",
+      "additionalProp2": "string",
+      "additionalProp3": "string"
+    },
+    "jsonld": {
+      "presentation_definition": {
+        "id": "string",
+        "name": "string",
+        "purpose": "string",
+        "format": {
+          "jwt": {
+            "alg": [
+              "string"
+            ]
+          },
+          "jwt_vc": {
+            "alg": [
+              "string"
+            ]
+          },
+          "jwt_vc_json": {
+            "alg": [
+              "string"
+            ]
+          },
+          "jwt_vp": {
+            "alg": [
+              "string"
+            ]
+          },
+          "jwt_vp_json": {
+            "alg": [
+              "string"
+            ]
+          },
+          "ldp": {
+            "proof_type": [
+              "string"
+            ]
+          },
+          "ldp_vc": {
+            "proof_type": [
+              "string"
+            ]
+          },
+          "ldp_vp": {
+            "proof_type": [
+              "string"
+            ]
+          },
+          "di": {
+            "proof_type": [
+              "string"
+            ],
+            "cryptosuite": [
+              "string"
+            ]
+          },
+          "di_vc": {
+            "proof_type": [
+              "string"
+            ],
+            "cryptosuite": [
+              "string"
+            ]
+          },
+          "di_vp": {
+            "proof_type": [
+              "string"
+            ],
+            "cryptosuite": [
+              "string"
+            ]
+          },
+          "undefined": {
+            "undefined": [
+              "string"
+            ]
+          }
+        },
+        "submission_requirements": [
+          {
+            "name": "string",
+            "purpose": "string",
+            "rule": "all",
+            "count": 0,
+            "min": 0,
+            "max": 0,
+            "from": "string",
+            "from_nested": [
+              "string"
+            ]
+          }
+        ],
+        "input_descriptors": [
+          {
+            "id": "string",
+            "name": "string",
+            "purpose": "string",
+            "group": [
+              "string"
+            ],
+            "schema": [
+              {
+                "uri": "string",
+                "required": true
+              }
+            ],
+            "issuance": [
+              {
+                "manifest": "string",
+                "additionalProp1": "string",
+                "additionalProp2": "string",
+                "additionalProp3": "string"
+              }
+            ],
+            "constraints": {
+              "limit_disclosure": "required",
+              "statuses": {
+                "active": {
+                  "directive": "required"
+                },
+                "suspended": {
+                  "directive": "required"
+                },
+                "revoked": {
+                  "directive": "required"
+                }
+              },
+              "fields": [
+                {
+                  "id": "string",
+                  "path": [
+                    "string"
+                  ],
+                  "purpose": "string",
+                  "filter": {
+                    "const": true,
+                    "enum": [
+                      true,
+                      0,
+                      "string"
+                    ],
+                    "exclusiveMinimum": 0,
+                    "exclusiveMaximum": 0,
+                    "format": "string",
+                    "minLength": 0,
+                    "maxLength": 0,
+                    "minimum": 0,
+                    "maximum": 0,
+                    "not": {},
+                    "pattern": "string",
+                    "type": "string"
+                  },
+                  "predicate": "required"
+                }
+              ],
+              "subject_is_issuer": "required",
+              "is_holder": [
+                {
+                  "field_id": [
+                    "string"
+                  ],
+                  "directive": "required"
+                }
+              ],
+              "same_subject": [
+                {
+                  "field_id": [
+                    "string"
+                  ],
+                  "directive": "required"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "options": {
+        "challenge": "string",
+        "domain": "string"
+      }
+    },
+    "bbs": {
+      "presentation_definition": {
+        "id": "string",
+        "name": "string",
+        "purpose": "string",
+        "format": {
+          "jwt": {
+            "alg": [
+              "string"
+            ]
+          },
+          "jwt_vc": {
+            "alg": [
+              "string"
+            ]
+          },
+          "jwt_vc_json": {
+            "alg": [
+              "string"
+            ]
+          },
+          "jwt_vp": {
+            "alg": [
+              "string"
+            ]
+          },
+          "jwt_vp_json": {
+            "alg": [
+              "string"
+            ]
+          },
+          "ldp": {
+            "proof_type": [
+              "string"
+            ]
+          },
+          "ldp_vc": {
+            "proof_type": [
+              "string"
+            ]
+          },
+          "ldp_vp": {
+            "proof_type": [
+              "string"
+            ]
+          },
+          "di": {
+            "proof_type": [
+              "string"
+            ],
+            "cryptosuite": [
+              "string"
+            ]
+          },
+          "di_vc": {
+            "proof_type": [
+              "string"
+            ],
+            "cryptosuite": [
+              "string"
+            ]
+          },
+          "di_vp": {
+            "proof_type": [
+              "string"
+            ],
+            "cryptosuite": [
+              "string"
+            ]
+          },
+          "undefined": {
+            "undefined": [
+              "string"
+            ]
+          }
+        },
+        "submission_requirements": [
+          {
+            "name": "string",
+            "purpose": "string",
+            "rule": "all",
+            "count": 0,
+            "min": 0,
+            "max": 0,
+            "from": "string",
+            "from_nested": [
+              "string"
+            ]
+          }
+        ],
+        "input_descriptors": [
+          {
+            "id": "string",
+            "name": "string",
+            "purpose": "string",
+            "group": [
+              "string"
+            ],
+            "schema": [
+              {
+                "uri": "string",
+                "required": true
+              }
+            ],
+            "issuance": [
+              {
+                "manifest": "string",
+                "additionalProp1": "string",
+                "additionalProp2": "string",
+                "additionalProp3": "string"
+              }
+            ],
+            "constraints": {
+              "limit_disclosure": "required",
+              "statuses": {
+                "active": {
+                  "directive": "required"
+                },
+                "suspended": {
+                  "directive": "required"
+                },
+                "revoked": {
+                  "directive": "required"
+                }
+              },
+              "fields": [
+                {
+                  "id": "string",
+                  "path": [
+                    "string"
+                  ],
+                  "purpose": "string",
+                  "filter": {
+                    "const": true,
+                    "enum": [
+                      true,
+                      0,
+                      "string"
+                    ],
+                    "exclusiveMinimum": 0,
+                    "exclusiveMaximum": 0,
+                    "format": "string",
+                    "minLength": 0,
+                    "maxLength": 0,
+                    "minimum": 0,
+                    "maximum": 0,
+                    "not": {},
+                    "pattern": "string",
+                    "type": "string"
+                  },
+                  "predicate": "required"
+                }
+              ],
+              "subject_is_issuer": "required",
+              "is_holder": [
+                {
+                  "field_id": [
+                    "string"
+                  ],
+                  "directive": "required"
+                }
+              ],
+              "same_subject": [
+                {
+                  "field_id": [
+                    "string"
+                  ],
+                  "directive": "required"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "options": {
+        "challenge": "string",
+        "domain": "string"
+      }
+    },
+    "nonce": "string"
+  },
+  "proof_response": {
+    "cred_defs": {
+      "additionalProp1": [
+        {
+          "attributes": {
+            "additionalProp1": "string",
+            "additionalProp2": "string",
+            "additionalProp3": "string"
+          },
+          "predicates": [
+            "string"
+          ]
+        }
+      ],
+      "additionalProp2": [
+        {
+          "attributes": {
+            "additionalProp1": "string",
+            "additionalProp2": "string",
+            "additionalProp3": "string"
+          },
+          "predicates": [
+            "string"
+          ]
+        }
+      ],
+      "additionalProp3": [
+        {
+          "attributes": {
+            "additionalProp1": "string",
+            "additionalProp2": "string",
+            "additionalProp3": "string"
+          },
+          "predicates": [
+            "string"
+          ]
+        }
+      ]
+    },
+    "self_attested_attributes": {
+      "additionalProp1": "string",
+      "additionalProp2": "string",
+      "additionalProp3": "string"
+    }
+  },
+  "info": {
+    "attributes": [
+      {
+        "cred_def_id": "string",
+        "name": "string",
+        "value": "string"
+      }
+    ],
+    "predicates": [
+      {
+        "cred_def_id": "string",
+        "predicate": "string"
+      }
+    ]
+  },
+  "proof_display": "string",
+  "connection": {
+    "id": "string",
+    "invitation": {
       "id": "string",
       "url": "string",
       "short_url": "string",
@@ -983,6 +1431,287 @@
           }
         }
       }
+    },
+    "state": "string",
+    "role": "inviter",
+    "local": {
+      "name": "string",
+      "url": "string",
+      "pairwise": {
+        "did": "string",
+        "verkey": "string"
+      },
+      "public": {
+        "did": "string",
+        "verkey": "string"
+      },
+      "properties": {
+        "additionalProp1": "string",
+        "additionalProp2": "string",
+        "additionalProp3": "string"
+      },
+      "did": "string",
+      "did_doc": {
+        "@context": "string",
+        "id": "string",
+        "publicKey": [
+          {
+            "id": "string",
+            "type": "string",
+            "controller": "string",
+            "publicKeyBase58": "string"
+          }
+        ],
+        "service": [
+          {
+            "id": "string",
+            "type": "string",
+            "serviceEndpoint": "string",
+            "priority": 0,
+            "recipientKeys": [
+              "string"
+            ],
+            "routingKeys": [
+              "string"
+            ]
+          }
+        ]
+      },
+      "ext": true,
+      "device": {
+        "name": "string",
+        "os_type": "0",
+        "app_type": "0",
+        "env_type": "0",
+        "token": "string",
+        "ref": "string"
+      }
+    },
+    "remote": {
+      "name": "string",
+      "url": "string",
+      "pairwise": {
+        "did": "string",
+        "verkey": "string"
+      },
+      "public": {
+        "did": "string",
+        "verkey": "string"
+      },
+      "properties": {
+        "additionalProp1": "string",
+        "additionalProp2": "string",
+        "additionalProp3": "string"
+      },
+      "did": "string",
+      "did_doc": {
+        "@context": "string",
+        "id": "string",
+        "publicKey": [
+          {
+            "id": "string",
+            "type": "string",
+            "controller": "string",
+            "publicKeyBase58": "string"
+          }
+        ],
+        "service": [
+          {
+            "id": "string",
+            "type": "string",
+            "serviceEndpoint": "string",
+            "priority": 0,
+            "recipientKeys": [
+              "string"
+            ],
+            "routingKeys": [
+              "string"
+            ]
+          }
+        ]
+      },
+      "ext": true,
+      "device": {
+        "name": "string",
+        "os_type": "0",
+        "app_type": "0",
+        "env_type": "0",
+        "token": "string",
+        "ref": "string"
+      }
+    },
+    "timestamps": {
+      "additionalProp1": 0,
+      "additionalProp2": 0,
+      "additionalProp3": 0
+    },
+    "ext_complete": true,
+    "did_exchange": true,
+    "max_queue_count": 0,
+    "max_queue_time_ms": 0
+  },
+  "aries_message": "string",
+  "properties": {
+    "additionalProp1": "string",
+    "additionalProp2": "string",
+    "additionalProp3": "string"
+  },
+  "choices": {
+    "attributes": {
+      "additionalProp1": {
+        "additionalProp1": {
+          "names": [
+            {
+              "name": "string",
+              "value": "string"
+            }
+          ],
+          "schema_id": "string",
+          "cred_def_id": "string"
+        },
+        "additionalProp2": {
+          "names": [
+            {
+              "name": "string",
+              "value": "string"
+            }
+          ],
+          "schema_id": "string",
+          "cred_def_id": "string"
+        },
+        "additionalProp3": {
+          "names": [
+            {
+              "name": "string",
+              "value": "string"
+            }
+          ],
+          "schema_id": "string",
+          "cred_def_id": "string"
+        }
+      },
+      "additionalProp2": {
+        "additionalProp1": {
+          "names": [
+            {
+              "name": "string",
+              "value": "string"
+            }
+          ],
+          "schema_id": "string",
+          "cred_def_id": "string"
+        },
+        "additionalProp2": {
+          "names": [
+            {
+              "name": "string",
+              "value": "string"
+            }
+          ],
+          "schema_id": "string",
+          "cred_def_id": "string"
+        },
+        "additionalProp3": {
+          "names": [
+            {
+              "name": "string",
+              "value": "string"
+            }
+          ],
+          "schema_id": "string",
+          "cred_def_id": "string"
+        }
+      },
+      "additionalProp3": {
+        "additionalProp1": {
+          "names": [
+            {
+              "name": "string",
+              "value": "string"
+            }
+          ],
+          "schema_id": "string",
+          "cred_def_id": "string"
+        },
+        "additionalProp2": {
+          "names": [
+            {
+              "name": "string",
+              "value": "string"
+            }
+          ],
+          "schema_id": "string",
+          "cred_def_id": "string"
+        },
+        "additionalProp3": {
+          "names": [
+            {
+              "name": "string",
+              "value": "string"
+            }
+          ],
+          "schema_id": "string",
+          "cred_def_id": "string"
+        }
+      }
+    },
+    "predicates": {
+      "additionalProp1": {
+        "additionalProp1": {
+          "cred_def_id": "string",
+          "schema_id": "string",
+          "predicate": "string"
+        },
+        "additionalProp2": {
+          "cred_def_id": "string",
+          "schema_id": "string",
+          "predicate": "string"
+        },
+        "additionalProp3": {
+          "cred_def_id": "string",
+          "schema_id": "string",
+          "predicate": "string"
+        }
+      },
+      "additionalProp2": {
+        "additionalProp1": {
+          "cred_def_id": "string",
+          "schema_id": "string",
+          "predicate": "string"
+        },
+        "additionalProp2": {
+          "cred_def_id": "string",
+          "schema_id": "string",
+          "predicate": "string"
+        },
+        "additionalProp3": {
+          "cred_def_id": "string",
+          "schema_id": "string",
+          "predicate": "string"
+        }
+      },
+      "additionalProp3": {
+        "additionalProp1": {
+          "cred_def_id": "string",
+          "schema_id": "string",
+          "predicate": "string"
+        },
+        "additionalProp2": {
+          "cred_def_id": "string",
+          "schema_id": "string",
+          "predicate": "string"
+        },
+        "additionalProp3": {
+          "cred_def_id": "string",
+          "schema_id": "string",
+          "predicate": "string"
+        }
+      }
     }
-  ]
+  },
+  "timestamps": {
+    "additionalProp1": 0,
+    "additionalProp2": 0,
+    "additionalProp3": 0
+  }
 }

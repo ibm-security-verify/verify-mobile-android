@@ -8,6 +8,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.respondError
+import io.ktor.client.engine.mock.toByteArray
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.ANDROID
 import io.ktor.client.plugins.logging.LogLevel
@@ -21,6 +22,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headers
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 
 
 class ApiMockEngine {
@@ -85,6 +88,22 @@ class ApiMockEngine {
                     error("Unhandled ${request.url.encodedPath}")
                 }
             }
+        }
+    }
+
+    suspend fun checkLastRequestedUrl(expectedUrl: String, requestType: HttpMethod = HttpMethod.Get) {
+        this.get().requestHistory.last().let { requestData ->
+            val requestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
+            when (requestType) {
+                HttpMethod.Get -> assertTrue(requestBody.isEmpty())
+                HttpMethod.Delete -> assertTrue(requestBody.isEmpty())
+                HttpMethod.Post -> assertTrue(requestBody.isEmpty().not())
+                HttpMethod.Patch -> assertTrue(requestBody.isEmpty().not())
+            }
+            assertEquals("Requested url does not match",
+                expectedUrl.trimEnd('/'),
+                requestData.url.encodedPath.trimEnd('/')
+            )
         }
     }
 }

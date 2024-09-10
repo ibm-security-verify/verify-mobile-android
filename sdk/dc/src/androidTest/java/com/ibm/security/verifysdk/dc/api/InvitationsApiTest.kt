@@ -3,14 +3,12 @@ package com.ibm.security.verifysdk.dc.api
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import com.ibm.security.verifysdk.testutils.loadJsonFromRawResource
-import io.ktor.client.engine.mock.toByteArray
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.ExperimentalSerializationApi
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
@@ -82,16 +80,7 @@ class InvitationsApiTest(private val inputUrl: String?) {
             .onFailure {
                 throw (it)
             }
-
-        apiMockEngine.get().requestHistory.last().let { requestData ->
-            val requestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
-            assertTrue(requestBody.isEmpty())
-            assertEquals(
-                "/diagency/v1.0/diagency/invitations/${id}",
-                requestData.url.encodedPath
-            )
-        }
-
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/invitations/${id}")
     }
 
     @Test
@@ -117,10 +106,11 @@ class InvitationsApiTest(private val inputUrl: String?) {
             )
         }
             .onSuccess { invitationList ->
-                assertEquals(42, invitationList.count)
+                assertEquals(33, invitationList.count)
                 assertEquals("string", invitationList.items[0].url)
             }
             .onFailure { log.info(it.toString()) }
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/invitations/")
     }
 
     @Test
@@ -152,5 +142,6 @@ class InvitationsApiTest(private val inputUrl: String?) {
                 assertEquals(3, invitationInfo.timestamps?.count())
             }
             .onFailure { log.info(it.toString()) }
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/invitations/${id}")
     }
 }

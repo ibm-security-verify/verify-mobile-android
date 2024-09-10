@@ -8,17 +8,15 @@ import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.dc.model.CreateConnectionArgs
 import com.ibm.security.verifysdk.dc.model.UpdateConnectionArgs
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
+import com.ibm.security.verifysdk.testutils.json
 import com.ibm.security.verifysdk.testutils.loadJsonFromRawResource
-import io.ktor.client.engine.mock.toByteArray
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
@@ -37,7 +35,6 @@ class ConnectionsApiTest(private val inputUrl: String?) {
     private val baseUrl = URL("http://localhost")
     private val accessToken = "abcdef123456"
     private val id = "01234567-6789-abcd-efgh-jiklmnopqrst"
-    private val json = Json
 
     companion object {
         private var apiMockEngine = ApiMockEngine()
@@ -81,7 +78,7 @@ class ConnectionsApiTest(private val inputUrl: String?) {
         )
 
         inputUrl?.let {
-            CredentialsApi(baseUrl = baseUrl).getAll(
+            ConnectionsApi(baseUrl = baseUrl).getAll(
                 accessToken = accessToken,
                 url = URL("${baseUrl}${inputUrl}")
             )
@@ -91,13 +88,15 @@ class ConnectionsApiTest(private val inputUrl: String?) {
             )
         }
             .onSuccess {
-                assertEquals(1, it.count)
+                assertEquals(22, it.count)
                 assertEquals("string", it.items[0].id)
             }
             .onFailure {
                 log.info(it.toString())
                 throw (it)
             }
+
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/connections/")
     }
 
     @Test
@@ -115,7 +114,7 @@ class ConnectionsApiTest(private val inputUrl: String?) {
         inputUrl?.let {
             ConnectionsApi(baseUrl = baseUrl).getOne(
                 accessToken = accessToken,
-                url = URL("${baseUrl}${inputUrl}"),
+                url = URL("${baseUrl}${inputUrl}${id}"),
                 id = id
             )
         } ?: run {
@@ -131,6 +130,8 @@ class ConnectionsApiTest(private val inputUrl: String?) {
                 log.info(it.toString())
                 throw (it)
             }
+
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/connections/${id}")
     }
 
     @Test
@@ -162,14 +163,8 @@ class ConnectionsApiTest(private val inputUrl: String?) {
                 throw (it)
             }
 
-        apiMockEngine.get().requestHistory.last().let { requestData ->
-            val requestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
-            assertTrue(requestBody.isEmpty())
-            assertEquals(
-                "/diagency/v1.0/diagency/connections/${id}",
-                requestData.url.encodedPath
-            )
-        }
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/connections/${id}")
+
     }
 
     @Test
@@ -205,15 +200,7 @@ class ConnectionsApiTest(private val inputUrl: String?) {
                 log.info(it.toString())
                 throw (it)
             }
-
-        apiMockEngine.get().requestHistory.last().let { requestData ->
-            val localRequestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
-            assertTrue(localRequestBody.isEmpty().not())
-            assertEquals(
-                "/diagency/v1.0/diagency/connections",
-                requestData.url.encodedPath.trimEnd('/')
-            )
-        }
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/connections/", HttpMethod.Post)
     }
 
     @Test
@@ -252,13 +239,6 @@ class ConnectionsApiTest(private val inputUrl: String?) {
                 throw (it)
             }
 
-        apiMockEngine.get().requestHistory.last().let { requestData ->
-            val localRequestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
-            assertTrue(localRequestBody.isEmpty().not())
-            assertEquals(
-                "/diagency/v1.0/diagency/connections/${id}",
-                requestData.url.encodedPath.trimEnd('/')
-            )
-        }
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/connections/${id}", HttpMethod.Patch)
     }
 }

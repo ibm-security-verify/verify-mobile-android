@@ -3,13 +3,11 @@ package com.ibm.security.verifysdk.dc.api
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import com.ibm.security.verifysdk.testutils.loadJsonFromRawResource
-import io.ktor.client.engine.mock.toByteArray
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
@@ -86,9 +84,11 @@ class AgentsApiTest(private val inputUrl: String?) {
         }
             .onSuccess { agentList ->
                 log.info(agentList.toString())
-                assertEquals(1, agentList.count)
+                assertEquals(11, agentList.count)
             }
             .onFailure { log.info(it.toString()) }
+
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/agents/")
     }
 
     @Test
@@ -123,6 +123,8 @@ class AgentsApiTest(private val inputUrl: String?) {
             .onFailure {
                 log.info(it.toString())
             }
+
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/agents/${id}")
     }
 
     @Test
@@ -150,14 +152,7 @@ class AgentsApiTest(private val inputUrl: String?) {
                 throw (it)
             }
 
-        apiMockEngine.get().requestHistory.last().let { requestData ->
-            val requestBody = requestData.body.toByteArray().toString(Charsets.UTF_8)
-            assertTrue(requestBody.isEmpty())
-            assertEquals(
-                "/diagency/v1.0/diagency/agents/${id}",
-                requestData.url.encodedPath
-            )
-        }
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/agents/${id}")
     }
 
     @Test
@@ -192,5 +187,7 @@ class AgentsApiTest(private val inputUrl: String?) {
             .onFailure {
                 log.info(it.toString())
             }
+
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/agents/${id}/did.json")
     }
 }

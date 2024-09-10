@@ -60,4 +60,16 @@ class ConnectionRoleTest {
     fun decode_withNull() {
         assertNull(ConnectionRole.decode(null))
     }
+
+    @Test
+    fun decode_withEqualValue()   {
+        val decodedEnumDirectMatch = ConnectionRole.decode(ConnectionRole.INVITER)
+        assertEquals(ConnectionRole.INVITER, decodedEnumDirectMatch)
+    }
+
+    @Test
+    fun decode_withNonExactMatch()   {
+        val decodedMixedCaseMatch = ConnectionRole.decode("Inviter")
+        assertEquals(ConnectionRole.INVITER, decodedMixedCaseMatch)
+    }
 }
