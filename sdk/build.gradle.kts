@@ -21,6 +21,9 @@ configurations.all {
     }
 }
 
+jacoco {
+    toolVersion = "0.8.12"
+}
 
 /**
  * Custom task customConnectedAndroidTest that depends on running
@@ -152,6 +155,20 @@ subprojects {
             preferProjectModules()
             force(rootProject.libs.netty.codec.http2) // CVE-2023-44487 in netty-codec-http2-4.1.93.Final
             force(rootProject.libs.jackson.woodstox.core)  // https://mvnrepository.com/artifact/com.fasterxml.woodstox/woodstox-core/6.2.4
+        }
+    }
+
+    /**
+     * List all first-level dependencies for a specific module.
+     */
+    tasks.register("listFirstLevelDependencies") {
+        doLast {
+            configurations["releaseCompileClasspath"]
+                .resolvedConfiguration
+                .firstLevelModuleDependencies
+                .forEach { dependency ->
+                    println("${dependency.moduleGroup}:${dependency.moduleName}:${dependency.moduleVersion}")
+                }
         }
     }
 }
