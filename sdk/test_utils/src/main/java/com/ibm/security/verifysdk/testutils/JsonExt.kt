@@ -2,8 +2,6 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
-@file:OptIn(ExperimentalSerializationApi::class)
-
 package com.ibm.security.verifysdk.testutils
 
 import androidx.test.platform.app.InstrumentationRegistry
@@ -13,10 +11,11 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import java.io.InputStreamReader
 
+@OptIn(ExperimentalSerializationApi::class)
 val json = Json {
     encodeDefaults = true
     explicitNulls = false
-    ignoreUnknownKeys = false
+    ignoreUnknownKeys = true
     isLenient = true
 }
 

@@ -13,10 +13,8 @@ import kotlinx.serialization.json.JsonElement
 data class DifPresentationRequest (
 
     @SerialName("presentation_definition")
-//    val presentationDefinition: PresentationDefinitionV1,
-    val presentationDefinition: JsonElement,
+    val presentationDefinition: PresentationDefinition,
 
     @SerialName("options")
-//    val options: DifPresentationOptions? = null
-    val options: JsonElement
+    val options: DifPresentationOptions? = null
 )

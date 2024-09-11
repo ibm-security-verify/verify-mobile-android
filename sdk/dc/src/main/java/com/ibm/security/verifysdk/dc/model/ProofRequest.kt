@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
-class ProofRequest(
+data class ProofRequest(
 
     @SerialName("nonce")
     val nonce: String,
@@ -41,5 +41,4 @@ class ProofRequest(
 
     @SerialName("bbs")
     val bbs: DifPresentationRequest? = null
-
 )
