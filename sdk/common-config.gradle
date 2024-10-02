@@ -1,7 +1,6 @@
-
 android {
     namespace = "com.ibm.security.verifysdk." + project.name
-//    testNamespace = "com.ibm.security.verifysdk." + project.name + ".test"
+    testNamespace = "com.ibm.security.verifysdk." + project.name + ".test"
 
     compileSdk = 34
     buildFeatures.buildConfig = true
@@ -50,6 +49,7 @@ java {
 
 dependencies {
     testImplementation(libs.junit)
+    androidTestImplementation(libs.skyscreamer.jsonassert)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.slf4j.android)
 }
