@@ -6,6 +6,7 @@ package com.ibm.security.verifysdk.dc.api
 
 import com.ibm.security.verifysdk.core.helper.BaseApi
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.model.CreateVerificationArgs
 import com.ibm.security.verifysdk.dc.model.UpdateVerificationArgs
 import com.ibm.security.verifysdk.dc.model.VerificationInfo
@@ -16,6 +17,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import java.net.URL
 
 @OptIn(ExperimentalSerializationApi::class)
+@ExperimentalDigitalCredentialsSdk
 open class VerificationsApi(private val baseUrl: URL) : BaseApi() {
 
     open suspend fun getAll(

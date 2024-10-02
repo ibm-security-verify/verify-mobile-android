@@ -6,8 +6,10 @@ package com.ibm.security.verifysdk.dc.api
 
 import com.ibm.security.verifysdk.core.helper.BaseApi
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.model.AgentReference
 import com.ibm.security.verifysdk.dc.model.AgentReferenceList
+import com.ibm.security.verifysdk.dc.model.DidDoc
 import io.ktor.client.HttpClient
 import io.ktor.http.HttpMethod
 import java.net.URL
@@ -20,6 +22,7 @@ import java.net.URL
  *
  * @param baseUrl The base URL of the API server.
  */
+@ExperimentalDigitalCredentialsSdk
 open class AgentsApi(private val baseUrl: URL) : BaseApi() {
 
     /**
@@ -127,7 +130,7 @@ open class AgentsApi(private val baseUrl: URL) : BaseApi() {
         url: URL? = null,
         accessToken: String,
         id: String
-    ): Result<AgentReference> {
+    ): Result<DidDoc> {
 
         val localUrl: URL = url ?: run {
             URL("$baseUrl/diagency/v1.0/diagency/agents/${id}/did.json")

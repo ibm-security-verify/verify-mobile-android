@@ -7,6 +7,7 @@ package com.ibm.security.verifysdk.dc.api
 
 import com.ibm.security.verifysdk.core.helper.BaseApi
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.model.InvitationInfo
 import com.ibm.security.verifysdk.dc.model.InvitationList
 import io.ktor.client.HttpClient
@@ -15,6 +16,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import java.net.URL
 
 @OptIn(ExperimentalSerializationApi::class)
+@ExperimentalDigitalCredentialsSdk
 open class InvitationsApi(private val baseUrl: URL) : BaseApi() {
 
     open suspend fun delete(
