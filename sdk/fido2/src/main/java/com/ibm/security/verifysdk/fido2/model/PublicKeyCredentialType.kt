@@ -4,7 +4,6 @@
 package com.ibm.security.verifysdk.fido2.model
 
 import com.ibm.security.verifysdk.fido2.model.PublicKeyCredentialType.PUBLIC_KEY
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -22,7 +21,6 @@ enum class PublicKeyCredentialType(val value: String) {
     /**
      * Represents a public key credential type.
      */
-    @OptIn(ExperimentalSerializationApi::class)
     @SerialName("public-key")
     PUBLIC_KEY("public-key")
 }
