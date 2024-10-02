@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 class ConnectionStateTest {
 
     @Test
-    fun to_tring() {
+    fun to_String() {
         assertEquals("inbound_invitation", ConnectionState.INBOUND_INVITATION.toString())
         assertEquals("outbound_offer", ConnectionState.OUTBOUND_OFFER.toString())
         assertEquals("inbound_offer", ConnectionState.INBOUND_OFFER.toString())

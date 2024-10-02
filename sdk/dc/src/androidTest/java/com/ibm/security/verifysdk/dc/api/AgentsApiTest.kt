@@ -2,10 +2,12 @@ package com.ibm.security.verifysdk.dc.api
 
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
+import com.ibm.security.verifysdk.testutils.json
 import com.ibm.security.verifysdk.testutils.loadJsonFromRawResource
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.encodeToString
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -13,6 +15,7 @@ import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URL
@@ -83,10 +86,12 @@ class AgentsApiTest(private val inputUrl: String?) {
             )
         }
             .onSuccess { agentList ->
-                log.info(agentList.toString())
-                assertEquals(11, agentList.count)
+                JSONAssert.assertEquals(responseBody.toString(), json.encodeToString(agentList), true)
             }
-            .onFailure { log.info(it.toString()) }
+            .onFailure {
+                log.info(it.toString())
+                throw (it)
+            }
 
         apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/agents/")
     }
@@ -122,6 +127,7 @@ class AgentsApiTest(private val inputUrl: String?) {
             }
             .onFailure {
                 log.info(it.toString())
+                throw (it)
             }
 
         apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/agents/${id}")
@@ -149,6 +155,7 @@ class AgentsApiTest(private val inputUrl: String?) {
             )
         }
             .onFailure {
+                log.info(it.toString())
                 throw (it)
             }
 
@@ -180,12 +187,13 @@ class AgentsApiTest(private val inputUrl: String?) {
                 id = id
             )
         }
-            .onSuccess { agent ->
-                assertEquals("string", agent.id)
-                assertEquals("string", agent.name)
+            .onSuccess { didDoc ->
+                JSONAssert.assertEquals(responseBody.toString(), json.encodeToString(didDoc), true)
+                assertEquals("string", didDoc.id)
             }
             .onFailure {
                 log.info(it.toString())
+                throw (it)
             }
 
         apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/agents/${id}/did.json")

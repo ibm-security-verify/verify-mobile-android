@@ -78,6 +78,7 @@ class InvitationsApiTest(private val inputUrl: String?) {
             )
         }
             .onFailure {
+                log.info(it.toString())
                 throw (it)
             }
         apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/invitations/${id}")
@@ -109,7 +110,10 @@ class InvitationsApiTest(private val inputUrl: String?) {
                 assertEquals(33, invitationList.count)
                 assertEquals("string", invitationList.items[0].url)
             }
-            .onFailure { log.info(it.toString()) }
+            .onFailure {
+                log.info(it.toString())
+                throw (it)
+            }
         apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/invitations/")
     }
 
@@ -141,7 +145,10 @@ class InvitationsApiTest(private val inputUrl: String?) {
                 assertEquals("string", invitationInfo.url)
                 assertEquals(3, invitationInfo.timestamps?.count())
             }
-            .onFailure { log.info(it.toString()) }
+            .onFailure {
+                log.info(it.toString())
+                throw (it)
+            }
         apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/invitations/${id}")
     }
 }

@@ -36,7 +36,7 @@ class CreateConnectionArgsTest {
     }
 
     @Test
-    fun initialize_withParticalValues() {
+    fun initialize_withPartialValues() {
         val args = CreateConnectionArgs(
             directRoute = true,
             properties = mapOf("key1" to "value1"),

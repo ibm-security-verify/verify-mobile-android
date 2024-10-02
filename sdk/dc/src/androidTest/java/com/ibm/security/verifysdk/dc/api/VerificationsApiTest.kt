@@ -151,6 +151,7 @@ class VerificationsApiTest(private val inputUrl: String?) {
             )
         }
             .onFailure {
+                log.info(it.toString())
                 throw (it)
             }
         apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/verifications/${id}")

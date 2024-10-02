@@ -5,6 +5,7 @@ import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.junit.Assert.assertEquals
@@ -23,7 +24,7 @@ class CredentialInfoTest {
             role = CredentialRole.ISSUER,
             state = CredentialState.ISSUED,
             issuerDid = "did:sov:123",
-            format = "jsonld",
+            format = "format",
             connection = ConnectionInfo(
                 id = "connId",
                 state = "active",
@@ -35,7 +36,12 @@ class CredentialInfoTest {
                     ext = true
                 ),
                 didExchange = true
-            )
+            ),
+            proposal = JsonPrimitive("proposal"),
+            preview = JsonPrimitive("preview"),
+            offer = CredentialInfoOffer(),
+            ariesMessage = JsonPrimitive("ariesMessage"),
+            properties = mapOf("propertyKey" to JsonPrimitive("propertyValue"))
         )
 
         val jsonString = json.encodeToString(credentialInfo)
@@ -45,7 +51,7 @@ class CredentialInfoTest {
                     "role":"issuer",
                     "state":"issued",
                     "issuer_did":"did:sov:123",
-                    "format":"jsonld",
+                    "format":"format",
                     "connection":{
                         "id":"connId",
                         "state":"active",
@@ -60,6 +66,13 @@ class CredentialInfoTest {
                             "ext":true
                         },
                         "did_exchange":true
+                    },
+                    "proposal":"proposal",
+                    "preview":"preview",
+                    "offer":{},
+                    "aries_message":"ariesMessage",
+                    "properties": {
+                        "propertyKey": "propertyValue"
                     }
                 }
             """.trimIndent().replace("\n", "").replace(" ", "")
@@ -74,7 +87,7 @@ class CredentialInfoTest {
                     "role":"issuer",
                     "state":"issued",
                     "issuer_did":"did:sov:123",
-                    "format":"jsonld",
+                    "format":"format",
                     "connection":{
                         "id":"connId",
                         "state":"active",
@@ -98,6 +111,7 @@ class CredentialInfoTest {
         assertEquals(CredentialRole.ISSUER, credentialInfo.role)
         assertEquals(CredentialState.ISSUED, credentialInfo.state)
         assertEquals("did:sov:123", credentialInfo.issuerDid)
+        assertEquals("format", credentialInfo.format)
         assertEquals("connId", credentialInfo.connection.id)
         assertEquals("active", credentialInfo.connection.state)
     }
@@ -113,7 +127,7 @@ class CredentialInfoTest {
             role = CredentialRole.ISSUER,
             state = CredentialState.ISSUED,
             issuerDid = "did:sov:123",
-            format = "jsonld",
+            format = "format",
             connection = ConnectionInfo(
                 id = "connId",
                 state = "active",
@@ -147,7 +161,7 @@ class CredentialInfoTest {
                     "role":"issuer",
                     "state":"issued",
                     "issuer_did":"did:sov:123",
-                    "format":"jsonld",
+                    "format":"format",
                     "connection":{
                         "id":"connId",
                         "state":"active",
@@ -163,6 +177,11 @@ class CredentialInfoTest {
                         },
                         "did_exchange":true
                     },
+                "proposal": null,
+                "preview": null,
+                "offer": null,
+                "aries_message": null,
+                "properties": null,
                 "schema_name": null,
                 "schema_version": null,
                 "schema_id": null,
@@ -179,5 +198,10 @@ class CredentialInfoTest {
         assertNull(credentialInfo.credDefId)
         assertNull(credentialInfo.credJson)
         assertNull(credentialInfo.timestamps)
+        assertNull(credentialInfo.proposal)
+        assertNull(credentialInfo.preview)
+        assertNull(credentialInfo.offer)
+        assertNull(credentialInfo.ariesMessage)
+        assertNull(credentialInfo.properties)
     }
 }
