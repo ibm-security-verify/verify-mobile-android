@@ -6,6 +6,7 @@ package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class InputDescriptor(
@@ -22,12 +23,12 @@ data class InputDescriptor(
     @SerialName("purpose")
     val purpose: String? = null,
 
-//    @SerialName("group")
-//    val group: List<String>? = null,
-//
-//    @SerialName("issuance")
-//    val issuance: List<Issuance>? = null,
-//
-//    @SerialName("constraints")
-//    val constraints: Constraints? = null
+    @SerialName("group")
+    val group: List<String>? = null,
+
+    @SerialName("issuance")
+    val issuance: List<JsonElement>? = null,
+
+    @SerialName("constraints")
+    val constraints: Constraints? = null
 )

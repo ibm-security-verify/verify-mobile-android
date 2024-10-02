@@ -2,13 +2,14 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
+@file:OptIn(ExperimentalSerializationApi::class)
+
 package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class ProofRequest(
 
