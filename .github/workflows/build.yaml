@@ -146,7 +146,7 @@ jobs:
           target: default
           arch: x86
           profile: Nexus 6
-          script: ./gradlew --no-daemon jacocoReport
+          script: ./gradlew --no-daemon :rootCoverageReport
 
       - name: Store code coverage report
         uses: actions/upload-artifact@v4.3.1
@@ -160,7 +160,7 @@ jobs:
         with:
           working-directory: ./sdk
           paths: |
-            ${{ github.workspace }}/**/build/reports/jacoco/jacocoReport.xml
+            ${{ github.workspace }}/**/build/reports/jacocoReport.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 0
           min-coverage-changed-files: 0
