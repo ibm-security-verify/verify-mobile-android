@@ -28,6 +28,7 @@ import com.google.zxing.integration.android.IntentResult
 import com.ibm.security.verifysdk.authentication.api.OAuthProvider
 import com.ibm.security.verifysdk.core.helper.ContextHelper
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.QrCode
 import com.ibm.security.verifysdk.dc.api.CredentialsApi
 import com.ibm.security.verifysdk.dc.api.InvitationsApi
@@ -43,6 +44,7 @@ import java.net.URL
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 
+@ExperimentalDigitalCredentialsSdk
 class MainActivity : ComponentActivity() {
 
     private val log: Logger = LoggerFactory.getLogger(javaClass.name)
