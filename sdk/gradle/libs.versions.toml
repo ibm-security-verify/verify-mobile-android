@@ -39,7 +39,8 @@ woodstockCore = "6.6.2"
 zxingAndroidEmbeddedVersion = "4.3.0"
 jetbrainsKotlinJvmVersion = "1.9.20"
 monitorVersion = "1.7.2"
-junitJunit = "4.12"
+rootCoverage = "1.9.0"
+jsonassert = "2.0-rc1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
@@ -97,7 +98,7 @@ slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4jAndroi
 versioning-plugin = { module = "org.jetbrains.dokka:versioning-plugin", version.ref = "versioningPluginVersion" }
 zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbeddedVersion" }
 androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitorVersion" }
-junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
+skyscreamer-jsonassert = { group = "org.skyscreamer", name = "jsonassert", version.ref = "jsonassert" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -106,3 +107,4 @@ jetbrains-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvmVersion" }
+neotech-rootcoverage = { id = "nl.neotech.plugin.rootcoverage", version.ref = "rootCoverage"}

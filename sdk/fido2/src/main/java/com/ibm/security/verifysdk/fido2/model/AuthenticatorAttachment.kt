@@ -5,6 +5,7 @@ package com.ibm.security.verifysdk.fido2.model
 
 import com.ibm.security.verifysdk.fido2.model.AuthenticatorAttachment.CROSS_PLATFORM
 import com.ibm.security.verifysdk.fido2.model.AuthenticatorAttachment.PLATFORM
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -23,10 +24,12 @@ enum class AuthenticatorAttachment(val value: String) {
     /**
      * Represents authenticators embedded in the platform.
      */
+    @SerialName("platform")
     PLATFORM("platform"),
 
     /**
      * Represents authenticators connected to the client platform through external means.
      */
+    @SerialName("cross-platform")
     CROSS_PLATFORM("cross-platform")
 }

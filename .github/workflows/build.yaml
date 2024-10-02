@@ -146,13 +146,13 @@ jobs:
           target: default
           arch: x86
           profile: Nexus 6
-          script: ./gradlew --no-daemon jacocoReport
+          script: ./gradlew --no-daemon :rootCoverageReport
 
       - name: Store code coverage report
         uses: actions/upload-artifact@v4.3.1
         with:
           name: jacoco-report
-          path: ./sdk/build/reports/jacoco/
+          path: ./sdk/build/reports/
 
       - name: Add coverage to PR
         id: jacoco
@@ -160,7 +160,7 @@ jobs:
         with:
           working-directory: ./sdk
           paths: |
-            ${{ github.workspace }}/**/build/reports/jacoco/jacocoReport.xml
+            ${{ github.workspace }}/**/build/reports/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 0
           min-coverage-changed-files: 0
@@ -219,25 +219,25 @@ jobs:
         run: mkdir -p ./sdk
 
       - name: Collect all artificats
-        uses: actions/download-artifact@v4.1.4
+        uses: actions/download-artifact@v4.1.7
         with:
           name: build-and-test
           path: ./sdk
 
       - name: Collect documentation artificats
-        uses: actions/download-artifact@v4.1.4
+        uses: actions/download-artifact@v4.1.7
         with:
           name: documentation
           path: ./sdk     
 
       - name: Collect maven-local artificats
-        uses: actions/download-artifact@v4.1.4
+        uses: actions/download-artifact@v4.1.7
         with:
           name: maven-local
           path: ~/.m2/repository/com/ibm/security
 
       - name: Collect code coverate result
-        uses: actions/download-artifact@v4.1.4
+        uses: actions/download-artifact@v4.1.7
         with:
           name: jacoco-report
           path: ./sdk
@@ -276,7 +276,9 @@ jobs:
 
 
       - name: Zip code coverage report
-        run: cd ./sdk/html && zip -r ../IBM-Verify-SDK_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_code-coverage-report.zip *
+        run: |
+          ls ./sdk/*/*
+          cd ./sdk/jacoco && zip -r ../../IBM-Verify-SDK_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_code-coverage-report.zip *
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@4634c16e79c963813287e889244c50009e7f0981

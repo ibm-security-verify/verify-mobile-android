@@ -6,6 +6,7 @@ package com.ibm.security.verifysdk.fido2.model
 import com.ibm.security.verifysdk.fido2.model.AttestationConveyancePreference.DIRECT
 import com.ibm.security.verifysdk.fido2.model.AttestationConveyancePreference.INDIRECT
 import com.ibm.security.verifysdk.fido2.model.AttestationConveyancePreference.NONE
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -24,15 +25,18 @@ enum class AttestationConveyancePreference(val value: String) {
     /**
      * Indicates that the authenticator will not convey attestation during registration.
      */
+    @SerialName("none")
     NONE("none"),
 
     /**
      * Indicates that the authenticator will convey attestation indirectly via the FIDO server.
      */
+    @SerialName("indirect")
     INDIRECT("indirect"),
 
     /**
      * Indicates that the authenticator will convey attestation directly to the relying party.
      */
+    @SerialName("direct")
     DIRECT("direct")
 }

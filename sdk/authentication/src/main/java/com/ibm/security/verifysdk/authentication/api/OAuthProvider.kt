@@ -14,26 +14,16 @@ import com.ibm.security.verifysdk.authentication.model.OIDCMetadataInfo
 import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.core.AuthenticationException
 import com.ibm.security.verifysdk.core.AuthorizationException
-import com.ibm.security.verifysdk.core.ErrorResponse
+import com.ibm.security.verifysdk.core.helper.BaseApi
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.accept
-import io.ktor.client.request.get
-import io.ktor.client.request.headers
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.request.url
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
 import io.ktor.http.formUrlEncode
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import java.net.MalformedURLException
 import java.net.URL
@@ -57,15 +47,9 @@ import kotlin.coroutines.resume
  */
 @OptIn(ExperimentalSerializationApi::class)
 @Suppress("unused")
-class OAuthProvider(val clientId: String, val clientSecret: String?) {
+class OAuthProvider(val clientId: String, val clientSecret: String?) : BaseApi() {
 
     private val log = LoggerFactory.getLogger(javaClass)
-
-    private val decoder =  Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = true
-    }
 
     /**
      * If set to `true`, SSL validation checks will be disabled.
@@ -123,17 +107,20 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
      * @return
      *
      */
-    suspend fun discover(url: URL, httpClient: HttpClient = NetworkHelper.getInstance): Result<OIDCMetadataInfo> {
+    suspend fun discover(
+        httpClient: HttpClient = NetworkHelper.getInstance,
+        url: URL
+    ): Result<OIDCMetadataInfo> {
 
         return try {
             if (url.path.endsWith(".well-known/openid-configuration", ignoreCase = true).not()) {
-                Result.failure(MalformedURLException("The URL does not end with the .well-known/openid-configuration path component."))
-            } else {
-                val response = httpClient.get {
-                    url(url.toString())
-                }.body<OIDCMetadataInfo>()
-                Result.success(response)
+                return Result.failure(MalformedURLException("The URL does not end with the .well-known/openid-configuration path component."))
             }
+
+            performRequest(
+                httpClient = httpClient,
+                url = url
+            )
         } catch (e: Throwable) {
             Result.failure(e)
         }
@@ -255,12 +242,12 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
      * @return
      */
     suspend fun authorize(
+        httpClient: HttpClient = NetworkHelper.getInstance,
         url: URL,
         redirectUrl: URL? = null,
         authorizationCode: String,
         codeVerifier: String? = null,
-        scope: Array<String>?,
-        httpClient: HttpClient = NetworkHelper.getInstance
+        scope: Array<String>?
     ): Result<TokenInfo> {
 
         return try {
@@ -274,30 +261,14 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
                 "redirect_uri" to (redirectUrl?.toString() ?: "")
             )
 
-            val response = httpClient.post {
-                url(url.toString())
-                headers {
-                    additionalHeaders.forEach {
-                        this@headers.append(it.key, it.value)
-                    }
-                }
-                contentType(ContentType.Application.FormUrlEncoded)
-                accept(ContentType.Application.Json)
-                setBody((formData + additionalParameters.toList()).formUrlEncode())
-            }
-
-            if (response.status.isSuccess()) {
-                Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
-            } else {
-                val errorResponse = response.body<ErrorResponse>()
-                Result.failure(
-                    AuthorizationException(
-                        response.status,
-                        errorResponse.error,
-                        errorResponse.errorDescription
-                    )
-                )
-            }
+            performRequest<TokenInfo>(
+                httpClient = httpClient,
+                method = HttpMethod.Post,
+                url = url,
+                headers = additionalHeaders,
+                contentType = ContentType.Application.FormUrlEncoded,
+                body = (formData + additionalParameters.toList()).formUrlEncode()
+            )
         } catch (e: Throwable) {
             Result.failure(e)
         }
@@ -320,11 +291,11 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
      *         exception if the request fails.
      */
     suspend fun authorize(
+        httpClient: HttpClient = NetworkHelper.getInstance,
         url: URL,
         username: String,
         password: String,
-        scope: Array<String>? = arrayOf(""),
-        httpClient: HttpClient = NetworkHelper.getInstance
+        scope: Array<String>? = arrayOf("")
     ): Result<TokenInfo> {
 
         return try {
@@ -337,30 +308,14 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
                 "scope" to (scope?.joinToString(" ") ?: ""),
             )
 
-            val response = httpClient.post {
-                url(url.toString())
-                headers {
-                    additionalHeaders.forEach {
-                        this@headers.append(it.key, it.value)
-                    }
-                }
-                contentType(ContentType.Application.FormUrlEncoded)
-                accept(ContentType.Application.Json)
-                setBody((formData + additionalParameters.toList()).formUrlEncode())
-            }
-
-            if (response.status.isSuccess()) {
-                Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
-            } else {
-                val errorResponse = response.body<ErrorResponse>()
-                Result.failure(
-                    AuthorizationException(
-                        response.status,
-                        errorResponse.error,
-                        errorResponse.errorDescription
-                    )
-                )
-            }
+            performRequest<TokenInfo>(
+                httpClient = httpClient,
+                method = HttpMethod.Post,
+                url = url,
+                headers = additionalHeaders,
+                contentType = ContentType.Application.FormUrlEncoded,
+                body = (formData + additionalParameters.toList()).formUrlEncode()
+            )
         } catch (e: Throwable) {
             Result.failure(e)
         }
@@ -397,30 +352,14 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) {
                 "scope" to (scope?.joinToString(" ") ?: ""),
             )
 
-            val response = httpClient.post {
-                url(url.toString())
-                headers {
-                    additionalHeaders.forEach {
-                        this@headers.append(it.key, it.value)
-                    }
-                }
-                contentType(ContentType.Application.Json)
-                accept(ContentType.Application.Json)
-                setBody((formData + additionalParameters.toList()).formUrlEncode())
-            }
-
-            if (response.status.isSuccess()) {
-                Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
-            } else {
-                val errorResponse = response.body<ErrorResponse>()
-                Result.failure(
-                    AuthorizationException(
-                        response.status,
-                        errorResponse.error,
-                        errorResponse.errorDescription
-                    )
-                )
-            }
+            performRequest<TokenInfo>(
+                httpClient = httpClient,
+                method = HttpMethod.Post,
+                url = url,
+                headers = additionalHeaders,
+                contentType = ContentType.Application.Json,
+                body = (formData + additionalParameters.toList()).formUrlEncode()
+            )
         } catch (e: Throwable) {
             Result.failure(e)
         }
