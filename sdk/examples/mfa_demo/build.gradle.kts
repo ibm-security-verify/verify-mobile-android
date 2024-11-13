@@ -12,9 +12,9 @@ android {
     defaultConfig {
         applicationId = "com.ibm.security.verifysdk.mfa.demoapp"
 
-        manifestPlaceholders["auth_redirect_scheme"] = "verifysdk"
-        manifestPlaceholders["auth_redirect_host"] = "callback"
-        manifestPlaceholders["auth_redirect_path"] = "/redirect"
+        manifestPlaceholders["authRedirectScheme"] = "https"
+        manifestPlaceholders["authRedirectHost"] = "sdk.verify.ibm.com"
+        manifestPlaceholders["authRedirectPath"] = "/redirect"
     }
 
     project.configurations.all {
