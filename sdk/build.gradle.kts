@@ -11,8 +11,8 @@ plugins {
 }
 
 // used for release naming and in mfa SDK
-extra["versionName"] = "3.0.3"
-extra["versionCode"] = "104"
+extra["versionName"] = "3.0.4"
+extra["versionCode"] = "105"
 
 configurations.all {
     resolutionStrategy {

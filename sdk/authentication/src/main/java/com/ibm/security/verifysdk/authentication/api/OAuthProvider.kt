@@ -23,7 +23,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.formUrlEncode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.serialization.ExperimentalSerializationApi
 import org.slf4j.LoggerFactory
 import java.net.MalformedURLException
 import java.net.URL
@@ -45,9 +44,8 @@ import kotlin.coroutines.resume
  *
  * @since 3.0.0
  */
-@OptIn(ExperimentalSerializationApi::class)
 @Suppress("unused")
-class OAuthProvider(val clientId: String, val clientSecret: String?) : BaseApi() {
+class OAuthProvider(val clientId: String, val clientSecret: String? = null) : BaseApi() {
 
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -139,7 +137,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) : BaseApi()
      * @param   state  An opaque value used by the client to maintain state between the request and
      *                  callback.  The authorization server includes this value when redirecting
      *                  back to the client.
-     * @poram   activity  The activity invoking this method.
+     * @param   activity  The activity invoking this method.
      *
      * @return  [Result] with the `code` to be used in the subsequent authorization request or
      *                  with `Throwable` in case of an error.
@@ -148,10 +146,10 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) : BaseApi()
     suspend fun authorizeWithBrowser(
         url: URL,
         redirectUrl: String,
-        codeChallenge: String?,
+        codeChallenge: String? = null,
         method: CodeChallengeMethod = CodeChallengeMethod.PLAIN,
-        scope: Array<String>?,
-        state: String?,
+        scope: Array<String>? = null,
+        state: String? = null,
         activity: ComponentActivity
     ): Result<String> {
 
@@ -247,7 +245,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) : BaseApi()
         redirectUrl: URL? = null,
         authorizationCode: String,
         codeVerifier: String? = null,
-        scope: Array<String>?
+        scope: Array<String>? = null
     ): Result<TokenInfo> {
 
         return try {
@@ -295,7 +293,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) : BaseApi()
         url: URL,
         username: String,
         password: String,
-        scope: Array<String>? = arrayOf("")
+        scope: Array<String>? = null
     ): Result<TokenInfo> {
 
         return try {
@@ -341,7 +339,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String?) : BaseApi()
     suspend fun refresh(
         url: URL,
         refreshToken: String,
-        scope: Array<String>? = arrayOf(""),
+        scope: Array<String>? = null,
         httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<TokenInfo> {
 
