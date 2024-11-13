@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -14,18 +15,16 @@
             android:name=".AuthenticationActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:allowBackup="false"
-            android:permission="com.ibm.security.verifysdk">
-            <intent-filter>
+            android:allowBackup="false">
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data
-                    android:host="${auth_redirect_host}"
-                    android:path="${auth_redirect_path}"
-                    android:scheme="${auth_redirect_scheme}" />
+                    android:scheme="${authRedirectScheme}"
+                    android:host="${authRedirectHost}"
+                    android:path="${authRedirectPath}"
+                    tools:replace="android:host,android:path,android:scheme" />
             </intent-filter>
         </activity>
     </application>

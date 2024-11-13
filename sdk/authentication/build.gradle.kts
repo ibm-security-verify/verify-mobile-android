@@ -9,14 +9,6 @@ apply(from = "$rootDir/common-config.gradle")
 apply(from = "$rootDir/common-config-ktor.gradle")
 apply(from = "$rootDir/common-publish.gradle")
 
-android {
-    defaultConfig {
-        manifestPlaceholders["auth_redirect_scheme"] = "verifysdk"
-        manifestPlaceholders["auth_redirect_host"] = "callback"
-        manifestPlaceholders["auth_redirect_path"] = "/redirect"
-    }
-}
-
 dependencies {
 
     implementation(project(":core"))
