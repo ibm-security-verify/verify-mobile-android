@@ -9,6 +9,18 @@ apply(from = "$rootDir/common-config.gradle")
 apply(from = "$rootDir/common-config-ktor.gradle")
 apply(from = "$rootDir/common-publish.gradle")
 
+android {
+    buildTypes {
+        getByName("debug") {    // required for test runs
+            manifestPlaceholders["authRedirectScheme"] = "https"
+            manifestPlaceholders["authRedirectHost"] = "sdk.verify.ibm.com"
+            manifestPlaceholders["authRedirectPath"] = "/callback"
+        }
+
+        testBuildType = "debug"
+    }
+}
+
 dependencies {
 
     implementation(project(":core"))
