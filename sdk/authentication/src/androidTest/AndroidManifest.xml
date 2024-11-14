@@ -15,9 +15,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="${auth_redirect_host}"
-                    android:path="${auth_redirect_path}"
-                    android:scheme="${auth_redirect_scheme}" />
+                    android:host="sdk.ibm.verify.ibm.com"
+                    android:path="/callback"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
     </application>
