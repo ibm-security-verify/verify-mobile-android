@@ -32,8 +32,8 @@ android {
 
 dependencies {
 
-    implementation(project(":core"))
-    implementation(project(":authentication"))
+    implementation("com.ibm.security.verifysdk:core:3.0.4")
+    implementation("com.ibm.security.verifysdk:authentication:3.0.4")
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)

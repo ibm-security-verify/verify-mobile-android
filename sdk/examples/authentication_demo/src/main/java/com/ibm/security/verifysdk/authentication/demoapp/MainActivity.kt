@@ -71,9 +71,12 @@ class MainActivity : ComponentActivity() {
                     .onSuccess { token ->
                         log.info("--> Token: $token")
                     }
+                    .onFailure {
+                        log.error("--> Error: $it")
+                    }
             }
                 .onFailure {
-                    log.info("--> Error: $it")
+                    log.error("--> Error: $it")
                 }
         }
     }
