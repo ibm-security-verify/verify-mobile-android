@@ -58,10 +58,17 @@ data class TokenInfo(
     val refreshToken: String = "",
 
     /**
+     * The type of token that the authorization server will return which encodes the user’s
+     * authentication information.
+     */
+    @SerialName("id_token")
+    val idToken: String? = null,
+
+    /**
      * The date and time when the access token was created.
      */
     @SerialName("created_on")
-    val createdOn: kotlinx.datetime.Instant = Clock.System.now(),
+    val createdOn: Instant = Clock.System.now(),
 
     /**
      *  The lifetime in seconds of the access token.
@@ -106,18 +113,20 @@ data class TokenInfo(
         override fun create(parcel: Parcel): TokenInfo {
             val accessToken = parcel.readString() ?: ""
             val refreshToken = parcel.readString() ?: ""
+            val idToken = parcel.readString()
             val createdOn = Instant.fromEpochSeconds(parcel.readLong())
             val expiresIn = parcel.readInt()
             val expiresOn = Instant.fromEpochSeconds(parcel.readLong())
             val scope = parcel.readString() ?: ""
             val tokenType = parcel.readString() ?: ""
-            val additionalData = HashMap<String, Any>()
 
+            val additionalData = HashMap<String, Any>()
             parcel.readMap(additionalData, Map::class.java.classLoader)
 
             return TokenInfo(
                 accessToken,
                 refreshToken,
+                idToken,
                 createdOn,
                 expiresIn,
                 expiresOn,
@@ -130,6 +139,7 @@ data class TokenInfo(
         override fun TokenInfo.write(parcel: Parcel, flags: Int) {
             parcel.writeString(accessToken)
             parcel.writeString(refreshToken)
+            parcel.writeString(idToken)
             parcel.writeLong(createdOn.epochSeconds)
             parcel.writeInt(expiresIn)
             parcel.writeLong(expiresOn.epochSeconds)
@@ -174,6 +184,7 @@ internal object TokenInfoSerializer : KSerializer<TokenInfo> {
 
     private const val ACCESS_TOKEN = "accessToken"
     private const val REFRESH_TOKEN = "refreshToken"
+    private const val ID_TOKEN = "idToken"
     internal const val CREATED_ON = "createdOn"
     private const val EXPIRES_IN = "expiresIn"
     internal const val EXPIRES_ON = "expiresOn"
@@ -194,6 +205,8 @@ internal object TokenInfoSerializer : KSerializer<TokenInfo> {
         "scope",
         "token_type",
         "tokenType",
+        "id_token",
+        "idToken",
         "version",  // ignored as attribute is not used
         "metadata"  // ignored as key is for the Metadata class and handled there
     )
@@ -212,6 +225,10 @@ internal object TokenInfoSerializer : KSerializer<TokenInfo> {
             .collect(Collectors.toList()).getOrNull(0)?.jsonPrimitive?.content.orEmpty()
 
         val refreshToken = listOf(REFRESH_TOKEN, "refresh_token").stream().map(decoderMap::get)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList()).getOrNull(0)?.jsonPrimitive?.content.orEmpty()
+
+        val idToken = listOf(ID_TOKEN, "id_token").stream().map(decoderMap::get)
             .filter(Objects::nonNull)
             .collect(Collectors.toList()).getOrNull(0)?.jsonPrimitive?.content.orEmpty()
 
@@ -242,7 +259,7 @@ internal object TokenInfoSerializer : KSerializer<TokenInfo> {
             .mapValues { (_, value) -> deserializeJsonElement(value.jsonPrimitive) }
 
         return TokenInfo(
-            accessToken, refreshToken, Instant.fromEpochSeconds(createdOn), expiresIn,
+            accessToken, refreshToken, idToken, Instant.fromEpochSeconds(createdOn), expiresIn,
             Instant.fromEpochSeconds(expiresOn), scope, tokenType, additionalData
         )
     }
@@ -273,6 +290,7 @@ internal object TokenInfoSerializer : KSerializer<TokenInfo> {
 
         map[ACCESS_TOKEN] = value.accessToken.toJsonElement()
         map[REFRESH_TOKEN] = value.refreshToken.toJsonElement()
+        map[ID_TOKEN] = value.idToken.toJsonElement()
         map[CREATED_ON] = value.createdOn.epochSeconds.toJsonElement()
         map[EXPIRES_IN] = value.expiresIn.toJsonElement()
         map[EXPIRES_ON] = value.expiresOn.epochSeconds.toJsonElement()
