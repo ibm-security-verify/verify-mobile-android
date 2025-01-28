@@ -65,8 +65,9 @@ internal class OAuthProviderTest {
 
         val result =
             oAuthProviderSecretNull.refresh(
-                URL("http://localhost/v1.0/authenticators/registration"),
-                "abc123def",
+                httpClient = apiMockEngine.getEngine(),
+                url = URL("http://localhost/v1.0/authenticators/registration"),
+                refreshToken = "abc123def",
             )
 
         assertTrue(result.isSuccess)
@@ -88,9 +89,10 @@ internal class OAuthProviderTest {
 
         val result =
             oAuthProvider.refresh(
-                URL("http://localhost/v1.0/authenticators/registration"),
+                httpClient = apiMockEngine.getEngine(),
+                url = URL("http://localhost/v1.0/authenticators/registration"),
                 "abc123def",
-                arrayOf("name", "age")
+                scope = arrayOf("name", "age")
             )
 
         assertTrue(result.isSuccess)
@@ -112,9 +114,10 @@ internal class OAuthProviderTest {
 
         val result =
             oAuthProvider.refresh(
-                URL("http://localhost/v1.0/authenticators/registration"),
+                httpClient = apiMockEngine.getEngine(),
+                url = URL("http://localhost/v1.0/authenticators/registration"),
                 "abc123def",
-                arrayOf("name", "age")
+                scope = arrayOf("name", "age")
             )
 
         assertTrue(result.isSuccess)
@@ -136,8 +139,9 @@ internal class OAuthProviderTest {
 
         val result =
             oAuthProvider.refresh(
-                URL("http://localhost/v1.0/authenticators/registration"),
-                ""
+                httpClient = apiMockEngine.getEngine(),
+                url = URL("http://localhost/v1.0/authenticators/registration"),
+                refreshToken = ""
             )
 
         assertTrue(result.isFailure)
