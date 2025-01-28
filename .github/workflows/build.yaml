@@ -10,6 +10,7 @@ on:
     - develop
     - 'dev-**'
     - 'VDEV-**'
+    - 'fix-**'
 
 jobs:    
   setup_environment:
