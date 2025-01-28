@@ -249,15 +249,25 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
     ): Result<TokenInfo> {
 
         return try {
-            val formData = listOf(
+            val formData = mutableMapOf(
                 "client_id" to clientId,
-                "client_secret" to (clientSecret ?: ""),
                 "code" to authorizationCode,
                 "code_verifier" to (codeVerifier ?: ""),
                 "grant_type" to "authorization_code",
-                "scope" to (scope?.joinToString(" ") ?: ""),
                 "redirect_uri" to (redirectUrl?.toString() ?: "")
             )
+
+            clientSecret?.let {
+                formData["client_secret"] = it
+            }
+
+            codeVerifier?.let {
+                formData["code_verifier"] = it
+            }
+
+            scope?.let {
+                formData["scope"] = it.joinToString(separator = " ")
+            }
 
             performRequest<TokenInfo>(
                 httpClient = httpClient,
@@ -265,7 +275,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
                 url = url,
                 headers = additionalHeaders,
                 contentType = ContentType.Application.FormUrlEncoded,
-                body = (formData + additionalParameters.toList()).formUrlEncode()
+                body = (formData.toList() + additionalParameters.toList()).formUrlEncode()
             )
         } catch (e: Throwable) {
             Result.failure(e)
@@ -297,14 +307,20 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
     ): Result<TokenInfo> {
 
         return try {
-            val formData = listOf(
+            val formData = mutableMapOf(
                 "client_id" to clientId,
-                "client_secret" to (clientSecret ?: ""),
                 "username" to username,
                 "password" to password,
                 "grant_type" to "password",
-                "scope" to (scope?.joinToString(" ") ?: ""),
             )
+
+            clientSecret?.let {
+                formData["client_secret"] = it
+            }
+
+            scope?.let {
+                formData["scope"] = it.joinToString(separator = " ")
+            }
 
             performRequest<TokenInfo>(
                 httpClient = httpClient,
@@ -312,7 +328,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
                 url = url,
                 headers = additionalHeaders,
                 contentType = ContentType.Application.FormUrlEncoded,
-                body = (formData + additionalParameters.toList()).formUrlEncode()
+                body = (formData.toList() + additionalParameters.toList()).formUrlEncode()
             )
         } catch (e: Throwable) {
             Result.failure(e)
@@ -337,20 +353,26 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
      * @return
      */
     suspend fun refresh(
+        httpClient: HttpClient = NetworkHelper.getInstance,
         url: URL,
         refreshToken: String,
-        scope: Array<String>? = null,
-        httpClient: HttpClient = NetworkHelper.getInstance,
-        clientSecret: String? = null
+        scope: Array<String>? = null
     ): Result<TokenInfo> {
 
         return try {
-            val formData = listOf(
+            val formData = mutableMapOf(
+                "client_id" to clientId,
                 "refresh_token" to refreshToken,
                 "grant_type" to "refresh_token",
-                "scope" to (scope?.joinToString(" ") ?: ""),
-                "client_secret" to (clientSecret ?: "")
             )
+
+            clientSecret?.let {
+                formData["client_secret"] = it
+            }
+
+            scope?.let {
+                formData["scope"] = it.joinToString(separator = " ")
+            }
 
             performRequest<TokenInfo>(
                 httpClient = httpClient,
@@ -358,7 +380,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
                 url = url,
                 headers = additionalHeaders,
                 contentType = ContentType.Application.FormUrlEncoded,
-                body = (formData + additionalParameters.toList()).formUrlEncode()
+                body = (formData.toList() + additionalParameters.toList()).formUrlEncode()
             )
         } catch (e: Throwable) {
             Result.failure(e)
