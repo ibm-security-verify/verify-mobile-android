@@ -340,7 +340,8 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
         url: URL,
         refreshToken: String,
         scope: Array<String>? = null,
-        httpClient: HttpClient = NetworkHelper.getInstance
+        httpClient: HttpClient = NetworkHelper.getInstance,
+        clientSecret: String? = null
     ): Result<TokenInfo> {
 
         return try {
@@ -348,6 +349,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
                 "refresh_token" to refreshToken,
                 "grant_type" to "refresh_token",
                 "scope" to (scope?.joinToString(" ") ?: ""),
+                "client_secret" to (clientSecret ?: "")
             )
 
             performRequest<TokenInfo>(
@@ -355,7 +357,7 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
                 method = HttpMethod.Post,
                 url = url,
                 headers = additionalHeaders,
-                contentType = ContentType.Application.Json,
+                contentType = ContentType.Application.FormUrlEncoded,
                 body = (formData + additionalParameters.toList()).formUrlEncode()
             )
         } catch (e: Throwable) {
