@@ -3,6 +3,7 @@
  */
 package com.ibm.security.verifysdk.authentication.model
 
+import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import com.ibm.security.verifysdk.core.extension.toJsonElement
@@ -12,6 +13,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -26,8 +28,10 @@ import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import org.json.JSONObject
@@ -124,15 +128,15 @@ data class TokenInfo(
             parcel.readMap(additionalData, Map::class.java.classLoader)
 
             return TokenInfo(
-                accessToken,
-                refreshToken,
-                idToken,
-                createdOn,
-                expiresIn,
-                expiresOn,
-                scope,
-                tokenType,
-                additionalData
+                accessToken = accessToken,
+                refreshToken = refreshToken,
+                idToken = idToken,
+                createdOn = createdOn,
+                expiresIn = expiresIn,
+                expiresOn = expiresOn,
+                scope = scope,
+                tokenType = tokenType,
+                additionalData = additionalData
             )
         }
 
@@ -252,7 +256,8 @@ internal object TokenInfoSerializer : KSerializer<TokenInfo> {
 
         val tokenType = listOf(TOKEN_TYPE, "token_type").stream().map(decoderMap::get)
             .filter(Objects::nonNull)
-            .collect(Collectors.toList()).getOrNull(0)?.jsonPrimitive?.content.orEmpty().takeIf { it.isNotEmpty() } ?: "Bearer"
+            .collect(Collectors.toList()).getOrNull(0)?.jsonPrimitive?.content.orEmpty()
+            .takeIf { it.isNotEmpty() } ?: "Bearer"
 
         val additionalData = decoderMap
             .filter { (key, _) -> !knownKeys.contains(key) }

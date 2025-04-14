@@ -57,9 +57,9 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
      *
      * @version 3.0.0
      */
-//    var ignoreSsl: Boolean = false
-//        set(value) {
-//            field = value
+    var ignoreSsl: Boolean = false
+        set(value) {
+            field = value
 //            if (value) {
 //                trustManager = trustManager ?: NetworkHelper.insecureTrustManager()
 //                sslContext = sslContext ?: SSLContext.getInstance("TLS").apply {
@@ -75,17 +75,17 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
 //                sslContext = null
 //                hostnameVerifier = null
 //            }
-//            NetworkHelper.initialize()
-//        }
+            NetworkHelper.initialize()
+        }
 
-    var additionalHeaders: MutableMap<String, String> = mutableMapOf()
-    var additionalParameters: MutableMap<String, String> = mutableMapOf()
+    var additionalHeaders: Map<String, String> = mutableMapOf()
+    var additionalParameters: Map<String, String> = mutableMapOf()
 
     constructor(
         clientId: String,
         clientSecret: String? = null,
-        additionalHeaders: MutableMap<String, String>? = null,
-        additionalParameters: MutableMap<String, String>?,
+        additionalHeaders: Map<String, String>? = null,
+        additionalParameters: Map<String, String>?,
     ) : this(clientId, clientSecret) {
         additionalHeaders?.let {
             this.additionalHeaders = it
