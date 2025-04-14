@@ -58,7 +58,7 @@ jobs:
         uses: android-actions/setup-android@v3.2.0
 
       - name: Load cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -123,7 +123,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Load cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
