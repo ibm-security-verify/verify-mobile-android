@@ -15,16 +15,20 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.CertificatePinner
+import okhttp3.Dns
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
 
+@OptIn(ExperimentalSerializationApi::class)
 @Suppress("MemberVisibilityCanBePrivate")
 object NetworkHelper {
 
@@ -50,6 +54,14 @@ object NetworkHelper {
         }
 
     var trustManager: X509TrustManager? = null
+        set(value) {
+            if (field != value) {
+                field = value
+                client = initializeClient(null)
+            }
+        }
+
+    var customDnsResolver: Dns? = null
         set(value) {
             if (field != value) {
                 field = value
@@ -88,8 +100,10 @@ object NetworkHelper {
                 }
                 install(ContentNegotiation) {
                     json(Json {
-                        isLenient = true
+                        explicitNulls = false
+                        encodeDefaults = true
                         ignoreUnknownKeys = true
+                        isLenient = true
                     })
                 }
                 install(HttpTimeout) {
@@ -114,6 +128,8 @@ object NetworkHelper {
             }
             install(ContentNegotiation) {
                 json(Json {
+                    explicitNulls = false
+                    encodeDefaults = true
                     isLenient = true
                     ignoreUnknownKeys = true
                 })
@@ -206,13 +222,12 @@ object NetworkHelper {
             readTimeout(readTimeOutMillis, TimeUnit.MILLISECONDS)
             certificatePinner?.let { certificatePinner(it) }
             sslContext?.let { sslContext ->
-                println("XXX: SslContext")
                 trustManager?.let {
-                    println("XXX: Trustmanager")
                     sslSocketFactory(sslContext.socketFactory, it)
                 }
             }
             hostnameVerifier?.let { hostnameVerifier(it) }
+            customDnsResolver?.let { dns(it) }
         }.build()
     }
 

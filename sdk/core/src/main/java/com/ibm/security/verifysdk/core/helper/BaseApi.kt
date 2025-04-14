@@ -14,29 +14,30 @@ import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNames
+import okhttp3.internal.http1.HeadersReader
 import java.net.URL
 
 @OptIn(ExperimentalSerializationApi::class)
 abstract class BaseApi() {
 
     /**
-     * JSON configuration for parsing and serializing JSON data.
+     * JSON decoder instance configured for flexible parsing.
      *
-     * This configuration object allows for customization of JSON parsing
-     * and serialization behavior. It includes options to set leniency and
-     * ignore unknown keys during JSON parsing.
-     *
-     * @property isLenient A flag indicating whether lenient parsing is enabled.
-     *                     Lenient parsing allows parsing of malformed JSON by ignoring
-     *                     unexpected tokens.
-     * @property ignoreUnknownKeys A flag indicating whether unknown keys encountered
-     *                              during parsing should be ignored.
+     * This decoder is set up with the following settings:
+     * - `encodeDefaults = true`: Includes default values when encoding.
+     * - `explicitNulls = false`: Omits `null` values from the output.
+     * - `ignoreUnknownKeys = true`: Allows parsing JSON objects with extra, unknown keys.
+     * - `isLenient = true`: Permits relaxed JSON formatting, such as unquoted keys or single quotes.
      */
     protected val decoder = Json {
         encodeDefaults = true
@@ -45,6 +46,30 @@ abstract class BaseApi() {
         isLenient = true
     }
 
+    /**
+     * Performs an HTTP request and handles the response, parsing it into the specified type.
+     *
+     * This function executes an HTTP request using the provided HTTP client and various request parameters.
+     * It decodes the response body into a specified type [T] if the request is successful, or returns a failure
+     * result with a detailed error message in case of a failed response.
+     *
+     * ### Authorization Header Handling:
+     * - If the provided [headers] do **not** include the `Authorization` header, and an [accessToken] is provided,
+     *   the function will automatically apply a `Bearer` token in the `Authorization` header.
+     * - If the `Authorization` header **is** already present in [headers], the [accessToken] is **ignored** and not applied.
+     * - This allows callers to fully override the authorization behavior by manually specifying the `Authorization` header.
+     *
+     * @param httpClient The HTTP client to use for the request. Defaults to the instance provided by [NetworkHelper.getInstance].
+     * @param method The HTTP method to use (e.g., GET, POST). Defaults to [HttpMethod.Get].
+     * @param url The URL to which the request is sent. This parameter is required.
+     * @param accessToken An optional bearer token for authentication. If provided, it is added to the request headers.
+     * @param headers An optional map of additional headers to include in the request.
+     * @param contentType The content type for the request body. Defaults to [ContentType.Application.Json].
+     * @param body The body of the request, which will be serialized and sent along with the request. This parameter is optional.
+     *
+     * @return A [Result] containing either the parsed response body as type [T] if successful,
+     *         or a failure result with an error message in case of failure.
+     */
     protected suspend inline fun <reified T> performRequest(
         httpClient: HttpClient = NetworkHelper.getInstance,
         method: HttpMethod = HttpMethod.Get,
@@ -56,16 +81,14 @@ abstract class BaseApi() {
     ): Result<T> {
         return try {
             val response = httpClient.request {
-                headers?.let { headers ->
-                    headers {
-                        headers.forEach {
-                            this@headers.append(it.key, it.value)
-                        }
-                    }
-                }
                 url(url)
                 this.method = method
-                accessToken?.let { bearerAuth(it) }
+                headers?.forEach { (key, value) -> this.headers.append(key, value) }
+                if (headers?.containsKey(HttpHeaders.Authorization) != true) {
+                    accessToken?.let {
+                        bearerAuth(it)
+                    }
+                }
                 accept(ContentType.Application.Json)
                 body?.let { requestBody ->
                     contentType(contentType)
@@ -74,21 +97,35 @@ abstract class BaseApi() {
             }
 
             if (response.status.isSuccess()) {
-                when (response.status) {
-                    HttpStatusCode.NoContent -> {
-                        Result.success(Unit as T)
-                    }
-
-                    else -> {
-                        Result.success(decoder.decodeFromString<T>(response.bodyAsText()))
-                    }
+                if (response.status == HttpStatusCode.NoContent) {
+                    Result.success(Unit as T)
+                } else {
+                    Result.success(decoder.decodeFromString(response.bodyAsText()))
+                }
+            } else {
+                val errorResponse = try {
+                    response.bodyAsText().takeIf { it.isNotBlank() }
+                        ?.let { decoder.decodeFromString<ErrorResponse>(it) }
+                } catch (_: Exception) {
+                    null
                 }
 
-            } else {
-                Result.failure(response.toResultFailure())
+                Result.failure(
+                    response.toResultFailure(
+                        errorResponse?.message
+                            ?: "HTTP error: ${response.status.value} ${response.status.description}"
+                    )
+                )
             }
         } catch (t: Throwable) {
             Result.failure(t)
         }
     }
+
+    @Serializable
+    data class ErrorResponse(
+        @JsonNames("status_code")
+        val statusCode: String,
+        val message: String
+    )
 }
