@@ -8,11 +8,14 @@ plugins {
     java
     jacoco
     alias(libs.plugins.neotech.rootcoverage) apply true
+    alias(libs.plugins.kotlin.kapt) apply false
+    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.jetbrains.compose) apply false
 }
 
 // used for release naming and in mfa SDK
-extra["versionName"] = "3.0.6"
-extra["versionCode"] = "107"
+extra["versionName"] = "3.0.7"
+extra["versionCode"] = "108"
 
 configurations.all {
     resolutionStrategy {
@@ -23,21 +26,21 @@ configurations.all {
 }
 
 rootCoverage {
-    excludes = listOf(
-        "**/R.class",
-        "**/R\$*.class",
-        "**/*Companion*.class",
-        "**/*Function0*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*",
-        "android/**/*.*",
-        "**/*\$Lambda$*.*",  // Jacoco can't handle several "$" in class names.
-        "**/*\$inlined$*.*"  // Kotlin specific classes Jacoco can't handle.
-    )
+ excludes = listOf(
+     "**/R.class",
+     "**/R\$*.class",
+     "**/*Companion*.class",
+     "**/*Function0*.class",
+     "**/BuildConfig.*",
+     "**/Manifest*.*",
+     "**/*Test*.*",
+     "android/**/*.*",
+     "**/*\$Lambda$*.*",  // Jacoco can't handle several "$" in class names.
+     "**/*\$inlined$*.*"  // Kotlin specific classes Jacoco can't handle.
+ )
 
-    generateHtml = true
-    generateXml = true
+ generateHtml = true
+ generateXml = true
 }
 
 tasks.jacocoTestCoverageVerification {
@@ -67,8 +70,13 @@ subprojects {
         resolutionStrategy {
             failOnVersionConflict()
             preferProjectModules()
-            force(rootProject.libs.netty.codec.http2) // CVE-2023-44487 in netty-codec-http2-4.1.93.Final
-            force(rootProject.libs.jackson.woodstox.core)  // https://mvnrepository.com/artifact/com.fasterxml.woodstox/woodstox-core/6.2.4
+            force(rootProject.libs.netty.codec.http2)
+            force("io.netty:netty-handler-proxy:4.1.118.Final")
+            force(rootProject.libs.jackson.woodstox.core)  // https://mvnrepository.com/artifact/com.fasterxml.woodstox/woodstox-core/6.2.4 
+            force("com.google.guava:guava:32.0.1-jre")
+            force("commons-io:commons-io:2.14.0")
+            force("com.google.protobuf:protobuf-java:3.25.5")
+            force("com.google.protobuf:protobuf-javalite:3.25.5")
         }
     }
 
@@ -85,4 +93,9 @@ subprojects {
                 }
         }
     }
+
+    /**
+     * List all dependencies for a specific module.
+     */
+    tasks.register<DependencyReportTask>("allDeps")
 }
