@@ -16,6 +16,30 @@ import io.ktor.http.HttpMethod
 import kotlinx.serialization.ExperimentalSerializationApi
 import java.net.URL
 
+/**
+ * Provides an API interface for managing `verifications` API endpoints in IBM Verify Identity
+ * Digital Credentials.
+ *
+ * This class supports operations to retrieve, update, and delete verification records
+ * through the backend service. It communicates via HTTP and handles JSON (de)serialization
+ * using Kotlinx Serialization with experimental APIs.
+ *
+ * Example usage:
+ * ```
+ * val api = VerificationsApi(baseUrl)
+ * val result = api.getAll(accessToken = "your-access-token")
+ * ```
+ *
+ * @constructor Creates a [VerificationsApi] instance with the provided [baseUrl].
+ * @param baseUrl The base URL of the API server that serves the verification endpoints.
+ *
+ * @see BaseApi
+ * @see VerificationInfo
+ * @see UpdateVerificationArgs
+ * @see VerificationState
+ *
+ * @since 3.0.7
+ */
 @OptIn(ExperimentalSerializationApi::class)
 @ExperimentalDigitalCredentialsSdk
 open class VerificationsApi(private val baseUrl: URL) : BaseApi() {
@@ -35,7 +59,7 @@ open class VerificationsApi(private val baseUrl: URL) : BaseApi() {
      * @return A [Result] containing either a list of [VerificationInfo] objects if the request is successful,
      *         or a failure result with an error message if the request fails.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun getAll(
         httpClient: HttpClient = NetworkHelper.getInstance,
@@ -64,7 +88,7 @@ open class VerificationsApi(private val baseUrl: URL) : BaseApi() {
      * @param id The ID of the verification to retrieve.
      * @return A [Result] containing either an [VerificationInfo] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun getOne(
         httpClient: HttpClient = NetworkHelper.getInstance,
@@ -93,7 +117,7 @@ open class VerificationsApi(private val baseUrl: URL) : BaseApi() {
      * @param id The ID of the verification to delete.
      * @return A [Result] containing either [Unit] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun delete(
         httpClient: HttpClient = NetworkHelper.getInstance,
@@ -123,7 +147,7 @@ open class VerificationsApi(private val baseUrl: URL) : BaseApi() {
      * @param updateVerificationArgs The [UpdateVerificationArgs] to be sent in the request body for updating the credential.
      * @return A [Result] containing either [VerificationInfo] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun update(
         httpClient: HttpClient = NetworkHelper.getInstance,

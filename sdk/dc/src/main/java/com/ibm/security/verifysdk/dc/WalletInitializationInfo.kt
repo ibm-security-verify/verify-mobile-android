@@ -19,7 +19,7 @@ import java.net.URL
  *
  * This class contains essential information such as wallet name, ID, authentication details, and service URLs.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @ExperimentalSerializationApi
 @Serializable
@@ -38,7 +38,7 @@ data class WalletInitializationInfo(
 
     @OptIn(ExperimentalSerializationApi::class)
     @Serializer(forClass = URL::class)
-    object TokenURLSerializer : KSerializer<URL> {
+    internal object TokenURLSerializer : KSerializer<URL> {
         override fun deserialize(decoder: Decoder): URL {
             val urlString = decoder.decodeString()
 

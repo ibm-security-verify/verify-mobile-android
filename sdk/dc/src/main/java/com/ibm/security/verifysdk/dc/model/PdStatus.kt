@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
  * @property directive An optional [Directives] value representing the directive associated with the status.
  *                     It can be null if no directive is specified.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class PdStatus(

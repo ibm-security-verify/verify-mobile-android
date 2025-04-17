@@ -29,7 +29,7 @@ import kotlinx.serialization.Serializable
  * @property jsonld An optional `PresentationRequest` related to the `jsonld` field of the proof request.
  * @property bbs An optional `PresentationRequest` related to the `bbs` field of the proof request.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class ProofRequest(

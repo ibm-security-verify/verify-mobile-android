@@ -21,7 +21,7 @@ import kotlinx.serialization.Serializable
  *
  * @property value The string value representing the optionality type (either "required" or "preferred").
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 enum class Optionality(val value: String) {

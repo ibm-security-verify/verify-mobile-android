@@ -10,7 +10,7 @@ package com.ibm.security.verifysdk.dc
  * This sealed class extends [Error] and defines different types of wallet-related errors
  * that may occur during parsing, formatting, or initialization processes.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 sealed class WalletError : Error() {
 

@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
  *  The agent's relationship to the credential.
  *
  *  @property value The string representation of the role, as defined in the API specification.
- *  @since 3.0.4
+ *  @since 3.0.7
  */
 @Serializable
 enum class CredentialRole(val value: String) {

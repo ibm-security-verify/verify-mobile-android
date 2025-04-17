@@ -43,7 +43,7 @@ import kotlinx.serialization.json.jsonPrimitive
  *
  * It ensures proper encoding and decoding of credential data while handling different credential structures.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @OptIn(ExperimentalSerializationApi::class)
 object CredentialSerializer : KSerializer<CredentialDescriptor> {
@@ -73,7 +73,7 @@ object CredentialSerializer : KSerializer<CredentialDescriptor> {
      * @return A deserialized [CredentialDescriptor] object.
      * @throws SerializationException If required fields are missing or have invalid values.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     override fun deserialize(decoder: Decoder): CredentialDescriptor {
         require(decoder is JsonDecoder)
@@ -159,7 +159,7 @@ object CredentialSerializer : KSerializer<CredentialDescriptor> {
      * @param value The [CredentialDescriptor] to serialize.
      * @throws SerializationException If serialization fails.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     override fun serialize(encoder: Encoder, value: CredentialDescriptor) {
         require(encoder is JsonEncoder)

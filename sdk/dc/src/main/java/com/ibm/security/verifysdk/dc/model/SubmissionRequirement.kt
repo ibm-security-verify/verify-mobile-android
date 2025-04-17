@@ -25,7 +25,7 @@ import kotlinx.serialization.Serializable
  * @property fromNested An optional list of strings specifying nested sources for the data required for the submission.
  *                       This field may be null.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class SubmissionRequirement(

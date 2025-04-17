@@ -24,7 +24,7 @@ import kotlinx.serialization.Serializable
  *
  * @property value The string representation of the rule value that is used in the API specification.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 enum class Rules(val value: String) {

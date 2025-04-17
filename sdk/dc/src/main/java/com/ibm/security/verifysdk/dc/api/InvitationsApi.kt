@@ -16,6 +16,29 @@ import io.ktor.http.HttpMethod
 import kotlinx.serialization.ExperimentalSerializationApi
 import java.net.URL
 
+/**
+ * Provides an API interface for managing and interacting with `invitations` API endpoints in IBM Verify Identity
+ * Digital Credentials.
+ *
+ * This class allows clients to retrieve, delete, and process invitation records.
+ * It communicates with a backend service via HTTP requests and handles response serialization.
+ *
+ * Example usage:
+ * ```
+ * val api = InvitationsApi(baseUrl)
+ * val invitations = api.getAll(accessToken = "your-token")
+ * ```
+ *
+ * @constructor Initializes a new instance of [InvitationsApi] using the provided base URL.
+ * @param baseUrl The root URL for accessing the invitation endpoints.
+ *
+ * @see BaseApi
+ * @see InvitationInfo
+ * @see InvitationProcessorRequest
+ * @see PreviewDescriptor
+ *
+ * @since 3.0.7
+ */
 @OptIn(ExperimentalSerializationApi::class)
 @ExperimentalDigitalCredentialsSdk
 open class InvitationsApi(private val baseUrl: URL) : BaseApi() {
@@ -34,7 +57,7 @@ open class InvitationsApi(private val baseUrl: URL) : BaseApi() {
      * @return A [Result] containing either a list of [InvitationInfo] objects if the request is successful,
      *         or a failure result with an error message if the request fails.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun getAll(
         httpClient: HttpClient = NetworkHelper.getInstance,
@@ -62,7 +85,7 @@ open class InvitationsApi(private val baseUrl: URL) : BaseApi() {
      * @param id The ID of the invitation to retrieve.
      * @return A [Result] containing either an [InvitationInfo] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun getOne(
         httpClient: HttpClient = NetworkHelper.getInstance,
@@ -97,7 +120,7 @@ open class InvitationsApi(private val baseUrl: URL) : BaseApi() {
      * @return A [Result] containing either a [PreviewDescriptor] object if the request is successful,
      *         or a failure result with an error message if the request fails.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun processInvitation(
         httpClient: HttpClient = NetworkHelper.getInstance,
@@ -128,7 +151,7 @@ open class InvitationsApi(private val baseUrl: URL) : BaseApi() {
      * @param id The ID of the invitation to delete.
      * @return A [Result] containing either [Unit] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun delete(
         httpClient: HttpClient = NetworkHelper.getInstance,

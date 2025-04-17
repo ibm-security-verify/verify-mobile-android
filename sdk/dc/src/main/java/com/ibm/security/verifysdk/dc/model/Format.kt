@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
  * @property ldpVp A Linked Data Proof representation of a Verifiable Presentation.
  * @property mdoc A Mobile Driving License (mDoc) or Mobile ID document representation.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class Format(

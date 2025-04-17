@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
  * @property selfAttestedAttributes A map containing self-attested attributes, where the key is the attribute name,
  *                                  and the value is the attribute's value, provided directly by the requester.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class ProofResponse (

@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
  * This class defines a field with an associated path, optional identifier, purpose, and predicate constraint.
  * It is primarily used in contexts where filtering or structuring data is required.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class Field(

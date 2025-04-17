@@ -30,7 +30,7 @@ import kotlinx.serialization.json.JsonElement
  * @property properties A map of additional properties associated with the verification process. This field may be null.
  * @property timestamps A map of timestamps related to various stages of the verification process. This field may be null.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class VerificationInfo (

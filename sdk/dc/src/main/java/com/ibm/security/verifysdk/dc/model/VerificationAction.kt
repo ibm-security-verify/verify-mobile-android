@@ -17,7 +17,7 @@ import kotlinx.serialization.Serializable
  * - [SHARE] - Share the credential proof for verification.
  * - [REJECT] - The request to prove a credential has been rejected.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 enum class VerificationAction {

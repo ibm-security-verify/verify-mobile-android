@@ -15,6 +15,31 @@ import io.ktor.http.HttpMethod
 import kotlinx.serialization.ExperimentalSerializationApi
 import java.net.URL
 
+/**
+ * Provides an interface for managing and interacting with `connection` API endpoints in IBM Verify Identity
+ * Digital Credentials.
+ *
+ * This class supports operations such as retrieving, updating, and deleting connections.
+ * It builds upon [BaseApi] to perform authenticated HTTP requests using a shared [HttpClient].
+ *
+ * The class is annotated with [@ExperimentalDigitalCredentialsSdk] and [@OptIn(ExperimentalSerializationApi::class)],
+ * indicating that it makes use of experimental SDK and serialization APIs that may change in future versions.
+ *
+ * Example usage:
+ * ```
+ * val api = ConnectionsApi(baseUrl)
+ * val result = api.getAll(accessToken = "token")
+ * ```
+ *
+ * @constructor Creates a new instance of [ConnectionsApi] with the provided base URL for API calls.
+ * @param baseUrl The base [URL] of the backend API endpoint used for all connection-related operations.
+ *
+ * @see BaseApi
+ * @see ConnectionInfo
+ * @see UpdateConnectionArgs
+ *
+ * @since 3.0.7
+ */
 @OptIn(ExperimentalSerializationApi::class)
 @ExperimentalDigitalCredentialsSdk
 open class ConnectionsApi(private val baseUrl: URL) : BaseApi() {
@@ -33,7 +58,7 @@ open class ConnectionsApi(private val baseUrl: URL) : BaseApi() {
      * @return A [Result] containing either a list of [ConnectionInfo] if the request is successful,
      *         or a failure result with an error if the request fails.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun getAll(
         httpClient: HttpClient = NetworkHelper.getInstance,
@@ -61,7 +86,7 @@ open class ConnectionsApi(private val baseUrl: URL) : BaseApi() {
      * @param id The ID of the connection to retrieve.
      * @return A [Result] containing either an [ConnectionInfo] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun getOne(
         httpClient: HttpClient = NetworkHelper.getInstance,
@@ -90,7 +115,7 @@ open class ConnectionsApi(private val baseUrl: URL) : BaseApi() {
      * @param id The ID of the connection to delete.
      * @return A [Result] containing either [Unit] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun delete(
         httpClient: HttpClient = NetworkHelper.getInstance,
@@ -120,7 +145,7 @@ open class ConnectionsApi(private val baseUrl: URL) : BaseApi() {
      * @param updateConnectionArgs The [UpdateConnectionArgs] data to be sent in the request body for updating the connection.
      * @return A [Result] containing either [ConnectionInfo] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun update(
         httpClient: HttpClient = NetworkHelper.getInstance,

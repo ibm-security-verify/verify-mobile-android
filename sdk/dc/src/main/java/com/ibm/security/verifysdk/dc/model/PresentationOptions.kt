@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
  * @property domain An optional domain string representing the context or domain
  * in which the presentation is being requested.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class PresentationOptions(

@@ -21,7 +21,7 @@ import kotlinx.serialization.json.JsonElement
 * @property did The decentralized identifier (DID) of the connection agent, if available.
 * @property didDoc The DID document associated with the agent's DID, if available, represented as a JSON element.
  *
- * @since 3.0.4
+ * @since 3.0.7
 */
 @Serializable
 data class ConnectionAgentInfo(

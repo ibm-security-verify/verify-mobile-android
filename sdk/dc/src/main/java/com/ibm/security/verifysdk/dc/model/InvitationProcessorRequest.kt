@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
  * @property url The URL of the invitation to be processed.
  * @property inspect A flag indicating whether the invitation should be inspected before processing.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class InvitationProcessorRequest(

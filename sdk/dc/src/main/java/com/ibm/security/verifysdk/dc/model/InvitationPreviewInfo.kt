@@ -41,7 +41,7 @@ import java.util.Base64
  * @property formats A list of formats that the invitation supports (e.g., "jwt", "ldp").
  * @property documentTypes A list of document types related to the invitation, used for filtering or categorization.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable(InvitationPreviewInfo.Companion::class)
 internal data class InvitationPreviewInfo(

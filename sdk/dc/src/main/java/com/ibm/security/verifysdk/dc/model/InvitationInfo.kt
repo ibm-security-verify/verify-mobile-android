@@ -21,7 +21,7 @@ import kotlinx.serialization.json.JsonElement
  * @property timestamps A map containing timestamp-related metadata associated with the invitation.
  * @property properties Additional properties related to the invitation.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @ExperimentalSerializationApi
 @Serializable

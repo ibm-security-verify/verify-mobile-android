@@ -28,7 +28,7 @@ import java.net.URL
  * @property baseUri The base URI of the wallet service API.
  * @property clientId The client identifier used for authenticating requests to the wallet service.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 interface WalletServiceDescriptor {
     var accessToken: String

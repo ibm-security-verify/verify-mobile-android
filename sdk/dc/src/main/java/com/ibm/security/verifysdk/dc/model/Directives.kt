@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
  * indicating whether they are required, allowed, or disallowed.
  *
  * @property value The string representation of the directive, used in API communication.
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 enum class Directives(val value: String) {

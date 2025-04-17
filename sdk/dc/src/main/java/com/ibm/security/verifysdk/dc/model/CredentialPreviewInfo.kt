@@ -28,7 +28,7 @@ import kotlinx.serialization.json.jsonObject
  * @property jsonRepresentation The JSON representation of the credential preview.
  * @property documentTypes A list of document types associated with the credential preview.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable(CredentialPreviewInfo.Companion::class)
 data class CredentialPreviewInfo(

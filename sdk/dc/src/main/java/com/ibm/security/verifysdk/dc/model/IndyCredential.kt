@@ -26,7 +26,7 @@ import java.util.Base64
  * @property connection The connection information related to the credential issuance.
  * @property properties A map of additional properties related to the credential.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class IndyCredential(

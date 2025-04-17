@@ -25,7 +25,7 @@ import kotlinx.serialization.json.JsonNames
  * @property JSON_LD The JSON-LD credential format.
  * @property MDOC The MSO MDoc credential format.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 enum class CredentialFormat {

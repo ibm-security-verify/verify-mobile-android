@@ -21,7 +21,7 @@ import kotlinx.serialization.Serializable
  * @property revoked An optional [PdStatus] representing the revoked status of the presentation definition.
  *                   If `null`, the revoked status is not defined.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class Statuses(

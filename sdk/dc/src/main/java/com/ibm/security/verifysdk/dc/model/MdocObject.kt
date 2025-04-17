@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
  *
  * @property alg A list of cryptographic algorithms supported by this JWT.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class MdocObject(

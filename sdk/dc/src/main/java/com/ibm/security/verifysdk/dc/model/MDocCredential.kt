@@ -28,7 +28,7 @@ import java.util.Base64
  * @property connection Information about the connection used for issuing the credential.
  * @property properties A map of additional properties associated with the credential, such as name and icon.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class MDocCredential(

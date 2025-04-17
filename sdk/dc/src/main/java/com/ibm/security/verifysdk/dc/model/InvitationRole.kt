@@ -20,7 +20,7 @@ import kotlinx.serialization.Serializable
  *
  * @property value The string value associated with the role, used for serialization and communication.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 enum class InvitationRole(val value: String) {

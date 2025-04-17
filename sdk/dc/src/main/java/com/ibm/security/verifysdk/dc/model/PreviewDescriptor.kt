@@ -21,7 +21,7 @@ import kotlinx.serialization.json.JsonElement
  * @property comment An optional comment that provides additional context about the preview.
  * @property jsonRepresentation An optional JSON element representing the preview in a structured format.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable(with = PreviewSerializer::class)
 interface PreviewDescriptor {

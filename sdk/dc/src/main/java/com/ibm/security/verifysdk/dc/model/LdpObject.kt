@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
  * @property proofType A list of cryptographic proof types used for verifying the integrity
  * and authenticity of the data.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class LdpObject(

@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
  * @property did The decentralized identifier (DID) for the agent.
  * @property verkey The public key for the agent.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class AgentInfo (

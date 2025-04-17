@@ -20,7 +20,7 @@ import kotlinx.serialization.Serializable
  *
  * @property value The string representation of the credential state as defined in the API.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 enum class CredentialState(val value: String) {

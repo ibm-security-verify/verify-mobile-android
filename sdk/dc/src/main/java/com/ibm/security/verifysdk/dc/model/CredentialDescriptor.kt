@@ -25,7 +25,7 @@ import kotlinx.serialization.json.JsonElement
  * @property issuerDid The decentralized identifier (DID) of the issuer.
  * @property jsonRepresentation The JSON representation of the credential, if available.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable(with = CredentialSerializer::class)
 sealed interface CredentialDescriptor{

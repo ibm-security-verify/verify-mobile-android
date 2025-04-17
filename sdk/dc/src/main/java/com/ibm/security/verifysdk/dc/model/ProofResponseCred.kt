@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
  * @property predicates A list of predicates associated with the credential, where each predicate represents a condition
  *                      or constraint that is associated with the credential's attributes that must be satisfied.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class ProofResponseCred(

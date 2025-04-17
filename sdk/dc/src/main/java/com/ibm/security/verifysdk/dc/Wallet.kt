@@ -35,7 +35,7 @@ import java.net.URL
  * **Serialization:**
  * - The `refreshUri` and `baseUri` properties use a custom serializer (`URLSerializer`) to handle URL serialization.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable

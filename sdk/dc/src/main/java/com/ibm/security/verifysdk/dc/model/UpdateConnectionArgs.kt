@@ -18,7 +18,7 @@ import kotlinx.serialization.Serializable
  * @property properties An optional map of key-value pairs representing the properties of the connection.
  *                      These properties can be updated. This field may be null.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class UpdateConnectionArgs (

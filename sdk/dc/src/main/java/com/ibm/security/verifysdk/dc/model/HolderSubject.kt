@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
  * @property fieldId A list of field identifiers that relate to the subject.
  * @property directive The directive specifying the optionality or requirement of the subject's presence.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class HolderSubject(

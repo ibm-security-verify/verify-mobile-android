@@ -30,7 +30,7 @@ import kotlinx.serialization.json.JsonElement
  *                      This field may be null.
  * @property credentialProposal A JSON representation of the credential proposal. This field may be null.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class UpdateCredentialArgs (

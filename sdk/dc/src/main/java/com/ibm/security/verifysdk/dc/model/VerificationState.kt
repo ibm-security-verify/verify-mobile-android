@@ -17,7 +17,7 @@ import kotlinx.serialization.Serializable
  *
  * @property value The string representation of the verification state.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 enum class VerificationState(val value: String) {

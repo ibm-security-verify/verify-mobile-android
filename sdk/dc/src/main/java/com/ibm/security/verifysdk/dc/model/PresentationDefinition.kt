@@ -20,7 +20,7 @@ import kotlinx.serialization.Serializable
  * @property format An optional [Format] describing the format of the presentation.
  * @property submissionRequirements An optional list of [SubmissionRequirement] objects that specify the requirements for submitting the presentation.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class PresentationDefinition(

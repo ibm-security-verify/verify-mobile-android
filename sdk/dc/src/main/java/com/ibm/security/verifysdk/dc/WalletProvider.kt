@@ -42,7 +42,7 @@ import kotlinx.serialization.json.Json
  * @param jsonData The JSON data containing wallet initialization information.
  * @param ignoreSSLCertificate Flag indicating whether to ignore SSL certificate verification (defaults to false).
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @OptIn(ExperimentalSerializationApi::class, ExperimentalDigitalCredentialsSdk::class)
 class WalletProvider(

@@ -18,7 +18,7 @@ import kotlinx.serialization.Serializable
  *                to the location of the schema definition.
  * @property required A nullable Boolean indicating whether the schema is required.
  *                    If `null`, it implies that the requirement is unspecified.
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class Schema(

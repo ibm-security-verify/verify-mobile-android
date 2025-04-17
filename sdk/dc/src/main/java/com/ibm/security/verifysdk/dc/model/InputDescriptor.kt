@@ -25,7 +25,7 @@ import kotlinx.serialization.json.JsonElement
  * @property issuance The issuance information for the input descriptor.
  * @property constraints The constraints associated with the input descriptor.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class InputDescriptor(

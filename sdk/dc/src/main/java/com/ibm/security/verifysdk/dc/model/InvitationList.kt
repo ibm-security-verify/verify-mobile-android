@@ -17,7 +17,7 @@ import kotlinx.serialization.Serializable
  * @property count The total number of invitations in the response.
  * @property items A list of [InvitationInfo] objects, each containing the details of an individual invitation.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @ExperimentalSerializationApi
 @Serializable

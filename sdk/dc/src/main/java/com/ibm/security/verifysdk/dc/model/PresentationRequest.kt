@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
  * @property options Optional additional parameters for the presentation request, such as a challenge
  * or domain, which can be used to enhance the security and context of the request.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @ExperimentalSerializationApi
 @Serializable

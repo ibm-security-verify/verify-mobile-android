@@ -18,7 +18,7 @@ import kotlinx.serialization.Serializable
  * @property proofRequestReferent The optional referent used to link the filter to a proof request.
  * @property exclude If `true`, excludes credentials matching the specified criteria instead of including them.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @ExperimentalSerializationApi
 @Serializable

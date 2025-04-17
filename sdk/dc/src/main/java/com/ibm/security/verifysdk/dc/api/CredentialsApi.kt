@@ -15,6 +15,28 @@ import io.ktor.http.HttpMethod
 import kotlinx.serialization.ExperimentalSerializationApi
 import java.net.URL
 
+/**
+ * Provides an API interface for interacting with `credential` API endpoints in IBM Verify Identity
+ * Digital Credentials.
+ *
+ * This class includes operations to retrieve, update, and delete credential records. It utilizes
+ * an HTTP client to send authorized requests to a backend service and parse the responses into Kotlin data classes.
+ *
+ * Example usage:
+ * ```
+ * val api = CredentialsApi(baseUrl)
+ * val result = api.getAll(accessToken = "token")
+ * ```
+ *
+ * @constructor Creates an instance of [CredentialsApi] with the given base URL.
+ * @param baseUrl The root URL used for sending API requests to the credential service.
+ *
+ * @see BaseApi
+ * @see CredentialDescriptor
+ * @see UpdateCredentialArgs
+ *
+ * @since 3.0.7
+ */
 @OptIn(ExperimentalSerializationApi::class)
 @ExperimentalDigitalCredentialsSdk
 open class CredentialsApi(private val baseUrl: URL) : BaseApi() {
@@ -33,7 +55,7 @@ open class CredentialsApi(private val baseUrl: URL) : BaseApi() {
      * @return A [Result] containing either a list of [CredentialDescriptor] objects if the request is successful,
      *         or a failure result with an error if the request fails.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun getAll(
         httpClient: HttpClient = NetworkHelper.getInstance,
@@ -61,7 +83,7 @@ open class CredentialsApi(private val baseUrl: URL) : BaseApi() {
      * @param id The ID of the credential to retrieve.
      * @return A [Result] containing either an [CredentialDescriptor] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun getOne(
         httpClient: HttpClient = NetworkHelper.getInstance,
@@ -90,7 +112,7 @@ open class CredentialsApi(private val baseUrl: URL) : BaseApi() {
      * @param id The ID of the credential to delete.
      * @return A [Result] containing either [Unit] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun delete(
         httpClient: HttpClient = NetworkHelper.getInstance,
@@ -120,7 +142,7 @@ open class CredentialsApi(private val baseUrl: URL) : BaseApi() {
      * @param updateCredentialArgs The [UpdateCredentialArgs] to be sent in the request body for updating the credential.
      * @return A [Result] containing either [CredentialDescriptor] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun update(
         httpClient: HttpClient = NetworkHelper.getInstance,

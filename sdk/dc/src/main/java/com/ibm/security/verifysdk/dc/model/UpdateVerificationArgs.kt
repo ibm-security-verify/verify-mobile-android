@@ -20,7 +20,7 @@ import kotlinx.serialization.Serializable
  * @property allowProofRequestOverride Flag indicating whether the proof request can be overridden.
  * @property returnProofDisplay Flag indicating whether the proof display should be returned.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class UpdateVerificationArgs(

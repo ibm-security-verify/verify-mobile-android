@@ -13,7 +13,7 @@ import kotlinx.serialization.SerialName
  *
  * @property value The string representation of the state, as defined in the API specification.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 enum class ConnectionState(val value: String) {
 

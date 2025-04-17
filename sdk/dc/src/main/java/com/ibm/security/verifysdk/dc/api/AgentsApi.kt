@@ -34,7 +34,7 @@ open class AgentsApi(private val baseUrl: URL) : BaseApi() {
      * @param additionalHeaders Optional map of additional headers to include in the request. See [BaseApi.performRequest] for additional information
      * @return A [Result] containing either an [AgentInfo] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     @OptIn(ExperimentalSerializationApi::class)
     open suspend fun getAll(
@@ -64,7 +64,7 @@ open class AgentsApi(private val baseUrl: URL) : BaseApi() {
      * @param id The ID of the agent to retrieve.
      * @return A [Result] containing either an [AgentInfo] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun getOne(
         httpClient: HttpClient = NetworkHelper.getInstance,
@@ -93,7 +93,7 @@ open class AgentsApi(private val baseUrl: URL) : BaseApi() {
      * @param id The ID of the agent to delete.
      * @return A [Result] containing either [Unit] on success or an error on failure.
      *
-     * @since 3.0.4
+     * @since 3.0.7
      */
     open suspend fun delete(
         httpClient: HttpClient = NetworkHelper.getInstance,

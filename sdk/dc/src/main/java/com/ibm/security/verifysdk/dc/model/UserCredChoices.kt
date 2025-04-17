@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
  * @property predicates A map containing the selected predicates for the credential. Each key represents
  * the predicate name, and the corresponding value represents the chosen value for that predicate.
  *
- * @since 3.0.4
+ * @since 3.0.7
  */
 @Serializable
 data class UserCredChoices(
