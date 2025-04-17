@@ -251,7 +251,7 @@ jobs:
           mv ./sdk/adaptive/build/outputs/aar/adaptive-release.aar ./sdk/adaptive/build/outputs/aar/IBM-Verify-SDK_adaptive_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
           mv ./sdk/authentication/build/outputs/aar/authentication-release.aar ./sdk/authentication/build/outputs/aar/IBM-Verify-SDK_authentication_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
           mv ./sdk/mfa/build/outputs/aar/mfa-release.aar ./sdk/mfa/build/outputs/aar/IBM-Verify-SDK_mfa_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar
-          mv ./sdk/dc/build/outputs/aar/mfa-release.aar ./sdk/dc/build/outputs/aar/IBM-Verify-SDK_dc_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
+          mv ./sdk/dc/build/outputs/aar/dc-release.aar ./sdk/dc/build/outputs/aar/IBM-Verify-SDK_dc_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
 
       - name: Move maven files to accessible folder
         run: |
