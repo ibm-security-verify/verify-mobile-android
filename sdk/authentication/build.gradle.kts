@@ -10,14 +10,10 @@ apply(from = "$rootDir/common-config-ktor.gradle")
 apply(from = "$rootDir/common-publish.gradle")
 
 android {
-    buildTypes {
-        getByName("debug") {    // required for test runs
-            manifestPlaceholders["auth_redirect_scheme"] = "https"
-            manifestPlaceholders["auth_redirect_host"] = "sdk.verify.ibm.com"
-            manifestPlaceholders["auth_redirect_path"] = "/callback"
-        }
-
-        testBuildType = "debug"
+    defaultConfig {
+        manifestPlaceholders["auth_redirect_scheme"] = "https"
+        manifestPlaceholders["auth_redirect_host"] = "sdk.verify.ibm.com"
+        manifestPlaceholders["auth_redirect_path"] = "/callback"
     }
 }
 

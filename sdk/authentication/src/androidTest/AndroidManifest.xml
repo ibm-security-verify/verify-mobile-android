@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application>
         <activity
@@ -15,9 +16,10 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="sdk.ibm.verify.ibm.com"
-                    android:path="/callback"
-                    android:scheme="https" />
+                    android:scheme="${auth_redirect_scheme}"
+                    android:host="${auth_redirect_host}"
+                    android:path="${auth_redirect_path}"
+                    tools:replace="android:host,android:path,android:scheme" />
             </intent-filter>
         </activity>
     </application>

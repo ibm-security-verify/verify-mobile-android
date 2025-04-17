@@ -78,8 +78,8 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
             NetworkHelper.initialize()
         }
 
-    var additionalHeaders: Map<String, String> = mutableMapOf()
-    var additionalParameters: Map<String, String> = mutableMapOf()
+    var additionalHeaders: MutableMap<String, String> = mutableMapOf()
+    var additionalParameters: MutableMap<String, String> = mutableMapOf()
 
     constructor(
         clientId: String,
@@ -88,11 +88,11 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
         additionalParameters: Map<String, String>?,
     ) : this(clientId, clientSecret) {
         additionalHeaders?.let {
-            this.additionalHeaders = it
+            this.additionalHeaders = it as MutableMap<String, String>
         }
 
         additionalParameters?.let {
-            this.additionalParameters = it
+            this.additionalParameters = it as MutableMap<String, String>
         }
     }
 
