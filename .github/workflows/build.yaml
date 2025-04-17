@@ -146,7 +146,10 @@ jobs:
           target: default
           arch: x86
           profile: Nexus 6
-          script: ./gradlew --no-daemon :rootCoverageReport
+          script: |
+            adb shell setprop log.tag.LoggerExtKtTest DEBUG
+            adb shell getprop log.tag.LoggerExtKtTest
+            ./gradlew --no-daemon :rootCoverageReport
 
       - name: Store code coverage report
         uses: actions/upload-artifact@v4.3.1
@@ -199,8 +202,7 @@ jobs:
       - name: Run the mend scan jar
         working-directory: ./sdk
         run: |
-          java -jar ../wss-unified-agent.jar -d ${{ github.workspace }}  
-
+          java -jar ../wss-unified-agent.jar -d ${{ github.workspace }}
 
   publish:
     name: Publish SDK, reports and documentation
@@ -218,25 +220,25 @@ jobs:
       - name: Create SDK directory
         run: mkdir -p ./sdk
 
-      - name: Collect all artificats
+      - name: Collect all artifacts
         uses: actions/download-artifact@v4.1.7
         with:
           name: build-and-test
           path: ./sdk
 
-      - name: Collect documentation artificats
+      - name: Collect documentation artifacts
         uses: actions/download-artifact@v4.1.7
         with:
           name: documentation
           path: ./sdk     
 
-      - name: Collect maven-local artificats
+      - name: Collect maven-local artifacts
         uses: actions/download-artifact@v4.1.7
         with:
           name: maven-local
           path: ~/.m2/repository/com/ibm/security
 
-      - name: Collect code coverate result
+      - name: Collect code coverage result
         uses: actions/download-artifact@v4.1.7
         with:
           name: jacoco-report
