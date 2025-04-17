@@ -47,9 +47,17 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+configurations.configureEach {
+    resolutionStrategy {
+        force("org.slf4j:slf4j-api:1.7.36")
+        force("org.slf4j:slf4j-android:1.7.36")
+    }
+}
+
 dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.skyscreamer.jsonassert)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.slf4j.android)
+    androidTestImplementation(libs.slf4j.api)
 }

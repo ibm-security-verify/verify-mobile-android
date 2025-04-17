@@ -44,7 +44,7 @@ rootCoverage = "1.9.0"
 rootbeerLib = "0.1.0"
 rules = "1.6.0"
 runtimeLivedata = "1.7.8"
-slf4jAndroidVersion = "1.7.36"
+slf4jVersion = "1.7.36"
 versioningPluginVersion = "1.9.20"
 woodstockCore = "6.6.2"
 zxingAndroidEmbeddedVersion = "4.3.0"
@@ -113,7 +113,8 @@ mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", versio
 netty-codec-http2 = { group = "io.netty", name = "netty-codec-http2", version.ref = "nettyCodecHttp2" }
 rootbeer-lib = { group = "com.scottyab", name = "rootbeer-lib", version.ref = "rootbeerLib" }
 skyscreamer-jsonassert = { group = "org.skyscreamer", name = "jsonassert", version.ref = "jsonassert" }
-slf4j-android = { group = "org.slf4j", name = "slf4j-android", version.ref = "slf4jAndroidVersion" }
+slf4j-android = { group = "org.slf4j", name = "slf4j-android", version.ref = "slf4jVersion" }
+slf4j-api= { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4jVersion" }
 versioning-plugin = { group = "org.jetbrains.dokka", name = "versioning-plugin", version.ref = "versioningPluginVersion" }
 zxing-android-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingAndroidEmbeddedVersion" }
 

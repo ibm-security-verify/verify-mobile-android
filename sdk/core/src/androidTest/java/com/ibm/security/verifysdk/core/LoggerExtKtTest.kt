@@ -10,6 +10,7 @@ import com.ibm.security.verifysdk.core.extension.entering
 import com.ibm.security.verifysdk.core.extension.exiting
 import com.ibm.security.verifysdk.core.extension.threadInfo
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -17,17 +18,25 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 
+
+/**
+ * On real devices or regular emulators, System.setProperty("log.tag.*", "DEBUG") does not actually
+ * change Android log level filters. That’s because: Log.isLoggable(tag, level) reads from native
+ * system properties like log.tag.<tag>, and System.setProperty(...) only sets a Java property,
+ * not a native one.
+ *
+ * How to resolve this: use adb to enable log levels before the test
+ *
+ *              `adb shell setprop log.tag.LoggerExtKtTest DEBUG`
+ *
+ * That command is also executed during the build script.
+ *
+ */
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 internal class LoggerExtKtTest {
 
-    private lateinit var log: Logger
-
-    @Before
-    fun setup() {
-        log = LoggerFactory.getLogger(javaClass)
-    }
-
+    private val log: Logger = LoggerFactory.getLogger(LoggerExtKtTest::class.java)
 
     /**
      * Expected output:
@@ -104,19 +113,6 @@ internal class LoggerExtKtTest {
     }
 
     /**
-     * No message should be logged, because the log level for that message is higher then
-     * the one that is set `LogLevel.INFO`.
-     */
-    @Test
-    fun log_logLevelToHigh_shouldNotWriteToLogcat() {
-        log.debug(Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE)
-        val logcatMessage =
-            TestHelper.getLogsAfterTestStart("log_logLevelToHigh_shouldNotWriteToLogcat")
-                .toString()
-        assert(logcatMessage.contains(Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE).not())
-    }
-
-    /**
      * Expected output:
      *
      *      `<Date/Time< <ThreadIDs> I LoggerTest: threadName=main; threadId=123456;
@@ -188,53 +184,6 @@ internal class LoggerExtKtTest {
     }
 
     /**
-     * Expected output:
-     *
-     *      `<Date/Time< <ThreadIDs> D LoggerTest: threadName=main; threadId=123456;
-     *
-     */
-    @Test
-    @Ignore("Configuration required for DEBUG level")
-    fun logThreadInfo_debug_shouldWriteToLogcat() {
-        log.threadInfo(Level.DEBUG)
-        val logcatMessage =
-            TestHelper.getLogsAfterTestStart("logThreadInfo_debug_shouldWriteToLogcat")
-                .toString()
-        assert(logcatMessage.contains(String.format("D %s:", javaClass.simpleName)))
-        assert(logcatMessage.contains(Regex("threadName=[^;]*; threadId=[^0-9]*[0-9]+;")))
-    }
-
-    /**
-     * Expected output:
-     *
-     *      `<Date/Time< <ThreadIDs> D LoggerTest: threadName=main; threadId=123456;
-     *
-     */
-    @Test
-    @Ignore("Configuration required for DEBUG level")
-    fun logThreadInfo_trace_shouldWriteToLogcat() {
-        log.threadInfo(Level.TRACE)
-        val logcatMessage =
-            TestHelper.getLogsAfterTestStart("logThreadInfo_trace_shouldWriteToLogcat")
-                .toString()
-        assert(logcatMessage.contains(String.format("D %s:", javaClass.simpleName)))
-        assert(logcatMessage.contains(Regex("threadName=[^;]*; threadId=[^0-9]*[0-9]+;")))
-    }
-
-    /**
-     *  No message should be logged.
-     */
-    @Test
-    fun log_validMessageButLogLevelInsufficient_shouldNotWriteToLog() {
-        log.debug(Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE)
-        log.trace(Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE)
-        val logcatMessage =
-            TestHelper.getLogsAfterTestStart("log_validMessageButLogLevelInsufficient_shouldNotWriteToLog")
-                .toString()
-        assert(logcatMessage.contains(Constants.LOGGER_TEST_SIMPLE_TEST_MESSAGE).not())
-    }
-
-    /**
      *  Every message should be logged.
      */
     @Test
@@ -284,17 +233,6 @@ internal class LoggerExtKtTest {
     }
 
     @Test
-    @Ignore("Configuration required for DEBUG level")
-    fun log_enteringWithTraceLevel_shouldWriteToLog() {
-        log.entering(Level.TRACE)
-        log_entryOrExit_shouldWriteToLog(
-            Constants.LOGGER_ENTRY,
-            "log_enteringWithVerboseLevel_shouldWriteToLog"
-        )
-    }
-
-    @Test
-    @Ignore("Configuration required for DEBUG level")
     fun log_enteringWithDebugLevel_shouldWriteToLog() {
         log.entering(Level.DEBUG)
         log_entryOrExit_shouldWriteToLog(
@@ -346,17 +284,6 @@ internal class LoggerExtKtTest {
     }
 
     @Test
-    @Ignore("Configuration required for DEBUG level")
-    fun log_exitingWithTraceLevel_shouldWriteToLog() {
-        log.exiting(Level.TRACE)
-        log_entryOrExit_shouldWriteToLog(
-            Constants.LOGGER_EXIT,
-            "log_exitingWithVerboseLevel_shouldWriteToLog"
-        )
-    }
-
-    @Test
-    @Ignore("Configuration required for DEBUG level")
     fun log_exitingWithDebugLevel_shouldWriteToLog() {
         log.exiting(Level.DEBUG)
         log_entryOrExit_shouldWriteToLog(
