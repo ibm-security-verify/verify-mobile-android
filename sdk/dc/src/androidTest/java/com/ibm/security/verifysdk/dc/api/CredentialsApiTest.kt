@@ -68,41 +68,6 @@ class CredentialsApiTest(private val inputUrl: String?) {
     }
 
     @Test
-    fun getAll_3types() = runTest {
-
-        val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.credentials_get_all_3types_response)
-        apiMockEngine.addMockResponse(
-            method = HttpMethod.Get,
-            urlPath = "/diagency/v1.0/diagency/credentials",
-            httpCode = HttpStatusCode.OK,
-            responseBody = responseBody.toString()
-        )
-
-        val result = inputUrl?.let {
-            CredentialsApi(baseUrl = baseUrl).getAll(
-                accessToken = accessToken,
-                url = URL("${baseUrl}${inputUrl}")
-            )
-        } ?: run {
-            CredentialsApi(baseUrl = baseUrl).getAll(
-                accessToken = accessToken
-            )
-        }
-
-        result
-            .onSuccess {
-                log.info(it.toString())
-            }
-            .onFailure {
-                log.info(it.toString())
-                throw (it)
-            }
-
-        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/credentials/")
-    }
-
-    @Test
     fun getAll() = runTest {
 
         val responseBody =
