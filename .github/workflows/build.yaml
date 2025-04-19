@@ -59,7 +59,7 @@ jobs:
         uses: android-actions/setup-android@v3.2.0
 
       - name: Load cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -124,7 +124,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Load cache
-        uses: actions/cache@v4.0.1
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -147,7 +147,10 @@ jobs:
           target: default
           arch: x86
           profile: Nexus 6
-          script: ./gradlew --no-daemon :rootCoverageReport
+          script: |
+            adb shell setprop log.tag.LoggerExtKtTest DEBUG
+            adb shell getprop log.tag.LoggerExtKtTest
+            ./gradlew --no-daemon :rootCoverageReport
 
       - name: Store code coverage report
         uses: actions/upload-artifact@v4.3.1
@@ -200,8 +203,7 @@ jobs:
       - name: Run the mend scan jar
         working-directory: ./sdk
         run: |
-          java -jar ../wss-unified-agent.jar -d ${{ github.workspace }}  
-
+          java -jar ../wss-unified-agent.jar -d ${{ github.workspace }}
 
   publish:
     name: Publish SDK, reports and documentation
@@ -219,25 +221,25 @@ jobs:
       - name: Create SDK directory
         run: mkdir -p ./sdk
 
-      - name: Collect all artificats
+      - name: Collect all artifacts
         uses: actions/download-artifact@v4.1.7
         with:
           name: build-and-test
           path: ./sdk
 
-      - name: Collect documentation artificats
+      - name: Collect documentation artifacts
         uses: actions/download-artifact@v4.1.7
         with:
           name: documentation
           path: ./sdk     
 
-      - name: Collect maven-local artificats
+      - name: Collect maven-local artifacts
         uses: actions/download-artifact@v4.1.7
         with:
           name: maven-local
           path: ~/.m2/repository/com/ibm/security
 
-      - name: Collect code coverate result
+      - name: Collect code coverage result
         uses: actions/download-artifact@v4.1.7
         with:
           name: jacoco-report
@@ -249,8 +251,8 @@ jobs:
           mv ./sdk/fido2/build/outputs/aar/fido2-release.aar ./sdk/fido2/build/outputs/aar/IBM-Verify-SDK_fido2_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
           mv ./sdk/adaptive/build/outputs/aar/adaptive-release.aar ./sdk/adaptive/build/outputs/aar/IBM-Verify-SDK_adaptive_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
           mv ./sdk/authentication/build/outputs/aar/authentication-release.aar ./sdk/authentication/build/outputs/aar/IBM-Verify-SDK_authentication_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
-          mv ./sdk/mfa/build/outputs/aar/mfa-release.aar ./sdk/mfa/build/outputs/aar/IBM-Verify-SDK_mfa_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
-
+          mv ./sdk/mfa/build/outputs/aar/mfa-release.aar ./sdk/mfa/build/outputs/aar/IBM-Verify-SDK_mfa_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar
+          mv ./sdk/dc/build/outputs/aar/dc-release.aar ./sdk/dc/build/outputs/aar/IBM-Verify-SDK_dc_${{ needs.setup_environment.outputs.VERIFY_SDK_RELEASE_TITLE}}_${{ needs.setup_environment.outputs.VERIFY_SDK_DATE}}_release.aar  
 
       - name: Move maven files to accessible folder
         run: |
@@ -260,7 +262,7 @@ jobs:
           mv ~/.m2/repository/com/ibm/security/verifysdk/adaptive/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
           mv ~/.m2/repository/com/ibm/security/verifysdk/authentication/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
           mv ~/.m2/repository/com/ibm/security/verifysdk/mfa/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
-
+          mv ~/.m2/repository/com/ibm/security/verifysdk/dc/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
 
       - name: Update documentation folder structure for GitHub commit
         run: |
@@ -269,12 +271,13 @@ jobs:
           mkdir -p ./sdk/documentation/android/adaptive/docs
           mkdir -p ./sdk/documentation/android/authentication/docs
           mkdir -p ./sdk/documentation/android/mfa/docs
+          mkdir -p ./sdk/documentation/android/dc/docs
           mv ./sdk/core/build/dokka/javadoc/* ./sdk/documentation/android/core/docs/
           mv ./sdk/fido2/build/dokka/javadoc/* ./sdk/documentation/android/fido2/docs/
           mv ./sdk/adaptive/build/dokka/javadoc/* ./sdk/documentation/android/adaptive/docs/
           mv ./sdk/authentication/build/dokka/javadoc/* ./sdk/documentation/android/authentication/docs/
           mv ./sdk/mfa/build/dokka/javadoc/* ./sdk/documentation/android/mfa/docs/
-
+          mv ./sdk/dc/build/dokka/javadoc/* ./sdk/documentation/android/dc/docs/
 
       - name: Zip code coverage report
         run: |
@@ -299,6 +302,8 @@ jobs:
             ./sdk/authentication/build/reports/*.html
             ./sdk/mfa/build/outputs/aar/*.aar
             ./sdk/mfa/build/reports/*.html
+            ./sdk/dc/build/outputs/aar/*.aar
+            ./sdk/dc/build/reports/*.html
             ./sdk/IBM-Verify-SDK_*_code-coverage-report.zip
 
       - name: Upload documentation to GitHub.io repo

@@ -14,7 +14,7 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.ibm.security.verifysdk.core.AuthorizationException
-import com.ibm.security.verifysdk.core.ErrorResponse
+import com.ibm.security.verifysdk.core.ErrorMessage
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.fido2.api.Fido2Api
 import com.ibm.security.verifysdk.fido2.demoapp.model.IvCreds
@@ -128,7 +128,7 @@ class RegistrationActivity : AppCompatActivity() {
             if (response.status.isSuccess()) {
                 Result.success(json.decodeFromString<IvCreds>(response.bodyAsText()))
            } else {
-                val errorResponse = response.body<ErrorResponse>()
+                val errorResponse = response.body<ErrorMessage>()
                 Result.failure(
                     AuthorizationException(
                         response.status,

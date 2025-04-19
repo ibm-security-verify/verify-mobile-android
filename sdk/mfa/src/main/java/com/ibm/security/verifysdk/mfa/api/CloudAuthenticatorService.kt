@@ -6,7 +6,7 @@ package com.ibm.security.verifysdk.mfa.api
 
 import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.core.AuthorizationException
-import com.ibm.security.verifysdk.core.ErrorResponse
+import com.ibm.security.verifysdk.core.ErrorMessage
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.mfa.MFAAttributeInfo
 import com.ibm.security.verifysdk.mfa.MFAServiceDescriptor
@@ -46,7 +46,7 @@ class CloudAuthenticatorService(
     private var _authenticatorId: String
 ) : MFAServiceDescriptor {
 
-    private val decoder = Json {
+    private val json = Json {
         ignoreUnknownKeys = true
         isLenient = true
     }
@@ -148,9 +148,9 @@ class CloudAuthenticatorService(
      */
     private suspend fun refreshTokenHandleResponse(response: HttpResponse): Result<TokenInfo> {
         return if (response.status.isSuccess()) {
-            Result.success(decoder.decodeFromString<TokenInfo>(response.bodyAsText()))
+            Result.success(json.decodeFromString<TokenInfo>(response.bodyAsText()))
         } else {
-            val errorResponse = response.body<ErrorResponse>()
+            val errorResponse = response.body<ErrorMessage>()
             Result.failure(
                 AuthorizationException(
                     response.status,
@@ -292,7 +292,7 @@ class CloudAuthenticatorService(
         return try {
             val responseBody = response.bodyAsText()
             val result: TransactionResult = try {
-                decoder.decodeFromString(responseBody)
+                json.decodeFromString(responseBody)
             } catch (e: Exception) {
                 return Result.failure(MFAServiceError.DecodingFailed())
             }

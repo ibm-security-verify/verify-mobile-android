@@ -73,17 +73,19 @@ object MFAAttributeInfo {
 
     private val applicationName: String
         get() {
-            val applicationInfo = applicationContext.packageManager.getApplicationInfo(applicationContext.packageName, 0)
+            val applicationInfo = applicationContext.packageManager.getApplicationInfo(
+                applicationContext.packageName,
+                0
+            )
             return applicationContext.packageManager.getApplicationLabel(applicationInfo).toString()
         }
 
     private val applicationVersion: String
-        get() {
-            return applicationContext.packageManager.getPackageInfo(
-                applicationContext.packageName,
-                0
-            ).versionName
-        }
+        get() = applicationContext.packageManager.getPackageInfo(
+            applicationContext.packageName,
+            0
+        ).versionName ?: "Unknown"
+
 
     private val frameworkVersion: String
         get() = BuildConfig.VERSION_NAME

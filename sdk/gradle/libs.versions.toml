@@ -1,11 +1,12 @@
 [versions]
-activityComposeVersion = "1.9.1"
-agp = "8.5.2"
+activityComposeVersion = "1.10.0"
+agp = "8.8.2"
 androidxJunit = "1.2.0"
 appcompat = "1.7.0"
 biometric = "1.2.0-alpha05"
 browser = "1.8.0"
-composeBom = "2024.06.00"
+composeBom = "2025.02.00"
+compose-compiler = "1.5.11"
 constraintlayout = "2.1.4"
 coreKtx = "1.13.1"
 dokka = "1.9.20"
@@ -13,98 +14,119 @@ espressoCore = "3.6.1"
 espressoCoreVersion = "3.6.0"
 fuelAndroid = "2.3.1"
 jackson = "2.17.1"
+jetbrainsKotlinJvmVersion = "2.1.0"
 jose4j = "0.9.6"
+jsonassert = "2.0-rc1"
 junit = "4.13.2"
 junitKtx = "1.2.0"
 junitVersion = "1.2.1"
-kotlin = "1.9.20"
+kotlin = "2.1.0"
 kotlinxCoroutinesAndroid = "1.8.1"
 kotlinxCoroutinesCore = "1.8.1"
 kotlinxCoroutinesTest = "1.8.1"
 kotlinxDatetime = "0.6.0"
 kotlinxSerializationJson = "1.6.3"
-ktor = "2.3.12"
-lifecycleProcess = "2.8.2"
+ksp = "2.1.0-1.0.29"
+ktor = "3.1.1"
+lifecycleLivedata = "2.8.7"
+lifecycleProcess = "2.8.7"
 loggingInterceptor = "4.12.0"
 material = "1.12.0"
+material3 = "1.3.1"
+material3-adaptive = "1.3.1"
+material3AdaptiveVersion = "1.0.0"
 mockitoKotlin = "5.3.1"
 mockwebserver = "4.12.0"
-nettyCodecHttp2 = "4.1.111.Final"
+monitorVersion = "1.7.2"
+nettyCodecHttp2 = "4.1.118.Final"
+roomVersion = "2.6.1"
+rootCoverage = "1.9.0"
 rootbeerLib = "0.1.0"
 rules = "1.6.0"
-runtimeLivedata = "1.6.8"
-slf4jAndroidVersion = "1.7.36"
+runtimeLivedata = "1.7.8"
+slf4jVersion = "1.7.36"
 versioningPluginVersion = "1.9.20"
 woodstockCore = "6.6.2"
 zxingAndroidEmbeddedVersion = "4.3.0"
-jetbrainsKotlinJvmVersion = "1.9.20"
-monitorVersion = "1.7.2"
-rootCoverage = "1.9.0"
-jsonassert = "2.0-rc1"
+adaptiveNavigationSuite = "1.3.1"
+navigationComposeVersion = "2.8.7"
 
 [libraries]
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityComposeVersion" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
-androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
-androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
-androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+androidx-biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "junitKtx" }
-androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleProcess" }
-androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleProcess" }
-androidx-material3 = { module = "androidx.compose.material3:material3" }
-androidx-rules = { module = "androidx.test:rules", version.ref = "rules" }
-androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "runtimeLivedata" }
-androidx-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
-androidx-ui = { module = "androidx.compose.ui:ui" }
-androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
-fuel-android = { module = "com.github.kittinunf.fuel:fuel-android", version.ref = "fuelAndroid" }
-jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
-jackson-dataformat-cbor = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor", version.ref = "jackson" }
-jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml", version.ref = "jackson" }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
-jackson-woodstox-core = { module = "com.fasterxml.woodstox:woodstox-core", version.ref = "woodstockCore"}
-jose4j = { module = "org.bitbucket.b_c:jose4j", version.ref = "jose4j" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
-kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
-kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
-ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
-ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
-ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
-ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
-ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
-ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockwebserver" }
-netty-codec-http2 = { module = "io.netty:netty-codec-http2", version.ref = "nettyCodecHttp2" }
-rootbeer-lib = { module = "com.scottyab:rootbeer-lib", version.ref = "rootbeerLib" }
-androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4jAndroidVersion" }
-versioning-plugin = { module = "org.jetbrains.dokka:versioning-plugin", version.ref = "versioningPluginVersion" }
-zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbeddedVersion" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleProcess" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-material3-adaptive-core = { group = "androidx.compose.material3.adaptive", name = "adaptive", version.ref = "material3AdaptiveVersion" }
+androidx-material3-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout", version.ref = "material3AdaptiveVersion" }
+androidx-material3-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "material3AdaptiveVersion" }
 androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitorVersion" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationComposeVersion" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomVersion" }
+androidx-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+fuel-android = { group = "com.github.kittinunf.fuel", name = "fuel-android", version.ref = "fuelAndroid" }
+jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-core", version.ref = "jackson" }
+jackson-dataformat-cbor = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-cbor", version.ref = "jackson" }
+jackson-dataformat-xml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-xml", version.ref = "jackson" }
+jackson-module-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "jackson" }
+jackson-woodstox-core = { group = "com.fasterxml.woodstox", name = "woodstox-core", version.ref = "woodstockCore" }
+jose4j = { group = "org.bitbucket.b_c", name = "jose4j", version.ref = "jose4j" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
+ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor" }
+ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktor" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-serialization = { group = "io.ktor", name = "ktor-client-serialization", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedata" }
+logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "loggingInterceptor" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "mockwebserver" }
+netty-codec-http2 = { group = "io.netty", name = "netty-codec-http2", version.ref = "nettyCodecHttp2" }
+rootbeer-lib = { group = "com.scottyab", name = "rootbeer-lib", version.ref = "rootbeerLib" }
 skyscreamer-jsonassert = { group = "org.skyscreamer", name = "jsonassert", version.ref = "jsonassert" }
+slf4j-android = { group = "org.slf4j", name = "slf4j-android", version.ref = "slf4jVersion" }
+slf4j-api= { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4jVersion" }
+versioning-plugin = { group = "org.jetbrains.dokka", name = "versioning-plugin", version.ref = "versioningPluginVersion" }
+zxing-android-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingAndroidEmbeddedVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 jetbrains-dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvmVersion" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-compiler" }
 neotech-rootcoverage = { id = "nl.neotech.plugin.rootcoverage", version.ref = "rootCoverage"}
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

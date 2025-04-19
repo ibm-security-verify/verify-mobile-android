@@ -10,8 +10,9 @@ import kotlinx.serialization.json.JsonNames
 @ExperimentalSerializationApi
 @Serializable
 data class ErrorMessage(
-    val error: String,
+    @JsonNames("messageId")
+    val error: String = "No identifier available",
 
-    @JsonNames("error_description")
-    val errorDescription: String
+    @JsonNames("error_description", "errorDescription", "messageDescription")
+    val errorDescription: String = "No description available"
 )

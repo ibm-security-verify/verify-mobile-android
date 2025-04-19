@@ -1,7 +1,0 @@
-{
-  "excludes": [
-    "**/androidTest/**",
-    "**/test/**",
-    "**/build/**"
-  ]
-}

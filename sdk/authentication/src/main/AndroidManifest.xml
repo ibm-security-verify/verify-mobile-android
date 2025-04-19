@@ -21,9 +21,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:scheme="${authRedirectScheme}"
-                    android:host="${authRedirectHost}"
-                    android:path="${authRedirectPath}"
+                    android:scheme="${auth_redirect_scheme}"
+                    android:host="${auth_redirect_host}"
+                    android:path="${auth_redirect_path}"
                     tools:replace="android:host,android:path,android:scheme" />
             </intent-filter>
         </activity>
