@@ -40,12 +40,12 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.release
-                artifactId = project.name
-                groupId 'com.ibm.security.verifysdk'
-                version "$versionName"
+                artifactId = "verify-sdk-${project.name}"
+                groupId 'com.github.ibm-security-verify'
+                version project.version ?: "$versionName"
                 pom {
                     name = artifactId
-                    description = 'com.ibm.security.verifysdk'
+                    description = "IBM Verify ${project.name.capitalize()} SDK for Android"
                     url = 'https://github.com/ibm-security-verify/verify-sdk-android'
                     licenses {
                         license {
@@ -60,8 +60,8 @@ afterEvaluate {
                     }
                     developers {
                         developer {
-                            id = ''
-                            name = 'IBM Security'
+                            id = 'ibm-verify'
+                            name = 'IBM Verify'
                             email = 'verify@au1.ibm.com'
                         }
                     }
