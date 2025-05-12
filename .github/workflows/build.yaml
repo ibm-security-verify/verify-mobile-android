@@ -100,7 +100,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.1
         with:
           name: maven-local
-          path: ~/.m2/repository/com/ibm/security
+          path: ~/.m2/repository/com/github/ibm-security-verify
 
       - name: Publish to GitHub packages
         working-directory: ./sdk
@@ -237,7 +237,7 @@ jobs:
         uses: actions/download-artifact@v4.1.7
         with:
           name: maven-local
-          path: ~/.m2/repository/com/ibm/security
+          path: ~/.m2/repository/com/github/ibm-security-verify
 
       - name: Collect code coverage result
         uses: actions/download-artifact@v4.1.7
@@ -257,12 +257,12 @@ jobs:
       - name: Move maven files to accessible folder
         run: |
           mkdir -p ./sdk/maven 
-          mv ~/.m2/repository/com/ibm/security/verifysdk/core/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/* ./sdk/maven/
-          mv ~/.m2/repository/com/ibm/security/verifysdk/fido2/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/* ./sdk/maven/
-          mv ~/.m2/repository/com/ibm/security/verifysdk/adaptive/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
-          mv ~/.m2/repository/com/ibm/security/verifysdk/authentication/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
-          mv ~/.m2/repository/com/ibm/security/verifysdk/mfa/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
-          mv ~/.m2/repository/com/ibm/security/verifysdk/dc/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
+          mv ~/.m2/repository/com/github/ibm-security-verify/verify-sdk-core/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/* ./sdk/maven/
+          mv ~/.m2/repository/com/github/ibm-security-verify/verify-sdk-fido2/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/* ./sdk/maven/
+          mv ~/.m2/repository/com/github/ibm-security-verify/verify-sdk-adaptive/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
+          mv ~/.m2/repository/com/github/ibm-security-verify/verify-sdk-authentication/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
+          mv ~/.m2/repository/com/github/ibm-security-verify/verify-sdk-mfa/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
+          mv ~/.m2/repository/com/github/ibm-security-verify/verify-sdk-dc/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
 
       - name: Update documentation folder structure for GitHub commit
         run: |
