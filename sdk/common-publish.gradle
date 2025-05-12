@@ -42,7 +42,7 @@ afterEvaluate {
                 from components.release
                 artifactId = "verify-sdk-${project.name}"
                 groupId 'com.github.ibm-security-verify'
-                version project.version ?: "$versionName"
+                version "$versionName"
                 pom {
                     name = artifactId
                     description = "IBM Verify ${project.name.capitalize()} SDK for Android"
