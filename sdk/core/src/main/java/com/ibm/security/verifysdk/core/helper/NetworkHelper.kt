@@ -6,6 +6,7 @@ package com.ibm.security.verifysdk.core.helper
 
 import com.ibm.security.verifysdk.core.BuildConfig
 import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
@@ -28,7 +29,6 @@ import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
 
-@OptIn(ExperimentalSerializationApi::class)
 @Suppress("MemberVisibilityCanBePrivate")
 object NetworkHelper {
 
@@ -49,7 +49,7 @@ object NetworkHelper {
         set(value) {
             if (field != value) {
                 field = value
-                client = initializeClient(null)
+                reinitializeClient()
             }
         }
 
@@ -57,7 +57,7 @@ object NetworkHelper {
         set(value) {
             if (field != value) {
                 field = value
-                client = initializeClient(null)
+                reinitializeClient()
             }
         }
 
@@ -65,79 +65,48 @@ object NetworkHelper {
         set(value) {
             if (field != value) {
                 field = value
-                client = initializeClient(null)
+                reinitializeClient()
             }
         }
 
     init {
-        initialize(null)
+        initialize()
     }
 
     val getInstance: HttpClient
-        get() {
-            return client
-        }
+        get() = client
 
     @Synchronized
     fun initialize(customClient: HttpClient? = null, httpClientEngine: HttpClientEngine? = null) {
-        client = customClient ?: initializeClient(httpClientEngine)
+        client = customClient ?: buildClient(httpClientEngine)
     }
 
     @Synchronized
-    private fun initializeClient(httpClientEngine: HttpClientEngine?): HttpClient {
+    private fun reinitializeClient() {
+        client = buildClient(null)
+    }
 
-        if (!BuildConfig.DEBUG) {
-            if (this@NetworkHelper.logLevel == LogLevel.ALL) {
-                println("LogLevel.All should not be used in production!")
-            }
+    private fun buildClient(httpClientEngine: HttpClientEngine?): HttpClient {
+
+        if (!BuildConfig.DEBUG && logLevel == LogLevel.ALL) {
+            println("LogLevel.All should not be used in production!")
         }
 
-        return httpClientEngine?.let {
-            HttpClient(it) {
-                install(Logging) {
-                    logger = this@NetworkHelper.logger
-                    level = this@NetworkHelper.logLevel
-                }
-                install(ContentNegotiation) {
-                    json(Json {
-                        explicitNulls = false
-                        encodeDefaults = true
-                        ignoreUnknownKeys = true
-                        isLenient = true
-                    })
-                }
-                install(HttpTimeout) {
-                    connectTimeoutMillis = this@NetworkHelper.connectTimeoutMillis
-                    requestTimeoutMillis = this@NetworkHelper.requestTimeoutMillis
-                }
+        return httpClientEngine?.let { engine ->
+            HttpClient(engine) {
+                configureClient()
             }
         } ?: HttpClient(OkHttp) {
             engine {
                 config {
                     followRedirects(this@NetworkHelper.followRedirects)
                     followSslRedirects(this@NetworkHelper.followSslRedirects)
-
                     customInterceptor?.let { addInterceptor(it) }
                     customLoggingInterceptor?.let { addInterceptor(it) }
                 }
                 preconfigured = createOkHttpClient()
             }
-            install(Logging) {
-                logger = this@NetworkHelper.logger
-                level = this@NetworkHelper.logLevel
-            }
-            install(ContentNegotiation) {
-                json(Json {
-                    explicitNulls = false
-                    encodeDefaults = true
-                    isLenient = true
-                    ignoreUnknownKeys = true
-                })
-            }
-            install(HttpTimeout) {
-                connectTimeoutMillis = this@NetworkHelper.connectTimeoutMillis
-                requestTimeoutMillis = this@NetworkHelper.requestTimeoutMillis
-            }
+            configureClient()
         }
 
 //        httpClientEngine?.let {
@@ -196,6 +165,24 @@ object NetworkHelper {
 //        }
     }
 
+    private fun HttpClientConfig<*>.configureClient() {
+        install(Logging) {
+            logger = this@NetworkHelper.logger
+            level = this@NetworkHelper.logLevel
+        }
+        install(ContentNegotiation) {
+            json(Json {
+                explicitNulls = false
+                encodeDefaults = true
+                ignoreUnknownKeys = true
+                isLenient = true
+            })
+        }
+        install(HttpTimeout) {
+            connectTimeoutMillis = this@NetworkHelper.connectTimeoutMillis
+            requestTimeoutMillis = this@NetworkHelper.requestTimeoutMillis
+        }
+    }
 
 //
 //    val okHttpClientBuilder = OkHttpClient.Builder()

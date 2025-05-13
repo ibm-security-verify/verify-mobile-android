@@ -90,3 +90,4 @@ sdk/.idea/misc.xml
 sdk/.idea/androidTestResultsUserPreferences.xml
 wss-unified-agent.jar
 sdk/.idea/migrations.xml
+.idea/**

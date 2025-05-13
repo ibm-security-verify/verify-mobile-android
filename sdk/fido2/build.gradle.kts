@@ -10,7 +10,7 @@ apply(from = "$rootDir/common-publish.gradle")
 
 dependencies {
 
-    implementation(project(":core"))
+    implementation(project(":sdk:core"))
 
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.core.ktx)
@@ -20,7 +20,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.datetime)
 
-    androidTestImplementation(project(":test_utils"))
+    androidTestImplementation(project(":sdk:test_utils"))
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.kotlinx.coroutines.test)

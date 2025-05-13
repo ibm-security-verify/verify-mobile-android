@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
     private val tenant = "verify.ice.ibmcloud.com" // without protocol
     private val clientId = "b29c2bc2-a7ae-4cf7-b437-46d28f7a0121"
     private val clientSecret = "ZXBpYHG4gm"
-    private val resourceServer = "192.168.42.23" // without protocol and port
+    private val resourceServer = "10.0.2.2" // without protocol and port
     private val resourceServerPort = "8080"
 
     private val tokenEndpoint = String.format("https://%s/oauth2/token", tenant)

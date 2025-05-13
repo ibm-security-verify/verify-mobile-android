@@ -28,7 +28,7 @@ android {
 
 dependencies {
 
-    implementation(project(":core"))
+    implementation(project(":sdk:core"))
 
     implementation(libs.androidx.material3)
     implementation(libs.androidx.runtime.livedata)

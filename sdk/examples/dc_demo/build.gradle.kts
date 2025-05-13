@@ -35,9 +35,9 @@ android {
 
 dependencies {
 
-    implementation(project(":dc"))
-    implementation(project(":core"))
-    implementation(project(":authentication"))
+    implementation(project(":sdk:dc"))
+    implementation(project(":sdk:core"))
+    implementation(project(":sdk:authentication"))
 
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material3.adaptive.core)
