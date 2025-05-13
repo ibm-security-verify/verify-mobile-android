@@ -16,8 +16,8 @@ android {
 
 dependencies {
 
-    implementation(project(":core"))
-    implementation(project(":fido2"))
+    implementation(project(":sdk:core"))
+    implementation(project(":sdk:fido2"))
 
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.constraintlayout)

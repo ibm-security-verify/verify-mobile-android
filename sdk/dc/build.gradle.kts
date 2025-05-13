@@ -10,8 +10,8 @@ apply(from = "$rootDir/common-publish.gradle")
 
 dependencies {
 
-    implementation(project(":core"))
-    implementation(project(":authentication"))
+    implementation(project(":sdk:core"))
+    implementation(project(":sdk:authentication"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.jackson.core)
@@ -22,7 +22,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.material)
 
-    androidTestImplementation(project(":test_utils"))
+    androidTestImplementation(project(":sdk:test_utils"))
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.kotlinx.coroutines.test)

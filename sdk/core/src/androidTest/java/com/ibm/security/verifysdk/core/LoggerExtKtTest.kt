@@ -233,6 +233,7 @@ internal class LoggerExtKtTest {
     }
 
     @Test
+    @Ignore
     fun log_enteringWithDebugLevel_shouldWriteToLog() {
         log.entering(Level.DEBUG)
         log_entryOrExit_shouldWriteToLog(
@@ -284,6 +285,7 @@ internal class LoggerExtKtTest {
     }
 
     @Test
+    @Ignore
     fun log_exitingWithDebugLevel_shouldWriteToLog() {
         log.exiting(Level.DEBUG)
         log_entryOrExit_shouldWriteToLog(

@@ -20,8 +20,8 @@ android {
 
 dependencies {
 
-    implementation(project(":core"))
-    implementation(project(":mfa"))
+    implementation(project(":sdk:core"))
+    implementation(project(":sdk:mfa"))
 
     implementation(libs.zxing.android.embedded)
 

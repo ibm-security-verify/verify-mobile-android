@@ -45,7 +45,7 @@ afterEvaluate {
                 version "$versionName"
                 pom {
                     name = artifactId
-                    description = "IBM Verify ${project.name.capitalize()} SDK for Android"
+                    description = "IBM Verify ${project.name.toUpperCase()} SDK for Android"
                     url = 'https://github.com/ibm-security-verify/verify-sdk-android'
                     licenses {
                         license {

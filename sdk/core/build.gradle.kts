@@ -16,6 +16,6 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.material)
 
-    androidTestImplementation(project(":test_utils"))
+    androidTestImplementation(project(":sdk:test_utils"))
     androidTestImplementation(libs.androidx.espresso.core)
 }

@@ -19,7 +19,7 @@ android {
 
 dependencies {
 
-    implementation(project(":core"))
+    implementation(project(":sdk:core"))
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.biometric)
@@ -30,7 +30,7 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.material)
 
-    androidTestImplementation(project(":test_utils"))
+    androidTestImplementation(project(":sdk:test_utils"))
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.kotlinx.coroutines.test)
