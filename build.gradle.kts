@@ -26,21 +26,21 @@ configurations.all {
 }
 
 rootCoverage {
- excludes = listOf(
-     "**/R.class",
-     "**/R\$*.class",
-     "**/*Companion*.class",
-     "**/*Function0*.class",
-     "**/BuildConfig.*",
-     "**/Manifest*.*",
-     "**/*Test*.*",
-     "android/**/*.*",
-     "**/*\$Lambda$*.*",  // Jacoco can't handle several "$" in class names.
-     "**/*\$inlined$*.*"  // Kotlin specific classes Jacoco can't handle.
- )
+    excludes = listOf(
+        "**/R.class",
+        "**/R\$*.class",
+        "**/*Companion*.class",
+        "**/*Function0*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        "**/*\$Lambda$*.*",  // Jacoco can't handle several "$" in class names.
+        "**/*\$inlined$*.*"  // Kotlin specific classes Jacoco can't handle.
+    )
 
- generateHtml = true
- generateXml = true
+    generateHtml = true
+    generateXml = true
 }
 
 tasks.jacocoTestCoverageVerification {

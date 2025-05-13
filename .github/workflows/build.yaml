@@ -141,7 +141,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.1
         with:
           name: jacoco-report
-          path: ./sdk/build/reports/
+          path: ./build/reports/
 
       - name: Add coverage to PR
         id: jacoco
