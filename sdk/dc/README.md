@@ -9,9 +9,9 @@ The DC software development kit (SDK) provides functionality to support credenti
 IBM Verify Identity Access enables businesses, governments, and individuals to issue, manage, and verify digital credentials with the Digital Credentials feature.
 [IBM Verify Identity Access Digital Credentials configuration](https://www.ibm.com/docs/en/sva/11.0.0?topic=configuring-verify-identity-access-digital-credentials-configuration)
 
-### Installation
+### Integrating with your project
 
-See ../README.md#Download
+See [here](../../README.md#integrating-with-your-project)
 
 ### API documentation
 

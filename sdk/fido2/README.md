@@ -29,29 +29,9 @@ An [example](../../examples/fido2) application is available for the Verify FIDO2
 
 ## Getting started
 
-### Installation
+### Integrating with your project
 
-1. Download all files
-   from [Releases](https://github.com/ibm-security-verify/verify-sdk-android/releases/latest) for
-   the `core` and `fido2` SDKs.
-
-1. Install the SDKs to your local Maven repository (usually it's `~/.m2`):
-
-```
-SDK_VERSION = 3.0.1
-
-### The name of the SDK: core | fido2
-SDK = core 
-
-### Install binary and pom file
-mvn install:install-file -Dfile=$SDK-$SDK_VERSION.aar -DgroupId=com.ibm.security.verifysdk -DartifactId=$SDK -Dversion=$SDK_VERSION -Dpackaging=aar -DpomFile=$SDK-$SDK_VERSION.pom
-
-### Install javadoc
-mvn install:install-file -Dfile=$SDK-$SDK_VERSION-javadoc.jar -DgroupId=com.ibm.security.verifysdk -DartifactId=$SDK -Dversion=$SDK_VERSION -Dpackaging=jar -Dclassifier=javadoc
-
-### Install sources
-mvn install:install-file -Dfile=$SDK-$SDK_VERSION-sources.jar -DgroupId=com.ibm.security.verifysdk -DartifactId=$SDK -Dversion=$SDK_VERSION -Dpackaging=jar -Dclassifier=sources
-``` 
+See [here](../../README.md#integrating-with-your-project)
 
 ### API documentation
 

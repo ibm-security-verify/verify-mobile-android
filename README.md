@@ -24,51 +24,40 @@ The following SDKs are currently offered in the package:
 | [MFA](sdk/mfa) | The IBM Security Verify MFA SDK provides multi-factor authentication support for creating authenticators and processing transactions.|
 | [DC](sdk/dc) | The IBM Security Verify DC SDK supporting digital credentials in a mobile Wallet.|
 
-## Download
+## Integrating with your project
 
-SDK artifacts are available [here](/releases).
+To include an IBM Verify SDK modules in your Android project, follow these steps:
 
-### Maven
+1. Add JitPack to your repositories
 
-Store the files in your local maven repository. This is usually located at `~/.m2/repository/`.
+   In your root-level `settings.gradle.kts` add the JitPack repository:
 
-Add `mavenLocal` at the top of your list of repositories:
-
-```gradle
-buildscript {
-    repositories {
-        mavenLocal()
-    }
-}
-```
-
-Add this line for each SDK to your `build.gradle` file (app level):
-
-```gradle
-implementation 'com.github.ibm-security-verify:verify-sdk-android:<module>:<version>'
-```
-
-### Jitpack
-
-In your project-level build.gradle file and add JitPack as a repository:
-
-```gradle
-allprojects {
-    repositories {
-        maven { url 'https://jitpack.io' }
+    ```kotlin
+    dependencyResolutionManagement {
+        repositories {
+            // other repositories...
+            maven { url = uri("https://jitpack.io") }
         }
     }
-```
+    ```
 
-Then for each SDK, add the following line into your module-level build.gradle file:
+2. Add the SDK dependencies
 
-```gradle
-    implementation 'com.github.ibm-security-verify:verify-sdk-android:core:v3.0.0'
-```
+   In your app-level `build.gradle.kts` add the SDK modules you want to use:
 
-Replace the particular SDK - `core` in this example - with the name of the SDKs you would like to embed.
+    ```kotlin
+    dependencies {
+        implementation("com.github.ibm-security-verify:verify-sdk-core:3.0.0")
+        implementation("com.github.ibm-security-verify:verify-sdk-<module>:<version>")
+        ...
+    }
+    ```
 
-You can then use the JitPack website https://jitpack.io/ to generate a compile statement, based on the SDK’s GitHub url.
+   Replace `version` with `main-SNAPSHOT` for the latest development snapshot. You can generate entries for other modules [here](https://jitpack.io/#ibm-security-verify/verify-sdk-android/).
+
+3. Sync and build
+
+   After adding the dependency, sync your project with Gradle files and build your app.
 
 ### Manually from GitHub release
 

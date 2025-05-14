@@ -17,33 +17,9 @@ The adaptive component provides device assessment. Based on cloud risk policies,
 
 See [On-board a native application](https://docs.verify.ibm.com/verify/docs/on-boarding-a-native-application)
 
-### Download
+### Integrating with your project
 
-#### Maven Central 
-Add this line for each component to your `build.gradle` file (app level):
-
-    implementation 'com.github.ibm-security-verify:verify-sdk-android:core:3.0.0'
-
-#### Jitpack
-In your project-level build.gradle file and add JitPack as a repository:
-
-    allprojects {
-        repositories {
-            maven { url 'https://jitpack.io' }
-            }
-        }
-
-Then for each SDK, add the foloowing line into your app-level build.gradle file:
-
-    implementation 'com.github.ibm-security-verify:verify-sdk-android:core:v3.0.0'
-
-Replace the particular SDK - `core` in this example with the name of the SDKs you would like to embedd.
-
-You can then use the JitPack website https://jitpack.io/ to generate a compile statement, based on the SDK’s GitHub url.
-
-#### Manually from GitHub release
-Download the relevant files from https://github.com/ibm-security-verify/verify-sdk-android/releases, copy and past them into the lib folder and sync your project.
-
+See [here](../../README.md#integrating-with-your-project)
 
 ### API documentation
 The Adaptive component API can be reviewed [here](https://ibm-security-verify.github.io/android/adaptive/docs/).
