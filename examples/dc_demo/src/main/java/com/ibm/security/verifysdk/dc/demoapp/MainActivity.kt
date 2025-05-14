@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
     }
 
     // Change this to the IP of the diagency service.
-    private val hostLocal = "10.0.2.2"
+    private val hostLocal = "iviadcgw-default.ivia-dc-demo-560b083b6ae574bb5eb8ef2f0de647f7-0000.au-syd.containers.appdomain.cloud"
     private lateinit var walletManager: WalletManager
 
     // Change this to the data this is presented in the QR code.
@@ -81,10 +81,10 @@ class MainActivity : ComponentActivity() {
             {
                     "name":"holder_1",
                     "id":"cn=user_1,ou=users,dc=ibm,dc=com",
-                    "serviceBaseUrl":"https://$hostLocal:9720",
+                    "serviceBaseUrl":"https://$hostLocal/diagency",
                     "clientId":"onpremise_vcholders",
                     "aznCode": "12345ABCDE",
-                    "oauthBaseUrl": "https://$hostLocal:8436/oauth2"
+                    "oauthBaseUrl": "https://$hostLocal/oauth2/token"
             }
             """.trimIndent().replace("\n", "").replace(" ", "")
 
