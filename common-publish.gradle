@@ -40,7 +40,7 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.release
-                artifactId = "verify-sdk-${project.name}"
+                artifactId = "verify${project.path.replace(":","-")}"
                 groupId 'com.github.ibm-security-verify'
                 version "$versionName"
                 pom {
