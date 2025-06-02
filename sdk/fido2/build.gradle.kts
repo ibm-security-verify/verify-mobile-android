@@ -10,7 +10,7 @@ apply(from = "$rootDir/common-publish.gradle")
 
 dependencies {
 
-    implementation(project(":sdk:core"))
+    api(project(":sdk:core"))
 
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.core.ktx)
