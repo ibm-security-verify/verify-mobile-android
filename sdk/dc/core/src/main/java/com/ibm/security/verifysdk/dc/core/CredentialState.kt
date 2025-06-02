@@ -4,7 +4,7 @@
 
 @file:OptIn(ExperimentalSerializationApi::class)
 
-package com.ibm.security.verifysdk.dc.cloud.model
+package com.ibm.security.verifysdk.dc.core
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName

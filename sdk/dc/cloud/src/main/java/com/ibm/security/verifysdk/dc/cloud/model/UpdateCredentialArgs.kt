@@ -4,6 +4,7 @@
 
 package com.ibm.security.verifysdk.dc.cloud.model
 
+import com.ibm.security.verifysdk.dc.core.CredentialState
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement

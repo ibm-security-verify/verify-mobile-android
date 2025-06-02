@@ -1,7 +1,7 @@
 /*
  * Copyright contributors to the IBM Verify Digital Credentials SDK for Android project
  */
-package com.ibm.security.verifysdk.dc.cloud.model
+package com.ibm.security.verifysdk.dc.core
 
 
 import kotlinx.serialization.SerialName

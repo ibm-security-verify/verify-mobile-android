@@ -1,13 +1,14 @@
 /*
  * Copyright contributors to the IBM Verify Digital Credentials SDK for Android project
  */
-package com.ibm.security.verifysdk.dc
+package com.ibm.security.verifysdk.dc.cloud
 
 import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.core.serializer.URLSerializer
 import com.ibm.security.verifysdk.dc.cloud.model.AgentInfo
+import com.ibm.security.verifysdk.dc.cloud.model.CloudCredentialDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.ConnectionInfo
-import com.ibm.security.verifysdk.dc.cloud.model.CredentialDescriptor
+import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.InvitationInfo
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -50,6 +51,6 @@ data class Wallet (
     val agent: AgentInfo,
     var connections: MutableList<ConnectionInfo>,
     var invitations: MutableList<InvitationInfo>,
-    var credentials: MutableList<CredentialDescriptor>, // pragma: allowlist secret
+    var credentials: MutableList<CloudCredentialDescriptor>, // pragma: allowlist secret
     var verifications: MutableList<VerificationInfo>
 ) : WalletDescriptor

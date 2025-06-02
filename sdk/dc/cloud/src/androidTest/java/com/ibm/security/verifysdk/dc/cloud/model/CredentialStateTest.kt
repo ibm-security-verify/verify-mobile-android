@@ -1,8 +1,8 @@
 package com.ibm.security.verifysdk.dc.cloud.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ibm.security.verifysdk.dc.core.CredentialState
 import com.ibm.security.verifysdk.testutils.json
-import kotlinx.serialization.encodeToString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull

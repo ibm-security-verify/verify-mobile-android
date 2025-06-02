@@ -4,11 +4,11 @@
 
 @file:OptIn(ExperimentalSerializationApi::class)
 
-package com.ibm.security.verifysdk.dc.cloud.model
+package com.ibm.security.verifysdk.dc.core
 
-import com.ibm.security.verifysdk.dc.cloud.model.CredentialFormat.INDY
-import com.ibm.security.verifysdk.dc.cloud.model.CredentialFormat.JSON_LD
-import com.ibm.security.verifysdk.dc.cloud.model.CredentialFormat.MDOC
+import com.ibm.security.verifysdk.dc.core.CredentialFormat.INDY
+import com.ibm.security.verifysdk.dc.core.CredentialFormat.JSON_LD
+import com.ibm.security.verifysdk.dc.core.CredentialFormat.MDOC
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -36,7 +36,10 @@ enum class CredentialFormat {
     JSON_LD,
 
     @JsonNames("mso_mdoc", "mso_mdoc_detail", "mso_mdoc_preview")
-    MDOC;
+    MDOC,
+
+    @JsonNames("dc+sd-jwt")
+    SDJWT;
 
     companion object {
         val CredentialFormat.serialName: String
@@ -44,6 +47,7 @@ enum class CredentialFormat {
                 INDY -> "indy"
                 JSON_LD -> "jsonld"
                 MDOC -> "mso_mdoc"
+                SDJWT -> "dc+sd-jwt"
             }
 
         /**

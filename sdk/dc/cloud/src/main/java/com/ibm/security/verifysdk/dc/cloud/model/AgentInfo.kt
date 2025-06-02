@@ -4,6 +4,8 @@
 
 package com.ibm.security.verifysdk.dc.cloud.model
 
+import com.ibm.security.verifysdk.dc.core.DID
+import com.ibm.security.verifysdk.dc.core.Verkey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -45,6 +47,3 @@ data class AgentInfo (
     @SerialName("verkey")
     val verkey: Verkey
 )
-
-typealias Verkey = String
-typealias DID = String

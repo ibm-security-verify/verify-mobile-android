@@ -1,13 +1,10 @@
-/*
- * Copyright contributors to the IBM Verify Digital Credentials SDK for Android project
- */
+package com.ibm.security.verifysdk.dc.core
 
-package com.ibm.security.verifysdk.dc.cloud.model
-
-import com.ibm.security.verifysdk.dc.serializer.CredentialSerializer
+import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.modules.SerializersModule
 
 /**
  * Represents a credential interface.
@@ -27,8 +24,7 @@ import kotlinx.serialization.json.JsonElement
  *
  * @since 3.0.7
  */
-@Serializable(with = CredentialSerializer::class)
-sealed interface CredentialDescriptor{
+interface CredentialDescriptor{
     val id: String
     val format: CredentialFormat
     val role: CredentialRole
@@ -76,3 +72,6 @@ sealed interface CredentialDescriptor{
      */
     fun getAgentUrl(): String
 }
+
+typealias Verkey = String
+typealias DID = String

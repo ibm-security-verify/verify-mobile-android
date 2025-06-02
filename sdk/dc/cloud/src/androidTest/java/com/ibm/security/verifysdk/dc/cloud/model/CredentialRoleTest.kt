@@ -1,6 +1,7 @@
 package com.ibm.security.verifysdk.dc.cloud.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ibm.security.verifysdk.dc.core.CredentialRole
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

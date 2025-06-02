@@ -2,7 +2,7 @@
  * Copyright contributors to the IBM Verify Digital Credentials SDK for Android project
  */
 
-package com.ibm.security.verifysdk.dc
+package com.ibm.security.verifysdk.dc.cloud
 
 import com.ibm.security.verifysdk.core.serializer.URLSerializer
 import kotlinx.serialization.ExperimentalSerializationApi

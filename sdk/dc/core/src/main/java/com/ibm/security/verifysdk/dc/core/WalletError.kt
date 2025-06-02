@@ -2,7 +2,7 @@
  * Copyright contributors to the IBM Verify Digital Credentials SDK for Android project
  */
 
-package com.ibm.security.verifysdk.dc
+package com.ibm.security.verifysdk.dc.core
 
 /**
  * Represents various errors that can occur within the wallet system.

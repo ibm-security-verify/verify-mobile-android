@@ -1,6 +1,7 @@
 package com.ibm.security.verifysdk.dc.cloud.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
 import com.ibm.security.verifysdk.dc.serializer.CredentialSerializer
 import com.ibm.security.verifysdk.testutils.LogHelper
 import com.ibm.security.verifysdk.testutils.json

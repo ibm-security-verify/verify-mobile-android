@@ -4,7 +4,7 @@
 
 package com.ibm.security.verifysdk.dc.cloud.model
 
-import com.ibm.security.verifysdk.dc.serializer.PreviewSerializer
+import com.ibm.security.verifysdk.dc.cloud.serializer.PreviewSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 

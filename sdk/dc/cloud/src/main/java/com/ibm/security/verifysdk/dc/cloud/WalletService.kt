@@ -2,7 +2,7 @@
  * Copyright contributors to the IBM Verify Digital Credentials SDK for Android project
  */
 
-package com.ibm.security.verifysdk.dc
+package com.ibm.security.verifysdk.dc.cloud
 
 import com.ibm.security.verifysdk.authentication.api.OAuthProvider
 import com.ibm.security.verifysdk.authentication.model.TokenInfo
@@ -11,10 +11,11 @@ import com.ibm.security.verifysdk.dc.cloud.api.AgentsApi
 import com.ibm.security.verifysdk.dc.cloud.api.CredentialsApi
 import com.ibm.security.verifysdk.dc.cloud.api.InvitationsApi
 import com.ibm.security.verifysdk.dc.cloud.api.VerificationsApi
+import com.ibm.security.verifysdk.dc.cloud.model.CloudCredentialDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialAction
-import com.ibm.security.verifysdk.dc.cloud.model.CredentialDescriptor
+import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialPreviewInfo
-import com.ibm.security.verifysdk.dc.cloud.model.CredentialState
+import com.ibm.security.verifysdk.dc.core.CredentialState
 import com.ibm.security.verifysdk.dc.cloud.model.InvitationProcessorRequest
 import com.ibm.security.verifysdk.dc.cloud.model.PreviewDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.UpdateCredentialArgs
@@ -23,6 +24,7 @@ import com.ibm.security.verifysdk.dc.cloud.model.VerificationAction
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationPreviewInfo
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationState
+import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
 import java.net.URL
 
 /**
@@ -208,7 +210,7 @@ class WalletService(
     override suspend fun processCredential(
         credentialPreviewInfo: CredentialPreviewInfo,
         action: CredentialAction
-    ): CredentialDescriptor {
+    ): CloudCredentialDescriptor {
         // Set the offer - not the invitation! - to an 'outbound_offer' state.
         processInvitation(URL(credentialPreviewInfo.url), forePreview = false)
 
@@ -235,7 +237,7 @@ class WalletService(
     suspend fun processCredential(
         identifier: String,
         action: CredentialAction
-    ): CredentialDescriptor {
+    ): CloudCredentialDescriptor {
 
         val updateCredentialArgs: UpdateCredentialArgs = when (action) {
             CredentialAction.ACCEPTED -> {

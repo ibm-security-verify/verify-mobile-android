@@ -2,11 +2,11 @@
  * Copyright contributors to the IBM Verify Digital Credentials SDK for Android project
  */
 
-package com.ibm.security.verifysdk.dc
+package com.ibm.security.verifysdk.dc.cloud
 
 import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialAction
-import com.ibm.security.verifysdk.dc.cloud.model.CredentialDescriptor
+import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialPreviewInfo
 import com.ibm.security.verifysdk.dc.cloud.model.PreviewDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationAction
@@ -53,6 +53,7 @@ interface WalletServiceDescriptor {
     ): VerificationInfo
 
     suspend fun <T : CredentialDescriptor> retrieveCredentials(type: Class<T>): List<T>
+
     suspend fun processCredential(
         credentialPreviewInfo: CredentialPreviewInfo,
         action: CredentialAction = CredentialAction.ACCEPTED

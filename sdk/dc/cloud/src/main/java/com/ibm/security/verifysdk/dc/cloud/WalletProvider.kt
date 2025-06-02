@@ -2,7 +2,7 @@
  * Copyright contributors to the IBM Verify Digital Credentials SDK for Android project
  */
 
-package com.ibm.security.verifysdk.dc
+package com.ibm.security.verifysdk.dc.cloud
 
 import com.ibm.security.verifysdk.authentication.api.OAuthProvider
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
@@ -12,6 +12,8 @@ import com.ibm.security.verifysdk.dc.cloud.api.CredentialsApi
 import com.ibm.security.verifysdk.dc.cloud.api.InvitationsApi
 import com.ibm.security.verifysdk.dc.cloud.api.VerificationsApi
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationState
+import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
+import com.ibm.security.verifysdk.dc.core.WalletError
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

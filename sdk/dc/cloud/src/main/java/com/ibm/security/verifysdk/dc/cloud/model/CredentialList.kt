@@ -4,6 +4,8 @@
 
 package com.ibm.security.verifysdk.dc.cloud.model
 
+import com.ibm.security.verifysdk.dc.cloud.serializer.CloudCredentialSerializer
+import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -16,5 +18,5 @@ internal data class CredentialList(
     val count: Int,
 
     @SerialName("items")
-    val items: List<CredentialDescriptor>
+    val items: List<CloudCredentialDescriptor>
 )

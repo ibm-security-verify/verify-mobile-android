@@ -2,7 +2,7 @@
  * Copyright contributors to the IBM Verify Digital Credentials Sample App for Android project
  */
 
-package com.ibm.security.verifysdk.dc.serializer
+package com.ibm.security.verifysdk.dc.cloud.serializer
 
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialPreviewInfo
 import com.ibm.security.verifysdk.dc.cloud.model.PreviewDescriptor
@@ -23,7 +23,6 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 
-@OptIn(ExperimentalSerializationApi::class)
 object PreviewSerializer : KSerializer<PreviewDescriptor> {
 
     val json = Json {
