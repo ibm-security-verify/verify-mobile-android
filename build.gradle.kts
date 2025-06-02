@@ -55,6 +55,12 @@ tasks.jacocoTestCoverageVerification {
     }
 }
 
+buildscript {
+    dependencies {
+        classpath(enforcedPlatform("com.fasterxml.jackson:jackson-bom:2.18.4"))
+    }
+}
+
 subprojects {
 
     apply {
@@ -63,13 +69,17 @@ subprojects {
     }
     val dokkaPlugin by configurations
     dependencies {
-        dokkaPlugin(rootProject.libs.versioning.plugin)
+        dokkaRuntime(enforcedPlatform("com.fasterxml.jackson:jackson-bom:2.18.4"))
+        dokkaPlugin(enforcedPlatform("com.fasterxml.jackson:jackson-bom:2.18.4"))
     }
 
     configurations.all {
         resolutionStrategy {
             failOnVersionConflict()
             preferProjectModules()
+            force("com.fasterxml.jackson.core:jackson-core:2.18.4")
+            force("com.fasterxml.jackson.core:jackson-databind:2.18.4")
+            force("com.fasterxml.jackson.core:jackson-annotations:2.18.4")
             force(rootProject.libs.netty.codec.http2)
             force("io.netty:netty-handler-proxy:4.1.118.Final")
             force(rootProject.libs.jackson.woodstox.core)  // https://mvnrepository.com/artifact/com.fasterxml.woodstox/woodstox-core/6.2.4 
