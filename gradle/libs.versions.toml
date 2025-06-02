@@ -1,7 +1,6 @@
 [versions]
 activityComposeVersion = "1.10.0"
 agp = "8.8.2"
-androidxJunit = "1.2.0"
 appcompat = "1.7.0"
 biometric = "1.2.0-alpha05"
 browser = "1.8.0"
@@ -11,7 +10,6 @@ constraintlayout = "2.1.4"
 coreKtx = "1.13.1"
 dokka = "1.9.20"
 espressoCore = "3.6.1"
-espressoCoreVersion = "3.6.0"
 fuelAndroid = "2.3.1"
 jackson = "2.17.1"
 jetbrainsKotlinJvmVersion = "2.1.0"
@@ -33,7 +31,6 @@ lifecycleProcess = "2.8.7"
 loggingInterceptor = "4.12.0"
 material = "1.12.0"
 material3 = "1.3.1"
-material3-adaptive = "1.3.1"
 material3AdaptiveVersion = "1.0.0"
 mockitoKotlin = "5.3.1"
 mockwebserver = "4.12.0"
@@ -45,7 +42,7 @@ rootbeerLib = "0.1.0"
 rules = "1.6.0"
 runtimeLivedata = "1.7.8"
 slf4jVersion = "1.7.36"
-versioningPluginVersion = "1.9.20"
+versioningPluginVersion = "2.0.0"
 woodstockCore = "6.6.2"
 zxingAndroidEmbeddedVersion = "4.3.0"
 adaptiveNavigationSuite = "1.3.1"
@@ -68,7 +65,6 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3",
 androidx-material3-adaptive-core = { group = "androidx.compose.material3.adaptive", name = "adaptive", version.ref = "material3AdaptiveVersion" }
 androidx-material3-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout", version.ref = "material3AdaptiveVersion" }
 androidx-material3-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "material3AdaptiveVersion" }
-androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitorVersion" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationComposeVersion" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
