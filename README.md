@@ -22,7 +22,8 @@ The following SDKs are currently offered in the package:
 | [Core](sdk/core) | The IBM Security Verify Core SDK provides common Keychain and networking functionality across the other components in the IBM Security Verify SDK offering.|
 | [Authentication](sdk/authentication) | The IBM Security Verify Authentication SDK is an implementation of OAuth 2.0 and OIDC targeting mobile use cases.|
 | [MFA](sdk/mfa) | The IBM Security Verify MFA SDK provides multi-factor authentication support for creating authenticators and processing transactions.|
-| [DC](sdk/dc) | The IBM Security Verify DC SDK supporting digital credentials in a mobile Wallet.|
+| [DC-Cloud](sdk/dc/cloud) | The IBM Security Verify DC SDK supporting digital credentials in a mobile cloud Wallet.|
+| [DC-Device](sdk/dc/device) | The IBM Security Verify DC SDK supporting digital credentials in a mobile device Wallet.|
 
 ## Integrating with your project
 
