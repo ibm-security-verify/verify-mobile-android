@@ -4,6 +4,7 @@
 
 package com.ibm.security.verifysdk.core.helper
 
+import com.ibm.security.verifysdk.core.ErrorMessage
 import com.ibm.security.verifysdk.core.extension.toResultFailure
 import io.ktor.client.HttpClient
 import io.ktor.client.request.accept
@@ -21,6 +22,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNames
@@ -39,7 +41,7 @@ abstract class BaseApi() {
      * - `ignoreUnknownKeys = true`: Allows parsing JSON objects with extra, unknown keys.
      * - `isLenient = true`: Permits relaxed JSON formatting, such as unquoted keys or single quotes.
      */
-    protected val decoder = Json {
+    protected val json = Json {
         encodeDefaults = true
         explicitNulls = false
         ignoreUnknownKeys = true
@@ -78,54 +80,49 @@ abstract class BaseApi() {
         headers: Map<String, String>? = null,
         contentType: ContentType = ContentType.Application.Json,
         body: Any? = null
-    ): Result<T> {
-        return try {
-            val response = httpClient.request {
-                url(url)
-                this.method = method
-                headers?.forEach { (key, value) -> this.headers.append(key, value) }
-                if (headers?.containsKey(HttpHeaders.Authorization) != true) {
-                    accessToken?.let {
-                        bearerAuth(it)
-                    }
-                }
-                accept(ContentType.Application.Json)
-                body?.let { requestBody ->
-                    contentType(contentType)
-                    setBody(requestBody)
+    ): Result<T> = runCatching {
+        val response = httpClient.request {
+            url(url)
+            this.method = method
+            headers?.forEach { (key, value) -> this.headers.append(key, value) }
+            if (headers?.containsKey(HttpHeaders.Authorization) != true) {
+                accessToken?.let {
+                    bearerAuth(it)
                 }
             }
+            accept(ContentType.Application.Json)
+            body?.let { requestBody ->
+                contentType(contentType)
+                setBody(requestBody)
+            }
+        }
 
-            if (response.status.isSuccess()) {
-                if (response.status == HttpStatusCode.NoContent) {
-                    Result.success(Unit as T)
-                } else {
-                    Result.success(decoder.decodeFromString(response.bodyAsText()))
-                }
-            } else {
-                val errorResponse = try {
-                    response.bodyAsText().takeIf { it.isNotBlank() }
-                        ?.let { decoder.decodeFromString<ErrorResponse>(it) }
-                } catch (_: Exception) {
-                    null
-                }
+        when {
+            response.status == HttpStatusCode.NoContent -> {
+                Unit as T
+            }
 
-                Result.failure(
-                    response.toResultFailure(
-                        errorResponse?.message
-                            ?: "HTTP error: ${response.status.value} ${response.status.description}"
-                    )
+            response.status.isSuccess() -> {
+                json.decodeFromString<T>(response.bodyAsText())
+            }
+
+            else -> {
+                val errorText = response.bodyAsText()
+                val errorResponse =
+                    runCatching { json.decodeFromString<ErrorResponse>(errorText) }.getOrNull()
+                throw ErrorResponse(
+                    statusCode = response.status,
+                    message = errorResponse?.message
+                        ?: "HTTP error: ${response.status.value} ${response.status.description}",
+                    responseBody = errorText
                 )
             }
-        } catch (t: Throwable) {
-            Result.failure(t)
         }
     }
-
-    @Serializable
-    data class ErrorResponse(
-        @JsonNames("status_code")
-        val statusCode: String,
-        val message: String
-    )
 }
+
+class ErrorResponse(
+    val statusCode: HttpStatusCode,
+    override val message: String,
+    val responseBody: String? = null
+) : Exception(message)
