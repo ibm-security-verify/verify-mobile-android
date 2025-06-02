@@ -288,7 +288,7 @@ class Fido2Api : BaseApi() {
         )
 
         val id = keyName.sha256().hexToByteArray()
-        val clientDataString = decoder.encodeToString(clientDataJson)
+        val clientDataString = json.encodeToString(clientDataJson)
 
         // Build authenticatorData
         val authenticatorDataParams = mutableListOf<Byte>()
@@ -503,7 +503,7 @@ class Fido2Api : BaseApi() {
         )
 
         val id = keyName.sha256().hexToByteArray()
-        val clientDataString = decoder.encodeToString(clientDataJson)
+        val clientDataString = json.encodeToString(clientDataJson)
 
         val authenticatorDataParams = mutableListOf<Byte>()
         authenticatorDataParams.addAll(options.rpId.sha256().hexToByteArray().toList())
