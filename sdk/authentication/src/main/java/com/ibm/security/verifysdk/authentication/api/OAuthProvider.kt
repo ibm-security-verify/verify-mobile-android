@@ -26,6 +26,8 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import org.slf4j.LoggerFactory
 import java.net.MalformedURLException
 import java.net.URL
+import javax.net.ssl.HostnameVerifier
+import javax.net.ssl.SSLContext
 import kotlin.coroutines.resume
 
 
@@ -60,21 +62,22 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
     var ignoreSsl: Boolean = false
         set(value) {
             field = value
-//            if (value) {
-//                trustManager = trustManager ?: NetworkHelper.insecureTrustManager()
-//                sslContext = sslContext ?: SSLContext.getInstance("TLS").apply {
-//                    init(
-//                        null,
-//                        arrayOf(trustManager),
-//                        java.security.SecureRandom()
-//                    )
-//                }
-//                hostnameVerifier = hostnameVerifier ?: HostnameVerifier { _, _ -> true }
-//            } else {
-//                trustManager = null
-//                sslContext = null
-//                hostnameVerifier = null
-//            }
+
+            if (value) {
+                NetworkHelper.trustManager = NetworkHelper.insecureTrustManager()
+                NetworkHelper.sslContext = SSLContext.getInstance("TLS").apply {
+                    init(
+                        null,
+                        arrayOf(NetworkHelper.trustManager),
+                        java.security.SecureRandom()
+                    )
+                }
+                NetworkHelper.hostnameVerifier = HostnameVerifier { _, _ -> true }
+            } else {
+                NetworkHelper.trustManager = null
+                NetworkHelper.sslContext = null
+                NetworkHelper.hostnameVerifier = null
+            }
             NetworkHelper.initialize()
         }
 
@@ -88,11 +91,11 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
         additionalParameters: Map<String, String>?,
     ) : this(clientId, clientSecret) {
         additionalHeaders?.let {
-            this.additionalHeaders = it as MutableMap<String, String>
+            this.additionalHeaders = it.toMutableMap()
         }
 
         additionalParameters?.let {
-            this.additionalParameters = it as MutableMap<String, String>
+            this.additionalParameters = it.toMutableMap()
         }
     }
 
