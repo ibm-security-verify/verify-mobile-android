@@ -8,7 +8,6 @@ import com.ibm.security.verifysdk.core.serializer.URLSerializer
 import com.ibm.security.verifysdk.dc.cloud.model.AgentInfo
 import com.ibm.security.verifysdk.dc.cloud.model.CloudCredentialDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.ConnectionInfo
-import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.InvitationInfo
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -46,11 +45,11 @@ data class Wallet (
     @Serializable(with = URLSerializer::class)
     val baseUri: URL,
     val clientId: String,
-    var clientSecret: String? = null,
-    var token: TokenInfo,
+    val clientSecret: String? = null,
+    val token: TokenInfo,
     val agent: AgentInfo,
-    var connections: MutableList<ConnectionInfo>,
-    var invitations: MutableList<InvitationInfo>,
-    var credentials: MutableList<CloudCredentialDescriptor>, // pragma: allowlist secret
-    var verifications: MutableList<VerificationInfo>
-) : WalletDescriptor
+    val connections: MutableList<ConnectionInfo>,
+    val invitations: MutableList<InvitationInfo>,
+    val credentials: MutableList<CloudCredentialDescriptor>, // pragma: allowlist secret
+    val verifications: MutableList<VerificationInfo>
+)
