@@ -5,8 +5,8 @@
 package com.ibm.security.verifysdk.dc.cloud.api
 
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
-import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.cloud.model.AgentInfoList
+import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import com.ibm.security.verifysdk.testutils.json
 import com.ibm.security.verifysdk.testutils.loadJsonFromRawResource
@@ -14,7 +14,6 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToString
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
