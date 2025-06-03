@@ -7,14 +7,13 @@ package com.ibm.security.verifysdk.dc.cloud.api
 import com.ibm.security.verifysdk.core.helper.BaseApi
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.dc.cloud.model.CloudCredentialDescriptor
-import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
-import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialList
 import com.ibm.security.verifysdk.dc.cloud.model.UpdateCredentialArgs
+import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
+import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
 import io.ktor.client.HttpClient
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.KSerializer
 import java.net.URL
 
 /**

@@ -6,11 +6,11 @@ package com.ibm.security.verifysdk.dc.cloud.api
 
 import com.ibm.security.verifysdk.core.helper.BaseApi
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
-import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.cloud.model.UpdateVerificationArgs
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationList
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationState
+import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
 import io.ktor.client.HttpClient
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.ExperimentalSerializationApi

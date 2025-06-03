@@ -4,6 +4,7 @@
 
 package com.ibm.security.verifysdk.dc.cloud.model
 
+import com.ibm.security.verifysdk.dc.core.PreviewDescriptor
 import com.ibm.security.verifysdk.dc.core.WalletError
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable

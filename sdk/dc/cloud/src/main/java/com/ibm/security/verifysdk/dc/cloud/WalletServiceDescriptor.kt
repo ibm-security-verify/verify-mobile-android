@@ -6,12 +6,13 @@ package com.ibm.security.verifysdk.dc.cloud
 
 import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialAction
-import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialPreviewInfo
-import com.ibm.security.verifysdk.dc.cloud.model.PreviewDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationAction
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationPreviewInfo
+import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
+import com.ibm.security.verifysdk.dc.core.PreviewDescriptor
+
 import java.net.URL
 
 /**
