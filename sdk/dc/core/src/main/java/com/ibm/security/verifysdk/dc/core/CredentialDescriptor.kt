@@ -1,10 +1,7 @@
 package com.ibm.security.verifysdk.dc.core
 
-import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.modules.SerializersModule
 
 /**
  * Represents a credential interface.
@@ -41,36 +38,6 @@ interface CredentialDescriptor{
     fun getTyp(): String {
         return this::class.simpleName ?: "Unknown"
     }
-
-    /**
-     * Retrieves a user-friendly name for the credential.
-     *
-     * Implementing classes should override this function to provide a meaningful name
-     * for display purposes.
-     *
-     * @return A string representing the friendly name of the credential.
-     */
-    fun getFriendlyName(): String
-
-    /**
-     * Retrieves the agent name associated with the credential.
-     *
-     * Implementing classes should override this function to specify the name of the
-     * agent handling the credential.
-     *
-     * @return A string representing the agent's name.
-     */
-    fun getAgentName(): String
-
-    /**
-     * Retrieves the agent URL associated with the credential.
-     *
-     * Implementing classes should override this function to specify the URL of the
-     * agent managing the credential.
-     *
-     * @return A string representing the agent's URL.
-     */
-    fun getAgentUrl(): String
 }
 
 typealias Verkey = String

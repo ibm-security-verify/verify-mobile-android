@@ -2,10 +2,8 @@
  * Copyright contributors to the IBM Verify Digital Credentials SDK for Android project
  */
 
-package com.ibm.security.verifysdk.dc.cloud.model
+package com.ibm.security.verifysdk.dc.core
 
-import com.ibm.security.verifysdk.dc.cloud.serializer.PreviewSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
 /**
@@ -23,7 +21,6 @@ import kotlinx.serialization.json.JsonElement
  *
  * @since 3.0.7
  */
-@Serializable(with = PreviewSerializer::class)
 interface PreviewDescriptor {
     val id: String
     val url: String
