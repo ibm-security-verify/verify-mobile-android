@@ -38,7 +38,7 @@ data class CredentialPreviewInfo(
     override val comment: String? = null,
     override val jsonRepresentation: JsonElement?,
     val documentTypes: List<String> = emptyList()
-) : PreviewDescriptor {
+) : CloudPreviewDescriptor() {
 
     companion object : KSerializer<CredentialPreviewInfo> {
 

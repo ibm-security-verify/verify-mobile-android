@@ -56,7 +56,7 @@ data class IndyCredential(
     val schemaName: String,
     @SerialName("schema_version")
     val schemaVersion: String,
-    val connection: ConnectionInfo,
+    override val connection: ConnectionInfo,
     val properties: Map<String, JsonElement>
 ) : CloudCredentialDescriptor() {
 

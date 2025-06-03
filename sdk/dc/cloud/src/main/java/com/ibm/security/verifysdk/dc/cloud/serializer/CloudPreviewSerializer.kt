@@ -4,10 +4,9 @@
 
 package com.ibm.security.verifysdk.dc.cloud.serializer
 
+import com.ibm.security.verifysdk.dc.cloud.model.CloudPreviewDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialPreviewInfo
-import com.ibm.security.verifysdk.dc.cloud.model.PreviewDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationPreviewInfo
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -23,7 +22,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 
-object PreviewSerializer : KSerializer<PreviewDescriptor> {
+object CloudPreviewSerializer : KSerializer<CloudPreviewDescriptor> {
 
     val json = Json {
         encodeDefaults = true
@@ -50,7 +49,7 @@ object PreviewSerializer : KSerializer<PreviewDescriptor> {
         return "unknown"
     }
 
-    override fun deserialize(decoder: Decoder): PreviewDescriptor {
+    override fun deserialize(decoder: Decoder): CloudPreviewDescriptor {
 
         val jsonDecoder = decoder as? JsonDecoder
             ?: throw SerializationException("This deserializer only works with JSON format.")
@@ -69,7 +68,7 @@ object PreviewSerializer : KSerializer<PreviewDescriptor> {
         }
     }
 
-    override fun serialize(encoder: Encoder, value: PreviewDescriptor) {
+    override fun serialize(encoder: Encoder, value: CloudPreviewDescriptor) {
 
         encoder as? JsonEncoder
             ?: throw SerializationException("This serializer only works with Json")

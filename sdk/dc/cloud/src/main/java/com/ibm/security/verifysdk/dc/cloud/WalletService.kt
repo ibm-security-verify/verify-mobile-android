@@ -13,18 +13,18 @@ import com.ibm.security.verifysdk.dc.cloud.api.InvitationsApi
 import com.ibm.security.verifysdk.dc.cloud.api.VerificationsApi
 import com.ibm.security.verifysdk.dc.cloud.model.CloudCredentialDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialAction
-import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialPreviewInfo
-import com.ibm.security.verifysdk.dc.core.CredentialState
 import com.ibm.security.verifysdk.dc.cloud.model.InvitationProcessorRequest
-import com.ibm.security.verifysdk.dc.cloud.model.PreviewDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.UpdateCredentialArgs
 import com.ibm.security.verifysdk.dc.cloud.model.UpdateVerificationArgs
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationAction
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationPreviewInfo
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationState
+import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
+import com.ibm.security.verifysdk.dc.core.CredentialState
 import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
+import com.ibm.security.verifysdk.dc.core.PreviewDescriptor
 import java.net.URL
 
 /**
@@ -224,7 +224,7 @@ class WalletService(
     * as either accepted or rejected. The state is determined by the [action] provided.
     * If the update is successful, the updated [CredentialDescriptor] is returned.
     *
-    * @param identifier The unique identifier of the credential to be updated.
+    * @param credentialPreviewInfo The unique identifier of the credential to be updated.
     * @param action The action to apply to the credential—either [CredentialAction.ACCEPTED]
     * or [CredentialAction.REJECTED].
     *
@@ -234,8 +234,8 @@ class WalletService(
      *
      * @since 3.0.7
     */
-    suspend fun processCredential(
-        identifier: String,
+    private suspend fun processCredential(
+        credentialPreviewInfo: String,
         action: CredentialAction
     ): CloudCredentialDescriptor {
 
@@ -255,7 +255,7 @@ class WalletService(
 
         return CredentialsApi(baseUri).update(
             accessToken = accessToken,
-            id = identifier,
+            id = credentialPreviewInfo,
             updateCredentialArgs = updateCredentialArgs
         ).getOrThrow()
     }

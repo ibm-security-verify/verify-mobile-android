@@ -5,13 +5,13 @@
 package com.ibm.security.verifysdk.dc.cloud.serializer
 
 import com.ibm.security.verifysdk.dc.cloud.model.CloudCredentialDescriptor
+import com.ibm.security.verifysdk.dc.cloud.model.IndyCredential
+import com.ibm.security.verifysdk.dc.cloud.model.JsonLdCredential
+import com.ibm.security.verifysdk.dc.cloud.model.MDocCredential
 import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
 import com.ibm.security.verifysdk.dc.core.CredentialFormat
 import com.ibm.security.verifysdk.dc.core.CredentialRole
 import com.ibm.security.verifysdk.dc.core.CredentialState
-import com.ibm.security.verifysdk.dc.cloud.model.IndyCredential
-import com.ibm.security.verifysdk.dc.cloud.model.JsonLdCredential
-import com.ibm.security.verifysdk.dc.cloud.model.MDocCredential
 import com.ibm.security.verifysdk.dc.core.DID
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
@@ -81,7 +81,7 @@ object CloudCredentialSerializer : KSerializer<CloudCredentialDescriptor> {
             CredentialFormat.JSON_LD -> JsonLdCredential.from(jsonObject)
             CredentialFormat.MDOC -> MDocCredential.from(jsonObject)
 
-            CredentialFormat.SDJWT -> throw NotImplementedError("SD-JWT not supported yet")
+            else -> throw NotImplementedError("CredentialFormat $format not supported")
         }
     }
 
@@ -103,7 +103,7 @@ object CloudCredentialSerializer : KSerializer<CloudCredentialDescriptor> {
             is IndyCredential -> value.toJsonObject(json)
             is JsonLdCredential -> value.toJsonObject(json)
             is MDocCredential -> value.toJsonObject(json)
-            else -> throw NotImplementedError("Unsupported CredentialDescriptor type")
+            else -> throw NotImplementedError("Unsupported CloudCredentialDescriptor type")
         }
         encoder.encodeJsonElement(jsonObject)
     }

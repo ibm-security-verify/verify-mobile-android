@@ -51,7 +51,7 @@ data class VerificationPreviewInfo(
     val documentTypes: List<String> = emptyList(),
     val name: String,
     val purpose: String
-) : PreviewDescriptor {
+) : CloudPreviewDescriptor() {
 
     companion object : KSerializer<VerificationPreviewInfo> {
 
