@@ -54,7 +54,7 @@ data class JsonLdCredential(
     override val format: CredentialFormat,
     @SerialName("cred_json")
     override val jsonRepresentation: JsonElement?,
-    val connection: ConnectionInfo,
+    override val connection: ConnectionInfo,
     val properties: Map<String, JsonElement>
 ) : CloudCredentialDescriptor() {
 

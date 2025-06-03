@@ -52,7 +52,7 @@ data class MDocCredential(
     override val format: CredentialFormat,
     @SerialName("cred_json")
     override val jsonRepresentation: JsonElement?,
-    val connection: ConnectionInfo,
+    override val connection: ConnectionInfo,
     val properties: Map<String, JsonElement>
 ) : CloudCredentialDescriptor() {
 
@@ -123,5 +123,4 @@ data class MDocCredential(
         put("connection", json.encodeToJsonElement(ConnectionInfo.serializer(), connection))
         put("properties", json.encodeToJsonElement(properties))
     }
-
 }
