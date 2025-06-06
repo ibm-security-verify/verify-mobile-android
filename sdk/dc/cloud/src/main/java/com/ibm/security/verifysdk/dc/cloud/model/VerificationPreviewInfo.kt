@@ -29,7 +29,7 @@ import kotlinx.serialization.json.jsonPrimitive
 /**
 * Represents preview information for a verification process.
 *
-* This class extends [PreviewDescriptor] and provides additional attributes such as document types,
+* This class extends [CloudPreviewDescriptor] and provides additional attributes such as document types,
 * name, and purpose. It includes custom serialization logic to handle multiple input formats.
 *
 * @property id The unique identifier of the verification preview.
