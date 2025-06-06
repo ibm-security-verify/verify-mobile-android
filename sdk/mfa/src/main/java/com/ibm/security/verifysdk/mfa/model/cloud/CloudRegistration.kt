@@ -2,6 +2,7 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
+@file:UseSerializers(URLSerializer::class)
 package com.ibm.security.verifysdk.mfa.model.cloud
 
 import com.ibm.security.verifysdk.core.serializer.URLSerializer
@@ -13,6 +14,7 @@ import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import java.net.URL
 
 @Serializable
@@ -25,7 +27,6 @@ internal data class CloudRegistration @OptIn(ExperimentalSerializationApi::class
     val refreshToken: String,
     val version: Version
 ) {
-    @Serializable(with = URLSerializer::class)
     val transactionUri: URL =
         URL(metadataContainer.registrationUri.toString().replace("registration", "$id/verifications"))
 
@@ -85,7 +86,6 @@ internal data class CloudRegistration @OptIn(ExperimentalSerializationApi::class
 @Serializable
 internal data class MetadataContainer(
     val authenticationMethods: AuthenticationMethods,
-    @Serializable(with = URLSerializer::class)
     val registrationUri: URL,
     val serviceName: String,
     @SerialName("featureFlags") val features: ArrayList<String> = ArrayList(),
@@ -96,10 +96,8 @@ internal data class MetadataContainer(
 @Serializable
 internal data class Metadata(
     val id : String = "",
-    @Serializable(with = URLSerializer::class)
     val registrationUri: URL,
     val serviceName: String,
-    @Serializable(with = URLSerializer::class)
     val transactionUri: URL,
     @SerialName("featureFlags") val features: ArrayList<String> = ArrayList(),
     @SerialName("customAttributes") val custom: Map<String, String> = HashMap(),
@@ -124,7 +122,6 @@ internal data class Version(
 @Serializable
 internal data class Signature(
     val enabled: Boolean,
-    @Serializable(with = URLSerializer::class)
     val enrollmentUri: URL,
     val attributes: SignatureAttributes
 )
@@ -132,7 +129,6 @@ internal data class Signature(
 @Serializable
 internal data class Totp(
     val enabled: Boolean,
-    @Serializable(with = URLSerializer::class)
     val enrollmentUri: URL,
     val id: String? = null,
     val attributes: TotpAttributes? = null

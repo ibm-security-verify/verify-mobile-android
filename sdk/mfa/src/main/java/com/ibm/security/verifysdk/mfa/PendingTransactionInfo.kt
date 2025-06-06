@@ -2,12 +2,14 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
+@file:UseSerializers(URLSerializer::class)
 package com.ibm.security.verifysdk.mfa
 
 import com.ibm.security.verifysdk.core.serializer.URLSerializer
 import com.ibm.security.verifysdk.core.serializer.UUIDSerializer
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import java.net.URL
 import java.util.UUID
 
@@ -15,7 +17,6 @@ import java.util.UUID
 data class PendingTransactionInfo(
     val id: String,
     val message: String,
-    @Serializable(with = URLSerializer::class)
     val postbackUri: URL,
     @Serializable(with = UUIDSerializer::class)
     val factorID: UUID,
