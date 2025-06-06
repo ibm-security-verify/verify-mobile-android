@@ -12,6 +12,7 @@ import com.ibm.security.verifysdk.dc.cloud.api.CredentialsApi
 import com.ibm.security.verifysdk.dc.cloud.api.InvitationsApi
 import com.ibm.security.verifysdk.dc.cloud.api.VerificationsApi
 import com.ibm.security.verifysdk.dc.cloud.model.CloudCredentialDescriptor
+import com.ibm.security.verifysdk.dc.cloud.model.CloudPreviewDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialAction
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialPreviewInfo
 import com.ibm.security.verifysdk.dc.cloud.model.InvitationProcessorRequest
@@ -24,7 +25,6 @@ import com.ibm.security.verifysdk.dc.cloud.model.VerificationState
 import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
 import com.ibm.security.verifysdk.dc.core.CredentialState
 import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
-import com.ibm.security.verifysdk.dc.core.PreviewDescriptor
 import java.net.URL
 
 /**
@@ -109,7 +109,7 @@ class WalletService(
             .onFailure { Result.failure<TokenInfo>(it) }
     }
 
-    override suspend fun previewInvitation(offerUrl: URL): PreviewDescriptor {
+    override suspend fun previewInvitation(offerUrl: URL): CloudPreviewDescriptor {
         return processInvitation(offerUrl)
     }
 
@@ -301,7 +301,7 @@ class WalletService(
     }
 
     /**
-    * Processes an invitation or offer URL and returns a [PreviewDescriptor] describing the result.
+    * Processes an invitation or offer URL and returns a [CloudPreviewDescriptor] describing the result.
     *
     * This function sends the provided [offerUrl] to the backend to either preview (inspect) or fully
     * process the invitation, depending on the [forePreview] flag. It builds an [InvitationProcessorRequest]
@@ -311,7 +311,7 @@ class WalletService(
     * @param offerUrl The full URL representing the invitation or credential offer to be processed.
     * @param forePreview If `true`, the invitation is only inspected (previewed). If `false`, the invitation is fully processed.
     *
-    * @return A [PreviewDescriptor] containing details about the processed invitation or offer.
+    * @return A [CloudPreviewDescriptor] containing details about the processed invitation or offer.
     *
     * @throws Exception if the backend request fails or the invitation cannot be processed.
      *
@@ -320,7 +320,7 @@ class WalletService(
     private suspend fun processInvitation(
         offerUrl: URL,
         forePreview: Boolean = true
-    ): PreviewDescriptor {
+    ): CloudPreviewDescriptor {
 
         val invitationProcessorRequest = InvitationProcessorRequest(
             url = offerUrl.toString(),

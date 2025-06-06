@@ -31,7 +31,7 @@ object CloudPreviewSerializer : KSerializer<CloudPreviewDescriptor> {
         isLenient = true
     }
 
-    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("PreviewDescriptor") {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("CloudPreviewDescriptor") {
         element<String>("id")
         element<String>("url")
         element<String?>("label", isOptional = true)

@@ -6,11 +6,11 @@ package com.ibm.security.verifysdk.dc.cloud.api
 
 import com.ibm.security.verifysdk.core.helper.BaseApi
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.dc.cloud.model.CloudPreviewDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.InvitationInfo
 import com.ibm.security.verifysdk.dc.cloud.model.InvitationList
 import com.ibm.security.verifysdk.dc.cloud.model.InvitationProcessorRequest
 import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
-import com.ibm.security.verifysdk.dc.core.PreviewDescriptor
 import io.ktor.client.HttpClient
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -35,7 +35,7 @@ import java.net.URL
  * @see BaseApi
  * @see InvitationInfo
  * @see InvitationProcessorRequest
- * @see PreviewDescriptor
+ * @see CloudPreviewDescriptor
  *
  * @since 3.0.7
  */
@@ -108,7 +108,7 @@ open class InvitationsApi(private val baseUrl: URL) : BaseApi() {
      * Processes an invitation by sending a request to the invitation processor API.
      *
      * This function sends a PUT request to the specified URL or the default URL for processing an invitation.
-     * It sends an [InvitationProcessorRequest] in the request body and returns a [PreviewDescriptor] object if the
+     * It sends an [InvitationProcessorRequest] in the request body and returns a [CloudPreviewDescriptor] object if the
      * operation is successful. In case of a failure, it returns a failure result with the associated error message or exception.
      *
      * @param httpClient The HTTP client used to perform the request. Defaults to [NetworkHelper.getInstance] if not provided.
@@ -117,7 +117,7 @@ open class InvitationsApi(private val baseUrl: URL) : BaseApi() {
      * @param additionalHeaders Optional map of additional headers to include in the request. See [BaseApi.performRequest] for additional information
      * @param invitationProcessorRequest The request body containing the data needed to process the invitation.
      *
-     * @return A [Result] containing either a [PreviewDescriptor] object if the request is successful,
+     * @return A [Result] containing either a [CloudPreviewDescriptor] object if the request is successful,
      *         or a failure result with an error message if the request fails.
      *
      * @since 3.0.7
@@ -128,7 +128,7 @@ open class InvitationsApi(private val baseUrl: URL) : BaseApi() {
         accessToken: String,
         additionalHeaders: Map<String, String>? = null,
         invitationProcessorRequest: InvitationProcessorRequest
-    ): Result<PreviewDescriptor> {
+    ): Result<CloudPreviewDescriptor> {
 
         return performRequest(
             httpClient = httpClient,
