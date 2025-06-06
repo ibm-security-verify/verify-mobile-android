@@ -5,6 +5,8 @@
 package com.ibm.security.verifysdk.core.extension
 
 import com.ibm.security.verifysdk.core.helper.KeystoreHelper.hash
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.util.Locale
 
 val camelRegex = "(?<=[a-zA-Z])[A-Z]".toRegex()
@@ -59,3 +61,6 @@ fun String.decodeBase32(): ByteArray {
 
     return binaryString.chunked(8).map { it.toInt(2).toByte() }.toByteArray()
 }
+
+fun String.urlFormEncodedString(): String =
+    URLEncoder.encode(this, StandardCharsets.UTF_8.toString())
