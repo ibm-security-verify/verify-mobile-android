@@ -4,32 +4,23 @@
 
 package com.ibm.security.verifysdk.core.helper
 
-import com.ibm.security.verifysdk.core.ErrorMessage
-import com.ibm.security.verifysdk.core.extension.toResultFailure
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import io.ktor.client.HttpClient
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
-import io.ktor.client.request.headers
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
-import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonNames
-import okhttp3.internal.http1.HeadersReader
 import java.net.URL
 
-@OptIn(ExperimentalSerializationApi::class)
 abstract class BaseApi() {
 
     /**
@@ -41,12 +32,7 @@ abstract class BaseApi() {
      * - `ignoreUnknownKeys = true`: Allows parsing JSON objects with extra, unknown keys.
      * - `isLenient = true`: Permits relaxed JSON formatting, such as unquoted keys or single quotes.
      */
-    protected val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
+
 
     /**
      * Performs an HTTP request and handles the response, parsing it into the specified type.
@@ -103,13 +89,13 @@ abstract class BaseApi() {
             }
 
             response.status.isSuccess() -> {
-                json.decodeFromString<T>(response.bodyAsText())
+                DefaultJson.decodeFromString<T>(response.bodyAsText())
             }
 
             else -> {
                 val errorText = response.bodyAsText()
                 val errorResponse =
-                    runCatching { json.decodeFromString<ErrorResponse>(errorText) }.getOrNull()
+                    runCatching { DefaultJson.decodeFromString<ErrorResponse>(errorText) }.getOrNull()
                 throw ErrorResponse(
                     statusCode = response.status,
                     message = errorResponse?.message
