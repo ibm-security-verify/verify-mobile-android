@@ -11,6 +11,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
@@ -36,8 +37,8 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import com.ibm.security.verifysdk.core.helper.ContextHelper
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
-import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
-import com.ibm.security.verifysdk.dc.WalletProvider
+import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
+import com.ibm.security.verifysdk.dc.cloud.WalletProvider
 import com.ibm.security.verifysdk.dc.demoapp.data.WalletEntity
 import com.ibm.security.verifysdk.dc.demoapp.data.WalletManager
 import com.ibm.security.verifysdk.dc.demoapp.ui.WalletViewModel
@@ -49,8 +50,9 @@ import com.ibm.security.verifysdk.dc.demoapp.ui.verification.VerificationIdentit
 import com.ibm.security.verifysdk.dc.demoapp.ui.verification.VerificationRequestScreen
 import com.ibm.security.verifysdk.dc.demoapp.ui.verification.VerificationScreen
 import com.ibm.security.verifysdk.dc.demoapp.ui.wallet.WalletScreen
-import com.ibm.security.verifysdk.dc.model.CredentialDescriptor
-import com.ibm.security.verifysdk.dc.model.VerificationInfo
+import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
+import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
+import com.journeyapps.barcodescanner.CaptureActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -81,7 +83,7 @@ class MainActivity : ComponentActivity() {
             {
                     "name":"holder_1",
                     "id":"cn=user_1,ou=users,dc=ibm,dc=com",
-                    "serviceBaseUrl":"https://$hostLocal/diagency",
+                    "serviceBaseUrl":"https://$hostLocal",
                     "clientId":"onpremise_vcholders",
                     "aznCode": "12345ABCDE",
                     "oauthBaseUrl": "https://$hostLocal/oauth2/token"
@@ -150,23 +152,36 @@ class MainActivity : ComponentActivity() {
         integrator.setPrompt("Scan QR Code")
         integrator.setOrientationLocked(false)
         integrator.setTorchEnabled(false)
-        integrator.setBeepEnabled(false)
+        integrator.setBeepEnabled(true)
+        integrator.setCaptureActivity(CaptureActivity::class.java)
         integrator.initiateScan()
     }
 
     private fun getWallet() {
 
         lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                val walletProvider =
-                    WalletProvider(jsonData = agentQrCodeData, ignoreSSLCertificate = true)
-                val wallet = walletProvider.initiate("John", "user_1", "secret")
-                val walletEntity = WalletEntity(wallet = wallet)
-                walletViewModel.insert(walletEntity)
-                walletManager =
-                    WalletManager(walletEntity = walletEntity, viewModel = walletViewModel)
+            try {
+                withContext(Dispatchers.IO) {
+                    val walletProvider =
+                        WalletProvider(jsonData = agentQrCodeData, ignoreSSLCertificate = true)
+                    val wallet = walletProvider.initiate("John", "user_1", "secret")
+                    val walletEntity = WalletEntity(wallet = wallet)
+                    walletViewModel.insert(walletEntity)
+                    walletManager =
+                        WalletManager(walletEntity = walletEntity, viewModel = walletViewModel)
+                }
+            } catch (e: Exception) {
+                showErrorDialog("Failed to initiate wallet", e.message ?: e.toString())
             }
         }
+    }
+
+    private fun showErrorDialog(title: String, message: String) {
+        AlertDialog.Builder(this) // Use `requireContext()` if in a Fragment
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .show()
     }
 
     @Deprecated("Deprecated in Java")

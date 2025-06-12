@@ -5,6 +5,7 @@
 package com.ibm.security.verifysdk.dc.demoapp.ui.verification
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -41,16 +42,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
+import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.demoapp.MainActivity.Screen
 import com.ibm.security.verifysdk.dc.demoapp.data.WalletManager
 import com.ibm.security.verifysdk.dc.demoapp.ui.AddUrlDialog
 import com.ibm.security.verifysdk.dc.demoapp.ui.StatusDialog
 import com.ibm.security.verifysdk.dc.demoapp.ui.WalletViewModel
-import com.ibm.security.verifysdk.dc.model.VerificationInfo
+import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
+import com.ibm.security.verifysdk.dc.demoapp.QrScanContract
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import org.json.JSONObject
 import java.net.URL
 
 @OptIn(
@@ -64,6 +67,7 @@ fun VerificationScreen(
     innerPadding: PaddingValues,
     navController: NavController
 ) {
+
     val coroutineScope = rememberCoroutineScope()
     val navigator = rememberListDetailPaneScaffoldNavigator<Any>()
 
@@ -78,6 +82,34 @@ fun VerificationScreen(
     val walletManager = wallet?.let { WalletManager(it, walletViewModel) }
 
     val verifications = wallet?.wallet?.verifications ?: emptyList()
+
+    var scannedQr by remember { mutableStateOf<String?>(null) }
+
+    val qrScannerLauncher =
+        rememberLauncherForActivityResult(contract = QrScanContract()) { result ->
+            scannedQr = result
+            result?.let {
+                val json = JSONObject(it)
+                verificationUrl = json.getString("url")
+                coroutineScope.launch {
+                    walletManager?.previewInvitation(URL(verificationUrl))
+                        ?.onSuccess { verificationPreview ->
+                            val jsonData = Json.encodeToString(verificationPreview)
+                            navController.currentBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("verificationPreview", jsonData)
+
+                            navController.navigate(Screen.VerificationRequest.route)
+                        }
+                        ?.onFailure {
+                            errorTitle = "Error"
+                            errorMessage = "Failed to fetch data: ${it.message}"
+                            showErrorDialog = true
+                        }
+                }
+                showAddDialog = false
+            }
+        }
 
     Scaffold(
         topBar = {
@@ -112,8 +144,11 @@ fun VerificationScreen(
             NavigableListDetailPaneScaffold(
                 navigator = navigator,
                 listPane = {
-                    LazyColumn(modifier = Modifier.padding(16.dp)
-                        .padding(bottom = 100.dp)) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .padding(bottom = 100.dp)
+                    ) {
                         items(verifications) { verification ->
                             VerificationListItem(verification, navigator)
                         }
@@ -185,7 +220,8 @@ fun VerificationScreen(
                         }
                 }
                 showAddDialog = false
-            }
+            },
+            onScanQrClick = { qrScannerLauncher.launch(Unit) }
         )
 
         StatusDialog(

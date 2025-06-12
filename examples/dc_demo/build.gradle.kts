@@ -35,7 +35,8 @@ android {
 
 dependencies {
 
-    implementation(project(":sdk:dc"))
+    implementation(project(":sdk:dc:core"))
+    implementation(project(":sdk:dc:cloud"))
     implementation(project(":sdk:core"))
     implementation(project(":sdk:authentication"))
 

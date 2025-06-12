@@ -32,7 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavController
-import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
+import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.demoapp.MainActivity.BottomNavItem
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalDigitalCredentialsSdk::class)

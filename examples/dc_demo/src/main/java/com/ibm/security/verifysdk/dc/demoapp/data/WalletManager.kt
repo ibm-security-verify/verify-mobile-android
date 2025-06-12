@@ -5,19 +5,22 @@
 package com.ibm.security.verifysdk.dc.demoapp.data
 
 import com.ibm.security.verifysdk.authentication.model.shouldRefresh
-import com.ibm.security.verifysdk.dc.WalletService
+import com.ibm.security.verifysdk.dc.cloud.WalletService
+import com.ibm.security.verifysdk.dc.cloud.model.CloudCredentialDescriptor
+import com.ibm.security.verifysdk.dc.cloud.model.CloudPreviewDescriptor
+import com.ibm.security.verifysdk.dc.cloud.model.CredentialPreviewInfo
 import com.ibm.security.verifysdk.dc.demoapp.BuildConfig
 import com.ibm.security.verifysdk.dc.demoapp.ui.WalletViewModel
-import com.ibm.security.verifysdk.dc.model.CredentialDescriptor
-import com.ibm.security.verifysdk.dc.model.CredentialPreviewInfo
-import com.ibm.security.verifysdk.dc.model.PreviewDescriptor
-import com.ibm.security.verifysdk.dc.model.VerificationAction
-import com.ibm.security.verifysdk.dc.model.VerificationInfo
-import com.ibm.security.verifysdk.dc.model.VerificationPreviewInfo
+import com.ibm.security.verifysdk.dc.core.PreviewDescriptor
+import com.ibm.security.verifysdk.dc.cloud.model.VerificationAction
+import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
+import com.ibm.security.verifysdk.dc.cloud.model.VerificationPreviewInfo
+import kotlinx.serialization.ExperimentalSerializationApi
 import java.net.URL
 
 class WalletManager(val walletEntity: WalletEntity, private val viewModel: WalletViewModel) {
 
+    @OptIn(ExperimentalSerializationApi::class)
     private suspend fun refreshToken() {
 
         if (walletEntity.wallet.token.shouldRefresh().not()) {
@@ -36,8 +39,9 @@ class WalletManager(val walletEntity: WalletEntity, private val viewModel: Walle
 
         walletService.refreshToken(refreshToken)
             .onSuccess { tokenInfo ->
-                walletEntity.wallet.token = tokenInfo
-                viewModel.update(walletEntity)
+                val updatedWallet = walletEntity.wallet.copy(token = tokenInfo)
+                val updatedEntity = walletEntity.copy(wallet = updatedWallet)
+                viewModel.update(updatedEntity)
             }
             .onFailure {
                 throw (it)
@@ -70,7 +74,7 @@ class WalletManager(val walletEntity: WalletEntity, private val viewModel: Walle
         }
     }
 
-    suspend fun previewInvitation(invitationUrl: URL): Result<PreviewDescriptor> {
+    suspend fun previewInvitation(invitationUrl: URL): Result<CloudPreviewDescriptor> {
 
         refreshToken()
 
@@ -108,7 +112,7 @@ class WalletManager(val walletEntity: WalletEntity, private val viewModel: Walle
         }
     }
 
-    suspend fun addCredential(credentialPreviewInfo: CredentialPreviewInfo): Result<CredentialDescriptor> {
+    suspend fun addCredential(credentialPreviewInfo: CredentialPreviewInfo): Result<CloudCredentialDescriptor> {
 
         refreshToken()
 

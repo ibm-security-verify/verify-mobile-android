@@ -38,15 +38,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavController
-import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
+import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.demoapp.MainActivity.Screen
 import com.ibm.security.verifysdk.dc.demoapp.data.WalletManager
 import com.ibm.security.verifysdk.dc.demoapp.ui.StatusDialog
 import com.ibm.security.verifysdk.dc.demoapp.ui.WalletViewModel
-import com.ibm.security.verifysdk.dc.model.VerificationInfo
-import com.ibm.security.verifysdk.dc.model.VerificationPreviewInfo
+import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
+import com.ibm.security.verifysdk.dc.cloud.model.VerificationPreviewInfo
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -190,15 +192,29 @@ private fun ProofRequestPresentation(
             verificationInfo.info?.jsonObject?.get("attributes")?.jsonArray?.forEach { attribute ->
                 val obj = attribute.jsonObject
                 if (obj["ns"]?.jsonPrimitive?.content == "org.iso.18013.5.1") {
-                    val values = obj["value"]?.jsonArray ?: return@forEach
-                    values.forEach { value ->
-                        val valueObj = value.jsonObject
-                        valueObj.entries.forEach { (key, jsonElement) ->
+                    when (val valueElement = obj["value"]) {
+                        is JsonArray -> {
+                            val values = obj["value"]?.jsonArray ?: return@forEach
+                            values.forEach { value ->
+                                val valueObj = value.jsonObject
+                                valueObj.entries.forEach { (key, jsonElement) ->
+                                    LabelValueRow(
+                                        label = key,
+                                        value = jsonElement.jsonPrimitive.content,
+                                    )
+                                    VerificationDetailsDivider()
+                                }
+                            }
+                        }
+                        is JsonPrimitive -> {
                             LabelValueRow(
-                                label = key,
-                                value = jsonElement.jsonPrimitive.content,
+                                label = "value",
+                                value = valueElement.content,
                             )
                             VerificationDetailsDivider()
+                        }
+                        else -> {
+                            // Optionally handle other types (e.g., JsonObject or null)
                         }
                     }
                 }

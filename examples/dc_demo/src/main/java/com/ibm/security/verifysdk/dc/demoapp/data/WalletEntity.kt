@@ -6,7 +6,7 @@ package com.ibm.security.verifysdk.dc.demoapp.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.ibm.security.verifysdk.dc.Wallet
+import com.ibm.security.verifysdk.dc.cloud.Wallet
 
 @Entity(tableName = "wallets")
 data class WalletEntity (

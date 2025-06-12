@@ -7,10 +7,11 @@ package com.ibm.security.verifysdk.dc.demoapp.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.ibm.security.verifysdk.dc.cloud.model.CloudCredentialDescriptor
 import com.ibm.security.verifysdk.dc.demoapp.data.DcRepository
 import com.ibm.security.verifysdk.dc.demoapp.data.WalletEntity
-import com.ibm.security.verifysdk.dc.model.CredentialDescriptor
-import com.ibm.security.verifysdk.dc.model.VerificationInfo
+import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
+import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,7 +44,7 @@ class WalletViewModel(private val repository: DcRepository) : ViewModel() {
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    fun updateCredentials(walletEntity: WalletEntity, newCredentials: MutableList<CredentialDescriptor>) {
+    fun updateCredentials(walletEntity: WalletEntity, newCredentials: MutableList<CloudCredentialDescriptor>) {
         val updatedWalletEntity = walletEntity.copy(
             wallet = walletEntity.wallet.copy(credentials = newCredentials)
         )

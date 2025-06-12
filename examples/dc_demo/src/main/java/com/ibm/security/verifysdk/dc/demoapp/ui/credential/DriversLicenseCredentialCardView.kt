@@ -38,6 +38,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
+import android.util.Base64
 
 @Serializable
 class DriversLicenseCredentialCardView(override var jsonRepresentation: JsonElement) :
@@ -62,13 +63,12 @@ class DriversLicenseCredentialCardView(override var jsonRepresentation: JsonElem
             ?: throw IllegalArgumentException("Missing 'birth_date' in payload")
 
         val portrait = attributes.find { it.id == "portrait" }
-            ?.value?.jsonArray?.map {
-                it.jsonPrimitive.int.toByte()
-            }?.toByteArray()
+            ?.value?.jsonPrimitive?.content
+            ?: throw IllegalArgumentException("Missing 'portrait' in payload")
 
         val authority = attributes.find { it.id == "issuing_authority" }
             ?.value?.jsonPrimitive?.content
-            ?: throw IllegalArgumentException("Missing 'issuing _authority' in payload")
+            ?: throw IllegalArgumentException("Missing 'issuing_authority' in payload")
 
         val documentNumber = attributes.find { it.id == "document_number" }
             ?.value?.jsonPrimitive?.content
@@ -141,8 +141,10 @@ class DriversLicenseCredentialCardView(override var jsonRepresentation: JsonElem
                 }
 
 
-                portrait?.let {
-                    val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap()
+                portrait.let { portrait ->
+                    val base64Data = portrait.substringAfter("base64,")
+                    val imageBytes = Base64.decode(base64Data, Base64.DEFAULT)
+                    val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)?.asImageBitmap()
                     Box(
                         modifier = Modifier
                             .size(70.dp, 110.dp)
