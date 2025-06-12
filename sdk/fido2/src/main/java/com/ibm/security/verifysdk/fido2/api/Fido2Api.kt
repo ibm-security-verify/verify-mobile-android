@@ -13,6 +13,7 @@ import com.ibm.security.verifysdk.core.extension.sha256
 import com.ibm.security.verifysdk.core.helper.BaseApi
 import com.ibm.security.verifysdk.core.helper.KeystoreHelper
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import com.ibm.security.verifysdk.fido2.BiometricAuthenticationException
 import com.ibm.security.verifysdk.fido2.COSEKey
 import com.ibm.security.verifysdk.fido2.model.AssertionOptions
@@ -288,7 +289,7 @@ class Fido2Api : BaseApi() {
         )
 
         val id = keyName.sha256().hexToByteArray()
-        val clientDataString = json.encodeToString(clientDataJson)
+        val clientDataString = DefaultJson.encodeToString(clientDataJson)
 
         // Build authenticatorData
         val authenticatorDataParams = mutableListOf<Byte>()
@@ -503,7 +504,7 @@ class Fido2Api : BaseApi() {
         )
 
         val id = keyName.sha256().hexToByteArray()
-        val clientDataString = json.encodeToString(clientDataJson)
+        val clientDataString = DefaultJson.encodeToString(clientDataJson)
 
         val authenticatorDataParams = mutableListOf<Byte>()
         authenticatorDataParams.addAll(options.rpId.sha256().hexToByteArray().toList())
