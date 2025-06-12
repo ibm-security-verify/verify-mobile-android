@@ -7,7 +7,7 @@ package com.ibm.security.verifysdk.dc.cloud.model
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.ibm.security.verifysdk.core.extension.toJsonElement
-import com.ibm.security.verifysdk.dc.cloud.serializer.CloudCredentialSerializer.json
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import com.ibm.security.verifysdk.dc.core.CredentialFormat
 import com.ibm.security.verifysdk.dc.core.CredentialFormat.Companion.serialName
 import com.ibm.security.verifysdk.dc.core.CredentialRole
@@ -112,11 +112,11 @@ data class IndyCredential(
             val credDefId = jsonObject["cred_def_id"]?.jsonPrimitive?.content ?: ""
             val schemaName = jsonObject["schema_name"]?.jsonPrimitive?.content ?: ""
             val schemaVersion = jsonObject["schema_version"]?.jsonPrimitive?.content ?: ""
-            val connection = json.decodeFromJsonElement<ConnectionInfo>(
+            val connection = DefaultJson.decodeFromJsonElement<ConnectionInfo>(
                 jsonObject["connection"]
                     ?: throw SerializationException("Missing connection")
             )
-            val properties = json.decodeFromJsonElement<Map<String, JsonElement>>(
+            val properties = DefaultJson.decodeFromJsonElement<Map<String, JsonElement>>(
                 jsonObject["properties"]
                     ?: throw SerializationException("Missing properties")
             )

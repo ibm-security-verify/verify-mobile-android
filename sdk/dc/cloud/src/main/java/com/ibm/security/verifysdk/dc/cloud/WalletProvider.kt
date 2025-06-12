@@ -6,6 +6,7 @@ package com.ibm.security.verifysdk.dc.cloud
 
 import com.ibm.security.verifysdk.authentication.api.OAuthProvider
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import com.ibm.security.verifysdk.dc.cloud.api.AgentsApi
 import com.ibm.security.verifysdk.dc.cloud.api.ConnectionsApi
 import com.ibm.security.verifysdk.dc.cloud.api.CredentialsApi
@@ -53,13 +54,6 @@ class WalletProvider(
     private val ignoreSSLCertificate: Boolean = false
 ) {
 
-    private val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
-
     suspend fun initiate(
         name: String,
         username: String,
@@ -68,7 +62,7 @@ class WalletProvider(
     ): Wallet = coroutineScope {
 
         val walletInitializationInfo = try {
-            json.decodeFromString(WalletInitializationInfo.serializer(), jsonData)
+            DefaultJson.decodeFromString(WalletInitializationInfo.serializer(), jsonData)
         } catch (e: SerializationException) {
             throw WalletError.DataInitializationFailed()
         }

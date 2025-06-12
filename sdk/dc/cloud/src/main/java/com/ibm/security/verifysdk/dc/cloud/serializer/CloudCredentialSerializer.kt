@@ -4,6 +4,7 @@
 
 package com.ibm.security.verifysdk.dc.cloud.serializer
 
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import com.ibm.security.verifysdk.dc.cloud.model.CloudCredentialDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.IndyCredential
 import com.ibm.security.verifysdk.dc.cloud.model.JsonLdCredential
@@ -40,13 +41,6 @@ import kotlinx.serialization.json.jsonPrimitive
  * @since 3.0.7
  */
 object CloudCredentialSerializer : KSerializer<CloudCredentialDescriptor> {
-
-    val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
 
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Credential") {
         element("format", CredentialFormat.serializer().descriptor)
@@ -100,9 +94,9 @@ object CloudCredentialSerializer : KSerializer<CloudCredentialDescriptor> {
         require(encoder is JsonEncoder)
 
         val jsonObject = when (value) {
-            is IndyCredential -> value.toJsonObject(json)
-            is JsonLdCredential -> value.toJsonObject(json)
-            is MDocCredential -> value.toJsonObject(json)
+            is IndyCredential -> value.toJsonObject(DefaultJson)
+            is JsonLdCredential -> value.toJsonObject(DefaultJson)
+            is MDocCredential -> value.toJsonObject(DefaultJson)
             else -> throw NotImplementedError("Unsupported CloudCredentialDescriptor type")
         }
         encoder.encodeJsonElement(jsonObject)

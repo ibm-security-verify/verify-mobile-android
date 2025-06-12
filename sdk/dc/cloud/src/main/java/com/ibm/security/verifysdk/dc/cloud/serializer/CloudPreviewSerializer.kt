@@ -4,6 +4,7 @@
 
 package com.ibm.security.verifysdk.dc.cloud.serializer
 
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import com.ibm.security.verifysdk.dc.cloud.model.CloudPreviewDescriptor
 import com.ibm.security.verifysdk.dc.cloud.model.CredentialPreviewInfo
 import com.ibm.security.verifysdk.dc.cloud.model.VerificationPreviewInfo
@@ -23,13 +24,6 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 
 object CloudPreviewSerializer : KSerializer<CloudPreviewDescriptor> {
-
-    val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
 
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("CloudPreviewDescriptor") {
         element<String>("id")
@@ -75,12 +69,12 @@ object CloudPreviewSerializer : KSerializer<CloudPreviewDescriptor> {
 
         when (value) {
             is CredentialPreviewInfo -> {
-                val json = Json.encodeToJsonElement(CredentialPreviewInfo.serializer(), value)
+                val json = DefaultJson.encodeToJsonElement(CredentialPreviewInfo.serializer(), value)
                 encoder.encodeJsonElement(json)
             }
 
             is VerificationPreviewInfo -> {
-                val json = Json.encodeToJsonElement(VerificationPreviewInfo.serializer(), value)
+                val json = DefaultJson.encodeToJsonElement(VerificationPreviewInfo.serializer(), value)
                 encoder.encodeJsonElement(json)
             }
         }
