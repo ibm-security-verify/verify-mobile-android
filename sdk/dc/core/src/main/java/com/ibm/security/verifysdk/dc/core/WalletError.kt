@@ -37,6 +37,13 @@ sealed class WalletError : Error() {
     data class MissingField(val fieldName: String) : WalletError()
 
     /**
+     * The method received an argument that it can’t validate.
+     *
+     * @param requirement The requirement of the argument.
+     */
+    data class InvalidArgument(val requirement: String) : WalletError()
+
+    /**
      * Represents a general error with a custom message.
      *
      * @param message The error message describing the issue.
@@ -55,6 +62,7 @@ sealed class WalletError : Error() {
             is InvalidFormat -> "Invalid JSON format to create."
             is DataInitializationFailed -> "The signing hash algorithm was invalid."
             is MissingField -> "The required field '$fieldName' is missing."
+            is InvalidArgument -> "Invalid argument: $requirement"
             is General -> message
         }
 }
