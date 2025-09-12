@@ -31,11 +31,13 @@ lifecycleProcess = "2.8.7"
 loggingInterceptor = "4.12.0"
 material = "1.12.0"
 material3 = "1.3.1"
+materialx = "1.5.0"
 material3AdaptiveVersion = "1.0.0"
 mockitoKotlin = "5.3.1"
 mockwebserver = "4.12.0"
 monitorVersion = "1.7.2"
 nettyCodecHttp2 = "4.1.118.Final"
+nimbusJoseJwt = "10.0.2"
 roomVersion = "2.6.1"
 rootCoverage = "1.9.0"
 rootbeerLib = "0.1.0"
@@ -104,9 +106,11 @@ ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serializatio
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedata" }
 logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "loggingInterceptor" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+materialx = { group = "androidx.compose.material", name = "material", version.ref = "materialx" }
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "mockwebserver" }
 netty-codec-http2 = { group = "io.netty", name = "netty-codec-http2", version.ref = "nettyCodecHttp2" }
+nimbus-jose-jwt = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbusJoseJwt" }
 rootbeer-lib = { group = "com.scottyab", name = "rootbeer-lib", version.ref = "rootbeerLib" }
 skyscreamer-jsonassert = { group = "org.skyscreamer", name = "jsonassert", version.ref = "jsonassert" }
 slf4j-android = { group = "org.slf4j", name = "slf4j-android", version.ref = "slf4jVersion" }
