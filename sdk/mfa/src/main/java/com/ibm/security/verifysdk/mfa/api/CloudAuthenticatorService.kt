@@ -32,7 +32,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.URL

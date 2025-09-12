@@ -37,19 +37,30 @@ interface MFAServiceDescriptor {
         httpClient: HttpClient = NetworkHelper.getInstance
     ): Result<TokenInfo>
 
-    suspend fun nextTransaction(transactionID: String? = null, httpClient: HttpClient = NetworkHelper.getInstance): Result<NextTransactionInfo>
+    suspend fun nextTransaction(
+        transactionID: String? = null,
+        httpClient: HttpClient = NetworkHelper.getInstance
+    ): Result<NextTransactionInfo>
 
-    suspend fun completeTransaction(userAction: UserAction, signedData: String, httpClient: HttpClient = NetworkHelper.getInstance): Result<Unit>
+    suspend fun completeTransaction(
+        userAction: UserAction,
+        signedData: String,
+        httpClient: HttpClient = NetworkHelper.getInstance
+    ): Result<Unit>
 }
 
 typealias NextTransactionInfo = Pair<PendingTransactionInfo?, Int>
 
-suspend fun MFAServiceDescriptor.login(loginUri: URL, code: String, httpClient: HttpClient = NetworkHelper.getInstance): Result<Unit> {
+suspend fun MFAServiceDescriptor.login(
+    loginUri: URL,
+    code: String,
+    httpClient: HttpClient = NetworkHelper.getInstance
+): Result<Unit> {
     val body = buildJsonObject {
         put("lsi", code)
     }
 
-    val decoder =  Json {
+    val decoder = Json {
         encodeDefaults = true
         explicitNulls = false
         ignoreUnknownKeys = true
@@ -78,7 +89,7 @@ suspend fun MFAServiceDescriptor.completeTransaction(
     userAction: UserAction = UserAction.VERIFY,
     factorType: FactorType,
     httpClient: HttpClient = NetworkHelper.getInstance
-):Result<Unit> {
+): Result<Unit> {
     var signedData = ""
     val pendingTransaction =
         currentPendingTransaction ?: throw MFAServiceError.InvalidPendingTransaction()
@@ -93,7 +104,11 @@ suspend fun MFAServiceDescriptor.completeTransaction(
         )
     }
 
-    return completeTransaction(userAction = userAction, signedData = signedData, httpClient = httpClient)
+    return completeTransaction(
+        userAction = userAction,
+        signedData = signedData,
+        httpClient = httpClient
+    )
 }
 
 internal fun factorKeyNameAndAlgorithm(factorType: FactorType): Pair<String, HashAlgorithmType> {
