@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.kotlin.kapt) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.jetbrains.compose) apply false
+    alias(libs.plugins.compose.compiler) apply false
 }
 
 // used for release naming and in mfa SDK

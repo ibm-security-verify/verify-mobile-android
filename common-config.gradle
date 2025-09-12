@@ -55,9 +55,13 @@ configurations.configureEach {
 }
 
 dependencies {
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.skyscreamer.jsonassert)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.skyscreamer.jsonassert)
     androidTestImplementation(libs.slf4j.android)
     androidTestImplementation(libs.slf4j.api)
+    lintChecks 'com.slack.lint.compose:compose-lint-checks:1.4.2'
+    lintChecks 'com.slack.lint:slack-lint-checks:0.9.0'
+    lintChecks 'com.uber.lint-checks:lint-checks-android:0.1.1'
+    lintChecks 'com.uber.lint-checks:lint-checks:0.1.1'
+    testImplementation(libs.junit)
 }
