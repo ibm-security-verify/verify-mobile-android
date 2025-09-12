@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.ibm.security.verifysdk.dc.demoapp.ui.ViewDescriptor
 import com.ibm.security.verifysdk.dc.demoapp.ui.verification.LabelValueRow
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -26,32 +27,46 @@ class BankingCredentialOfferView(override var jsonRepresentation: JsonElement) :
 
     @Composable
     override fun ShowCredential(modifier: Modifier) {
+
+        val labelWidth = 100.dp
+
         Column(modifier = modifier) {
             LabelValueRow(
                 label = "Type",
                 value = "Bank account",
-                textStyle = MaterialTheme.typography.bodyLarge
+                textStyle = MaterialTheme.typography.bodyLarge,
+                labelWidth = labelWidth
             )
             LabelValueRow(
                 label = "Name",
                 value = credentialOffer.familyName,
-                textStyle = MaterialTheme.typography.bodyLarge)
+                textStyle = MaterialTheme.typography.bodyLarge,
+                labelWidth = labelWidth
+            )
             LabelValueRow(
                 label = "Given name",
                 value = credentialOffer.givenName,
-                textStyle = MaterialTheme.typography.bodyLarge)
+                textStyle = MaterialTheme.typography.bodyLarge,
+                labelWidth = labelWidth
+            )
             LabelValueRow(
                 label = "Birth date",
                 value = credentialOffer.birthDate,
-                textStyle = MaterialTheme.typography.bodyLarge)
+                textStyle = MaterialTheme.typography.bodyLarge,
+                labelWidth = labelWidth
+            )
             LabelValueRow(
                 label = "Account number",
                 value = credentialOffer.accountNumber,
-                textStyle = MaterialTheme.typography.bodyLarge)
+                textStyle = MaterialTheme.typography.bodyLarge,
+                labelWidth = labelWidth
+            )
             LabelValueRow(
                 label = "Email address",
                 value = credentialOffer.emailAddress,
-                textStyle = MaterialTheme.typography.bodyLarge)
+                textStyle = MaterialTheme.typography.bodyLarge,
+                labelWidth = labelWidth
+            )
         }
     }
 }

@@ -5,16 +5,15 @@
 package com.ibm.security.verifysdk.dc.demoapp.data
 
 import com.ibm.security.verifysdk.authentication.model.shouldRefresh
-import com.ibm.security.verifysdk.dc.cloud.WalletService
-import com.ibm.security.verifysdk.dc.cloud.model.CloudCredentialDescriptor
-import com.ibm.security.verifysdk.dc.cloud.model.CloudPreviewDescriptor
-import com.ibm.security.verifysdk.dc.cloud.model.CredentialPreviewInfo
+import com.ibm.security.verifysdk.dc.WalletService
 import com.ibm.security.verifysdk.dc.demoapp.BuildConfig
 import com.ibm.security.verifysdk.dc.demoapp.ui.WalletViewModel
-import com.ibm.security.verifysdk.dc.core.PreviewDescriptor
-import com.ibm.security.verifysdk.dc.cloud.model.VerificationAction
-import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
-import com.ibm.security.verifysdk.dc.cloud.model.VerificationPreviewInfo
+import com.ibm.security.verifysdk.dc.model.CredentialDescriptor
+import com.ibm.security.verifysdk.dc.model.CredentialPreviewInfo
+import com.ibm.security.verifysdk.dc.model.PreviewDescriptor
+import com.ibm.security.verifysdk.dc.model.VerificationAction
+import com.ibm.security.verifysdk.dc.model.VerificationInfo
+import com.ibm.security.verifysdk.dc.model.VerificationPreviewInfo
 import kotlinx.serialization.ExperimentalSerializationApi
 import java.net.URL
 
@@ -74,7 +73,7 @@ class WalletManager(val walletEntity: WalletEntity, private val viewModel: Walle
         }
     }
 
-    suspend fun previewInvitation(invitationUrl: URL): Result<CloudPreviewDescriptor> {
+    suspend fun previewInvitation(invitationUrl: URL): Result<PreviewDescriptor> {
 
         refreshToken()
 
@@ -112,7 +111,7 @@ class WalletManager(val walletEntity: WalletEntity, private val viewModel: Walle
         }
     }
 
-    suspend fun addCredential(credentialPreviewInfo: CredentialPreviewInfo): Result<CloudCredentialDescriptor> {
+    suspend fun addCredential(credentialPreviewInfo: CredentialPreviewInfo): Result<CredentialDescriptor> {
 
         refreshToken()
 

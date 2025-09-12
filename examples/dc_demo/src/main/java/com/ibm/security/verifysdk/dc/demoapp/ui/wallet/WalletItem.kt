@@ -18,11 +18,14 @@ import com.ibm.security.verifysdk.dc.demoapp.ui.verification.LabelValueRow
 fun WalletDetails(wallet: WalletEntity) {
     Column {
         LabelValueRow(label = "ID", value = wallet.wallet.agent.id,
-            valueTextSizeReduction = 1) // to avoid new lines
+            valueTextSizeReduction = 1,
+            labelWidth = 70.dp) // to avoid new lines
         Spacer(modifier = Modifier.height(12.dp))
-        LabelValueRow(label = "Name", value = wallet.wallet.agent.name)
+        LabelValueRow(label = "Name", value = wallet.wallet.agent.name,
+            labelWidth = 70.dp)
         Spacer(modifier = Modifier.height(12.dp))
-        LabelValueRow(label = "Host", value = wallet.wallet.baseUri.host)
+        LabelValueRow(label = "Host", value = wallet.wallet.baseUri.host,
+            labelWidth = 70.dp)
 
         Spacer(modifier = Modifier.height(24.dp))
 

@@ -4,25 +4,22 @@
 
 package com.ibm.security.verifysdk.dc.demoapp.ui.credential
 
-import android.graphics.BitmapFactory
-import android.util.Base64
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,18 +29,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ibm.security.verifysdk.dc.demoapp.ui.ViewDescriptor
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
 
 @Serializable
@@ -97,7 +90,10 @@ class BankingCredentialCardView(override var jsonRepresentation: JsonElement) :
             initialValue = 360f,
             targetValue = 0f,
             animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 15000, easing = LinearEasing), // 15 seconds per rotation
+                animation = tween(
+                    durationMillis = 15000,
+                    easing = LinearEasing
+                ), // 15 seconds per rotation
                 repeatMode = RepeatMode.Restart
             )
         )
@@ -105,10 +101,9 @@ class BankingCredentialCardView(override var jsonRepresentation: JsonElement) :
         Card(
             modifier = modifier
                 .padding(16.dp)
-                .fillMaxWidth()
-                .aspectRatio(1.585f),
+                .fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF004D40)), // Financial tone
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF004D40)),
             elevation = CardDefaults.elevatedCardElevation(8.dp)
         ) {
             Box(
@@ -116,7 +111,6 @@ class BankingCredentialCardView(override var jsonRepresentation: JsonElement) :
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                // 💲 Background dollar sign
                 Text(
                     text = "$",
                     fontSize = 160.sp,
@@ -124,12 +118,9 @@ class BankingCredentialCardView(override var jsonRepresentation: JsonElement) :
                     color = Color.White.copy(alpha = 0.05f),
                     modifier = Modifier
                         .align(Alignment.Center)
-                        .graphicsLayer {
-                            rotationY = rotation
-                        }
+                        .graphicsLayer { rotationY = rotation }
                 )
 
-                // Account number at the top-right
                 Text(
                     text = accountNumber,
                     fontWeight = FontWeight.Bold,
@@ -138,39 +129,51 @@ class BankingCredentialCardView(override var jsonRepresentation: JsonElement) :
                     modifier = Modifier.align(Alignment.TopEnd)
                 )
 
-                // Main content
                 Column(
-                    modifier = Modifier.align(Alignment.CenterStart)
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 48.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text(
-                        text = "Bank Account",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = "$firstName $middleName $lastName".replace("  ", " ").trim(),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    LabelValueInCard(label = "Date of Birth", value = birthDate, textColor = Color.White)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    LabelValueInCard(label = "Email", value = emailAddress, textColor = Color.White)
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Bank Account",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            color = Color.White
+                        )
+                        Text(
+                            text = "$firstName $middleName $lastName".replace("  ", " ").trim(),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            color = Color.White
+                        )
+                        LabelValueInCard(
+                            label = "Date of Birth",
+                            value = birthDate,
+                            textColor = Color.White
+                        )
+                        LabelValueInCard(
+                            label = "Email",
+                            value = emailAddress,
+                            textColor = Color.White
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Text(
+                            text = "Financial Authority: $institutionNumber",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp,
+                            color = Color.White
+                        )
+                    }
                 }
-
-                // Bottom right label
-                Text(
-                    text = "Financial Authority: $institutionNumber",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp,
-                    color = Color.White,
-                    modifier = Modifier.align(Alignment.BottomEnd)
-                )
             }
         }
     }

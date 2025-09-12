@@ -10,6 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,7 +37,6 @@ import com.ibm.security.verifysdk.dc.demoapp.ui.ViewDescriptor
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 @Serializable
@@ -93,7 +93,7 @@ class IbmEmployeeCredentialCardView(override var jsonRepresentation: JsonElement
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Box(
+            BoxWithConstraints(
                 modifier = Modifier
                     .background(
                         brush = Brush.linearGradient(
@@ -102,71 +102,84 @@ class IbmEmployeeCredentialCardView(override var jsonRepresentation: JsonElement
                     )
                     .padding(16.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.align(Alignment.CenterStart)
+                val isHorizontal = maxWidth > maxHeight
+
+                val base64Data = portrait.substringAfter("base64,")
+                val imageBytes = Base64.decode(base64Data, Base64.DEFAULT)
+                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                    ?.asImageBitmap()
+
+                if (isHorizontal) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Text(
-                            text = "IBM Employee Card",
-                            style = MaterialTheme.typography.titleLarge.copy(
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "IBM Employee Card",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                            )
+
+                            Text(
+                                text = "$firstName $lastName",
                                 fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
                                 color = Color.White
-                            ),
-                            modifier = Modifier.align(Alignment.Start)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+                            )
 
-                        Text(
-                            text = "$firstName $lastName",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            color = Color.Black
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        LabelValueInCard(
-                            label = "DoB",
-                            value = birthDate
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        LabelValueInCard(
-                            label = "Job Title",
-                            value = jobTitle
-                        )
-                        LabelValueInCard(
-                            label = "Hire Date",
-                            value = hireDate
-                        )
-                        LabelValueInCard(
-                            label = "Email address",
-                            value = emailAddress
+                            LabelValueInCard(label = "DoB", value = birthDate)
+                            LabelValueInCard(label = "Job Title", value = jobTitle)
+                            LabelValueInCard(label = "Hire Date", value = hireDate)
+                            LabelValueInCard(label = "Email address", value = emailAddress)
+                        }
+                        PortraitBox(
+                            bitmap = bitmap
                         )
                     }
-
-                    portrait.let { portrait ->
-                        val base64Data = portrait.substringAfter("base64,")
-                        val imageBytes = Base64.decode(base64Data, Base64.DEFAULT)
-                        val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                            ?.asImageBitmap()
-                        Box(
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(
                             modifier = Modifier
-                                .size(70.dp, 110.dp)
-                                .align(Alignment.CenterEnd)
-                                .background(Color.Gray, RoundedCornerShape(4.dp))
+                                .weight(1f)
+                                .padding(end = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            bitmap?.let { image ->
-                                Image(
-                                    bitmap = image,
-                                    contentDescription = "Portrait",
-                                    modifier = Modifier.matchParentSize()
+                            Text(
+                                text = "IBM Employee Card",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
                                 )
-                            }
+                            )
+
+                            Text(
+                                text = "$firstName $lastName",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = Color.White
+                            )
+
+                            LabelValueInCard(label = "DoB", value = birthDate, color = Color.White)
+                            LabelValueInCard(label = "Job Title", value = jobTitle, color = Color.White)
+                            LabelValueInCard(label = "Hire Date", value = hireDate, color = Color.White)
+                            LabelValueInCard(label = "Email address", value = emailAddress, color = Color.White)
                         }
+
+                        PortraitBox(
+                            bitmap = bitmap
+                        )
                     }
                 }
             }

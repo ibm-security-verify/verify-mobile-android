@@ -56,7 +56,7 @@ object ViewDescriptorSerializer : KSerializer<ViewDescriptor> {
     }
 
     override fun deserialize(decoder: Decoder): ViewDescriptor {
-        require(decoder is JsonDecoder)
+        require(decoder is JsonDecoder) { "Expected JsonDecoder but got ${decoder::class.simpleName}" }
 
         val jsonElement = decoder.decodeJsonElement().jsonObject
 
@@ -161,7 +161,7 @@ object ViewDescriptorSerializer : KSerializer<ViewDescriptor> {
     }
 
     override fun serialize(encoder: Encoder, value: ViewDescriptor) {
-        require(encoder is JsonEncoder)
+        require(encoder is JsonEncoder) { "Expected JsonEncoder but got ${encoder::class.simpleName}" }
         val jsonObject = buildJsonObject {
             put("jsonRepresentation", value.jsonRepresentation.toJsonElement())
         }

@@ -22,9 +22,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.lifecycleScope
@@ -37,8 +39,7 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import com.ibm.security.verifysdk.core.helper.ContextHelper
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
-import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
-import com.ibm.security.verifysdk.dc.cloud.WalletProvider
+import com.ibm.security.verifysdk.dc.WalletProvider
 import com.ibm.security.verifysdk.dc.demoapp.data.WalletEntity
 import com.ibm.security.verifysdk.dc.demoapp.data.WalletManager
 import com.ibm.security.verifysdk.dc.demoapp.ui.WalletViewModel
@@ -50,12 +51,15 @@ import com.ibm.security.verifysdk.dc.demoapp.ui.verification.VerificationIdentit
 import com.ibm.security.verifysdk.dc.demoapp.ui.verification.VerificationRequestScreen
 import com.ibm.security.verifysdk.dc.demoapp.ui.verification.VerificationScreen
 import com.ibm.security.verifysdk.dc.demoapp.ui.wallet.WalletScreen
-import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
-import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
+import com.ibm.security.verifysdk.dc.model.VerificationInfo
+import com.ibm.security.verifysdk.dc.model.CredentialDescriptor
+import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
+import com.ibm.security.verifysdk.dc.demoapp.data.AgentQrCodeData
 import com.journeyapps.barcodescanner.CaptureActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import okhttp3.Dns
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -74,21 +78,8 @@ class MainActivity : ComponentActivity() {
         WalletViewModelFactory((application as DcApplication).repository)
     }
 
-    // Change this to the IP of the diagency service.
-    private val hostLocal = "iviadcgw-default.ivia-dc-demo-560b083b6ae574bb5eb8ef2f0de647f7-0000.au-syd.containers.appdomain.cloud"
+    //    private val hostLocal = "10.0.2.2"
     private lateinit var walletManager: WalletManager
-
-    // Change this to the data this is presented in the QR code.
-    private var agentQrCodeData = """
-            {
-                    "name":"holder_1",
-                    "id":"cn=user_1,ou=users,dc=ibm,dc=com",
-                    "serviceBaseUrl":"https://$hostLocal",
-                    "clientId":"onpremise_vcholders",
-                    "aznCode": "12345ABCDE",
-                    "oauthBaseUrl": "https://$hostLocal/oauth2/token"
-            }
-            """.trimIndent().replace("\n", "").replace(" ", "")
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,7 +89,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             IBMSecurityVerifySDKTheme {
-                MyApp(walletViewModel)
+                MyApp(
+                    walletViewModel
+                )
             }
         }
 
@@ -115,7 +108,7 @@ class MainActivity : ComponentActivity() {
         NetworkHelper.customDnsResolver = object : Dns {
             override fun lookup(hostname: String): List<InetAddress> {
                 return if (hostname == "diagency") {
-                    listOf(InetAddress.getByName(hostLocal))
+                    listOf(InetAddress.getByName(walletViewModel.hostLocal.toString()))
                 } else {
                     InetAddress.getAllByName(hostname).toList()
                 }
@@ -157,14 +150,35 @@ class MainActivity : ComponentActivity() {
         integrator.initiateScan()
     }
 
-    private fun getWallet() {
-
+    private fun getWallet(
+        server: String,
+        nickname: String,
+        user: String,
+        clientId: String,
+        secret: String
+    ) {
         lifecycleScope.launch {
             try {
+
+                walletViewModel.hostLocal = server
+                walletViewModel.nickname = nickname
+
+                val agentQrCodeData = AgentQrCodeData(
+                    name = nickname,
+                    id = "cn=user_1,ou=users,dc=ibm,dc=com",
+                    serviceBaseUrl = "https://${walletViewModel.hostLocal}",
+                    clientId = clientId,
+                    aznCode = "",
+                    oauthBaseUrl = "https://${walletViewModel.hostLocal}/oauth2/token"
+                )
+
                 withContext(Dispatchers.IO) {
                     val walletProvider =
-                        WalletProvider(jsonData = agentQrCodeData, ignoreSSLCertificate = true)
-                    val wallet = walletProvider.initiate("John", "user_1", "secret")
+                        WalletProvider(
+                            jsonData = Json.encodeToString(agentQrCodeData),
+                            ignoreSSLCertificate = true
+                        )
+                    val wallet = walletProvider.initiate(nickname, user, secret)
                     val walletEntity = WalletEntity(wallet = wallet)
                     walletViewModel.insert(walletEntity)
                     walletManager =
@@ -184,19 +198,10 @@ class MainActivity : ComponentActivity() {
             .show()
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        val intentResult: IntentResult? =
-            IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (intentResult != null && intentResult.contents != null) {
-            agentQrCodeData = intentResult.contents
-            log.info("agentQrCodeData: $agentQrCodeData")
-        }
-    }
-
     @Composable
-    fun MyApp(walletViewModel: WalletViewModel) {
+    fun MyApp(
+        walletViewModel: WalletViewModel
+    ) {
         val navController = rememberNavController()
         var credentialList by remember { mutableStateOf<List<CredentialDescriptor>>(emptyList()) }
         var verificationList by remember { mutableStateOf<List<VerificationInfo>>(emptyList()) }
@@ -214,7 +219,10 @@ class MainActivity : ComponentActivity() {
                         innerPadding = innerPadding,
                         onCredentialsLoaded = { credentialList = it },
                         onVerificationsLoaded = { verificationList = it },
-                        getWallet = this@MainActivity::getWallet
+                        getWallet = { server, name, user, clientId, secret ->
+                            this@MainActivity.getWallet(server, name, user, clientId, secret)
+                        },
+                        scanQrcCode = this@MainActivity::startQRCodeScanning
                     )
                 }
                 composable(BottomNavItem.Credential.route) {

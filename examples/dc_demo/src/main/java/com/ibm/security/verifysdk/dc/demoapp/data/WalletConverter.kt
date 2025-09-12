@@ -6,8 +6,7 @@ package com.ibm.security.verifysdk.dc.demoapp.data
 
 import androidx.room.TypeConverter
 import com.ibm.security.verifysdk.core.serializer.DefaultJson
-import com.ibm.security.verifysdk.dc.cloud.Wallet
-import kotlinx.serialization.json.Json
+import com.ibm.security.verifysdk.dc.Wallet
 
 class WalletConverter {
 

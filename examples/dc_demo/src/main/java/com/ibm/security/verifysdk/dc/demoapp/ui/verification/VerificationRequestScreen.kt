@@ -38,12 +38,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavController
-import com.ibm.security.verifysdk.dc.cloud.model.VerificationPreviewInfo
-import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.demoapp.MainActivity.Screen
 import com.ibm.security.verifysdk.dc.demoapp.data.WalletManager
 import com.ibm.security.verifysdk.dc.demoapp.ui.StatusDialog
 import com.ibm.security.verifysdk.dc.demoapp.ui.WalletViewModel
+import com.ibm.security.verifysdk.dc.model.VerificationPreviewInfo
+import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
@@ -111,10 +111,12 @@ fun VerificationRequestScreen(walletViewModel: WalletViewModel, navController: N
                 .padding(32.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            LabelValueRow("Company", company)
-            LabelValueRow("Name", name)
-            LabelValueRow("Purpose", purpose)
-            LabelValueRow("Credential", credential)
+            val labelWidth = 120.dp
+
+            LabelValueRow("Company", company, labelWidth = labelWidth)
+            LabelValueRow("Name", name, labelWidth = labelWidth)
+            LabelValueRow("Purpose", purpose, labelWidth = labelWidth)
+            LabelValueRow("Credential", credential, labelWidth = labelWidth)
 
             Spacer(modifier = Modifier.height(16.dp))
 

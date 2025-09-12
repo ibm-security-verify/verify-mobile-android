@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -38,13 +40,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavController
-import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.demoapp.MainActivity.Screen
 import com.ibm.security.verifysdk.dc.demoapp.data.WalletManager
 import com.ibm.security.verifysdk.dc.demoapp.ui.StatusDialog
 import com.ibm.security.verifysdk.dc.demoapp.ui.WalletViewModel
-import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
-import com.ibm.security.verifysdk.dc.cloud.model.VerificationPreviewInfo
+import com.ibm.security.verifysdk.dc.model.VerificationInfo
+import com.ibm.security.verifysdk.dc.model.VerificationPreviewInfo
+import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -85,8 +87,12 @@ fun VerificationIdentityDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Identity Details",
-                    fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        "Identity Details",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -95,84 +101,91 @@ fun VerificationIdentityDetailsScreen(
             )
         }
     ) { innerPadding ->
-        Column(
+
+        val scrollState = rememberScrollState()
+
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(32.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            verificationInfo?.let {
-                ProofRequestPresentation(it)
-            }
-
-            Text(
-                buildAnnotatedString {
-                    append("If you want to share identity details with ${verificationPreviewInfo?.label}, tap ")
-                    appendLine()
-                    pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                    append("Allow Verification")
-                    pop()
-                },
-                style = MaterialTheme.typography.titleLarge.copy(lineHeight = 1.5.em),
-                textAlign = TextAlign.Center,
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Button(modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-                onClick = {
-                    verificationPreviewInfo?.let {
-                        coroutineScope.launch {
-                            walletManager?.processProofRequest(verificationPreviewInfo)
-                                ?.onSuccess { verificationInfo ->
-                                    navController.currentBackStackEntry
-                                        ?.savedStateHandle
-                                        ?.set(
-                                            "label", verificationPreviewInfo.label
-                                        )
-
-                                    walletViewModel.updateVerification(
-                                        walletManager.walletEntity,
-                                        (walletManager.walletEntity.wallet.verifications + verificationInfo).toMutableList()
-                                    )
-                                    navController.navigate(Screen.VerificationDone.route)
-                                }
-                                ?.onFailure {
-                                    errorTitle = "Error"
-                                    errorMessage =
-                                        "Something went wrong: ${it.message ?: "Unknown error"}"
-                                    showErrorDialog = true
-                                }
-                        }
-                    }
-                }) {
-                Text("Allow Verification")
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedButton(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
+                    .verticalScroll(scrollState)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("Cancel")
+                verificationInfo?.let {
+                    ProofRequestPresentation(it)
+                }
+
+                Text(
+                    buildAnnotatedString {
+                        append("If you want to share identity details with ${verificationPreviewInfo?.label}, tap ")
+                        appendLine()
+                        pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                        append("Allow Verification")
+                        pop()
+                    },
+                    style = MaterialTheme.typography.titleLarge.copy(lineHeight = 1.5.em),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                )
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    onClick = {
+                        verificationPreviewInfo?.let {
+                            coroutineScope.launch {
+                                walletManager?.processProofRequest(verificationPreviewInfo)
+                                    ?.onSuccess { verificationInfo ->
+                                        navController.currentBackStackEntry
+                                            ?.savedStateHandle
+                                            ?.set(
+                                                "label", verificationPreviewInfo.label
+                                            )
+
+                                        walletViewModel.updateVerification(
+                                            walletManager.walletEntity,
+                                            (walletManager.walletEntity.wallet.verifications + verificationInfo).toMutableList()
+                                        )
+                                        navController.navigate(Screen.VerificationDone.route)
+                                    }
+                                    ?.onFailure {
+                                        errorTitle = "Error"
+                                        errorMessage =
+                                            "Something went wrong: ${it.message ?: "Unknown error"}"
+                                        showErrorDialog = true
+                                    }
+                            }
+                        }
+                    }) {
+                    Text("Allow Verification")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                ) {
+                    Text("Cancel")
+                }
+
+                Spacer(modifier = Modifier.height(100.dp))
             }
 
-            Spacer(modifier = Modifier.height(100.dp))
+            StatusDialog(
+                showErrorDialog,
+                title = errorTitle,
+                message = errorMessage,
+                onDismiss = { showErrorDialog = false }
+            )
         }
-
-        StatusDialog(
-            showErrorDialog,
-            title = errorTitle,
-            message = errorMessage,
-            onDismiss = { showErrorDialog = false }
-        )
     }
 }
 
@@ -186,36 +199,39 @@ private fun ProofRequestPresentation(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 0.dp)
-            .padding(12.dp)
     ) {
         Column {
             verificationInfo.info?.jsonObject?.get("attributes")?.jsonArray?.forEach { attribute ->
                 val obj = attribute.jsonObject
-                if (obj["ns"]?.jsonPrimitive?.content == "org.iso.18013.5.1") {
-                    when (val valueElement = obj["value"]) {
-                        is JsonArray -> {
-                            val values = obj["value"]?.jsonArray ?: return@forEach
-                            values.forEach { value ->
-                                val valueObj = value.jsonObject
-                                valueObj.entries.forEach { (key, jsonElement) ->
-                                    LabelValueRow(
-                                        label = key,
-                                        value = jsonElement.jsonPrimitive.content,
-                                    )
-                                    VerificationDetailsDivider()
-                                }
+                when (val valueElement = obj["value"]) {
+                    is JsonArray -> {
+                        val values = obj["value"]?.jsonArray ?: return@forEach
+                        values.forEach { value ->
+                            val valueObj = value.jsonObject
+                            valueObj.entries.forEach { (key, jsonElement) ->
+                                LabelValueRow(
+                                    label = key,
+                                    value = jsonElement.jsonPrimitive.content,
+                                )
+                                VerificationDetailsDivider()
                             }
                         }
-                        is JsonPrimitive -> {
-                            LabelValueRow(
-                                label = "value",
-                                value = valueElement.content,
-                            )
-                            VerificationDetailsDivider()
-                        }
-                        else -> {
-                            // Optionally handle other types (e.g., JsonObject or null)
-                        }
+                    }
+
+                    is JsonPrimitive -> {
+                        val id = obj["id"]?.jsonPrimitive?.content ?: "value"
+                        LabelValueRow(
+                            label = id.split("_")
+                                .joinToString(" ") { word ->
+                                    word.lowercase().replaceFirstChar { it.uppercase() }
+                                },
+                            value = valueElement.content,
+                        )
+                        VerificationDetailsDivider()
+                    }
+
+                    else -> {
+                        // Optionally handle other types (e.g., JsonObject or null)
                     }
                 }
             }

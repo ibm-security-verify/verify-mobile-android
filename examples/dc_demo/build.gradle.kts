@@ -30,15 +30,11 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-
 }
 
 dependencies {
 
-    implementation(project(":sdk:dc:core"))
-    implementation(project(":sdk:dc:cloud"))
-    implementation(project(":sdk:core"))
-    implementation(project(":sdk:authentication"))
+    implementation(project(":sdk:dc"))
 
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material3.adaptive.core)

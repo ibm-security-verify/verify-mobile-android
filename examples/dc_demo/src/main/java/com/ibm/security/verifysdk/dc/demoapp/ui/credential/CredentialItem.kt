@@ -28,13 +28,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ibm.security.verifysdk.core.serializer.DefaultJson
-import com.ibm.security.verifysdk.dc.cloud.model.CloudCredentialDescriptor
-import com.ibm.security.verifysdk.dc.cloud.serializer.CloudCredentialSerializer
 import com.ibm.security.verifysdk.dc.demoapp.ui.ViewDescriptor
 import com.ibm.security.verifysdk.dc.demoapp.ui.verification.LabelValueRow
-import com.ibm.security.verifysdk.dc.core.CredentialDescriptor
+import com.ibm.security.verifysdk.dc.model.CredentialDescriptor
+import com.ibm.security.verifysdk.dc.serializer.CredentialSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonObject
@@ -43,7 +43,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun CredentialListItem(
-    credential: CloudCredentialDescriptor,
+    credential: CredentialDescriptor,
     navigator: ThreePaneScaffoldNavigator<Any>
 ) {
     val itemView = remember(credential.jsonRepresentation) {
@@ -56,7 +56,7 @@ fun CredentialListItem(
             .clickable {
                 navigator.navigateTo(
                     pane = ListDetailPaneScaffoldRole.Detail,
-                    content = Json.encodeToString(CloudCredentialSerializer, credential)
+                    content = Json.encodeToString(CredentialSerializer, credential)
                 )
             }
     ) {
@@ -145,13 +145,15 @@ internal fun LabelValueInCard(
         Text(
             text = "$label:",
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-            color = textColor
+            color = textColor,
+            overflow = TextOverflow.Ellipsis
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
-            color = textColor
+            color = textColor,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

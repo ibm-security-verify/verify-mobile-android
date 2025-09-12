@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.ibm.security.verifysdk.dc.demoapp.ui.ViewDescriptor
 import com.ibm.security.verifysdk.dc.demoapp.ui.verification.LabelValueRow
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -25,26 +26,33 @@ class ResidentCredentialOfferView(override var jsonRepresentation: JsonElement) 
 
     @Composable
     override fun ShowCredential(modifier: Modifier) {
+
+        val labelWidth = 140.dp
+
         Column(modifier = modifier) {
             LabelValueRow(
                 label = "Type",
                 value = "Resident card",
-                textStyle = MaterialTheme.typography.bodyLarge
+                textStyle = MaterialTheme.typography.bodyLarge,
+                labelWidth = labelWidth
             )
             LabelValueRow(
                 label = "First name",
                 value = credential.credentialSubject.givenName,
-                textStyle = MaterialTheme.typography.bodyLarge
+                textStyle = MaterialTheme.typography.bodyLarge,
+                labelWidth = labelWidth
             )
             LabelValueRow(
                 label = "Last name",
                 value = credential.credentialSubject.familyName,
-                textStyle = MaterialTheme.typography.bodyLarge
+                textStyle = MaterialTheme.typography.bodyLarge,
+                labelWidth = labelWidth
             )
             LabelValueRow(
                 label = "Birth country",
                 value = credential.credentialSubject.birthCountry,
-                textStyle = MaterialTheme.typography.bodyLarge
+                textStyle = MaterialTheme.typography.bodyLarge,
+                labelWidth = labelWidth
             )
         }
     }

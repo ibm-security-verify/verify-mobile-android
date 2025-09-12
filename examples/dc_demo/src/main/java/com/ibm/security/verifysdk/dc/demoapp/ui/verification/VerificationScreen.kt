@@ -42,19 +42,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.ibm.security.verifysdk.dc.core.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.demoapp.MainActivity.Screen
+import com.ibm.security.verifysdk.dc.demoapp.QrScanContract
 import com.ibm.security.verifysdk.dc.demoapp.data.WalletManager
 import com.ibm.security.verifysdk.dc.demoapp.ui.AddUrlDialog
 import com.ibm.security.verifysdk.dc.demoapp.ui.StatusDialog
 import com.ibm.security.verifysdk.dc.demoapp.ui.WalletViewModel
-import com.ibm.security.verifysdk.dc.cloud.model.VerificationInfo
-import com.ibm.security.verifysdk.dc.demoapp.QrScanContract
+import com.ibm.security.verifysdk.dc.model.VerificationInfo
+import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.json.JSONObject
 import java.net.URL
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 @OptIn(
     ExperimentalMaterial3Api::class, ExperimentalDigitalCredentialsSdk::class,
@@ -159,10 +164,8 @@ fun VerificationScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.primaryContainer)
                                 .padding(16.dp)
                         ) {
-
                             val verification = navigator.currentDestination?.content?.toString()
                                 ?.takeIf { it.isNotEmpty() && it != "null" }
                                 ?.let { Json.decodeFromString<VerificationInfo>(it) }
@@ -173,25 +176,61 @@ fun VerificationScreen(
                                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                                 )
                             } else {
-                                LabelValueRow("ID", verification.id)
-                                VerificationDetailsDivider()
+                                val id = verification.id
+                                val state = verification.state.value
+                                val role = verification.role.value
+                                val issuerDid = verification.verifierDid
+
+                                val descriptor =
+                                    verification.proofRequest?.mdoc?.presentationDefinition?.inputDescriptors?.getOrNull(
+                                        0
+                                    )
+                                val name = descriptor?.name ?: "unknown"
+                                val purpose = descriptor?.purpose ?: "unknown"
+                                val signed =
+                                    verification.info?.jsonObject?.get("validityInfo")?.jsonObject?.get(
+                                        "signed"
+                                    )?.jsonPrimitive?.content?.let {
+                                        val parsed = ZonedDateTime.parse(it)
+                                        val localTime =
+                                            parsed.withZoneSameInstant(ZoneId.systemDefault())
+                                        val formatter =
+                                            DateTimeFormatter.ofPattern("dd MMMM yyyy, hh:mm a")
+                                        localTime.format(formatter)
+                                    } ?: "unknown"
+
                                 LabelValueRow(
-                                    "Name",
-                                    verification.proofRequest?.mdoc?.presentationDefinition?.name
-                                        ?: "unknown"
+                                    "ID", id
                                 )
                                 VerificationDetailsDivider()
                                 LabelValueRow(
-                                    "Purpose",
-                                    verification.proofRequest?.mdoc?.presentationDefinition?.purpose
-                                        ?: "unknown"
+                                    "State", state
                                 )
                                 VerificationDetailsDivider()
+                                LabelValueRow(
+                                    "Role", role
+                                )
+                                VerificationDetailsDivider()
+                                LabelValueRow(
+                                    "Issuer DID", issuerDid
+                                )
+                                VerificationDetailsDivider()
+                                VerificationDetailsDivider()
+                                LabelValueRow(
+                                    "Name", name
+                                )
+                                VerificationDetailsDivider()
+                                LabelValueRow(
+                                    "Purpose", purpose
+                                )
+                                VerificationDetailsDivider()
+                                LabelValueRow(
+                                    "Signed", signed
+                                )
                                 Spacer(modifier = Modifier.width(16.dp))
                             }
                         }
                     }
-
                 }
             )
         }
@@ -201,10 +240,16 @@ fun VerificationScreen(
             "Verification",
             verificationUrl,
             onUrlChange = { verificationUrl = it },
-            onDismiss = { showAddDialog = false },
+            onDismiss = {
+                verificationUrl = ""
+                showAddDialog = false
+            },
             onSubmit = {
+                val urlToLoad = verificationUrl
+                verificationUrl = ""
+
                 coroutineScope.launch {
-                    walletManager?.previewInvitation(URL(verificationUrl))
+                    walletManager?.previewInvitation(URL(urlToLoad))
                         ?.onSuccess { verificationPreview ->
                             val jsonData = Json.encodeToString(verificationPreview)
                             navController.currentBackStackEntry
