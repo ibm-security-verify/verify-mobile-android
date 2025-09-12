@@ -16,9 +16,12 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.HttpStatusCode.Companion.MovedPermanently
+import io.ktor.http.HttpStatusCode.Companion.PermanentRedirect
+import io.ktor.http.HttpStatusCode.Companion.SeeOther
+import io.ktor.http.HttpStatusCode.Companion.TemporaryRedirect
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import kotlinx.serialization.json.Json
 import java.net.URL
 
 abstract class BaseApi() {
@@ -66,7 +69,7 @@ abstract class BaseApi() {
         headers: Map<String, String>? = null,
         contentType: ContentType = ContentType.Application.Json,
         body: Any? = null
-    ): Result<T> = runCatching {
+    ): Result<T> = safeRunCatchingSuspend {
         val response = httpClient.request {
             url(url)
             this.method = method
@@ -88,14 +91,28 @@ abstract class BaseApi() {
                 Unit as T
             }
 
+            response.status in setOf(
+                PermanentRedirect,
+                MovedPermanently,
+                SeeOther,
+                TemporaryRedirect
+            ) -> {
+                val location = response.headers[HttpHeaders.Location]
+                    ?: throw IllegalStateException("Missing 'Location' header")
+                location as T
+            }
+
             response.status.isSuccess() -> {
                 DefaultJson.decodeFromString<T>(response.bodyAsText())
             }
 
             else -> {
+
                 val errorText = response.bodyAsText()
-                val errorResponse =
-                    runCatching { DefaultJson.decodeFromString<ErrorResponse>(errorText) }.getOrNull()
+                val errorResponse = safeRunCatchingSuspend {
+                    DefaultJson.decodeFromString<ErrorResponse>(errorText)
+                }.getOrNull()
+
                 throw ErrorResponse(
                     statusCode = response.status,
                     message = errorResponse?.message

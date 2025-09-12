@@ -3,7 +3,6 @@ package com.ibm.security.verifysdk.core
 import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import junit.framework.TestCase.assertEquals
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 import org.junit.Test
 
 @OptIn(ExperimentalSerializationApi::class)

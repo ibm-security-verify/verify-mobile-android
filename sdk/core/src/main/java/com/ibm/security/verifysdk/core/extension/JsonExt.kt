@@ -10,9 +10,15 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
+import kotlinx.serialization.json.longOrNull
 
 fun Any?.toJsonElement(): JsonElement = when (this) {
     is Array<*> -> this.toJsonArray()
@@ -45,5 +51,22 @@ fun JsonObject.getStringOrThrow(key: String): String {
 fun JsonObject.getStringList(key: String): List<String> {
     return this[key]?.jsonArray?.mapNotNull { it.jsonPrimitive.contentOrNull } ?: emptyList()
 }
+
+fun JsonElement.toKotlinType(): Any? {
+    return when (this) {
+        is JsonNull -> null
+        is JsonPrimitive -> when {
+            this.isString -> this.content
+            this.booleanOrNull != null -> this.boolean
+            this.longOrNull != null -> this.long
+            this.doubleOrNull != null -> this.double
+            else -> this.content
+        }
+        is JsonObject -> this.mapValues { it.value.toKotlinType() }
+        is JsonArray -> this.map { it.toKotlinType() }
+        else -> this.toString()
+    }
+}
+
 
 

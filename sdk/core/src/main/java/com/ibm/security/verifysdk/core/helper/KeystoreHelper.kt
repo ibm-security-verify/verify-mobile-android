@@ -15,7 +15,11 @@ import org.slf4j.LoggerFactory
 import java.security.*
 import java.security.spec.ECGenParameterSpec
 import java.security.spec.RSAKeyGenParameterSpec
+import java.util.Locale
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
+import javax.crypto.spec.GCMParameterSpec
 
 /**
  * Helper class to perform key management and signing operations.
@@ -77,8 +81,9 @@ object KeystoreHelper {
             if ((algorithm in supportedAlgorithmsSigning).not()) {
                 throw UnsupportedOperationException(
                     String.format(
+                        Locale.ENGLISH,
                         "Algorithm %s is not supported",
-                        algorithm
+                        algorithm,
                     )
                 )
             }
@@ -140,6 +145,46 @@ object KeystoreHelper {
         } finally {
             log.exiting()
         }
+    }
+
+    fun createAESKey(alias: String) {
+        val keyStore = KeyStore.getInstance(keystoreType).apply { load(null) }
+        if (!keyStore.containsAlias(alias)) {
+            val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, keystoreType)
+            val keySpec = KeyGenParameterSpec.Builder(
+                alias,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            )
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setUserAuthenticationRequired(false)
+                .build()
+            keyGenerator.init(keySpec)
+            keyGenerator.generateKey()
+        }
+    }
+
+    fun encryptAndStorePrivateKey(alias: String, privateKeyBytes: ByteArray): Pair<String, String> {
+        val keyStore = KeyStore.getInstance(keystoreType).apply { load(null) }
+        val secretKey = (keyStore.getEntry(alias, null) as KeyStore.SecretKeyEntry).secretKey
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+        val iv = cipher.iv
+        val encrypted = cipher.doFinal(privateKeyBytes)
+        val encryptedBase64 = Base64.encodeToString(encrypted, Base64.NO_WRAP)
+        val ivBase64 = Base64.encodeToString(iv, Base64.NO_WRAP)
+        return Pair(encryptedBase64, ivBase64)
+    }
+
+    fun decryptPrivateKey(alias: String, encryptedBase64: String, ivBase64: String): ByteArray {
+        val keyStore = KeyStore.getInstance(keystoreType).apply { load(null) }
+        val secretKey = (keyStore.getEntry(alias, null) as KeyStore.SecretKeyEntry).secretKey
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        val iv = Base64.decode(ivBase64, Base64.NO_WRAP)
+        val spec = GCMParameterSpec(128, iv)
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
+        val encryptedBytes = Base64.decode(encryptedBase64, Base64.NO_WRAP)
+        return cipher.doFinal(encryptedBytes)
     }
 
     /**

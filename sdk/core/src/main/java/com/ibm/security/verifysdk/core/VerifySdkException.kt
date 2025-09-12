@@ -5,8 +5,6 @@ package com.ibm.security.verifysdk.core
 
 import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
-import java.lang.System.getProperty
 
 /**
  * VerifySdkException is a generic exception that can be thrown when working with Verify SDKs.
