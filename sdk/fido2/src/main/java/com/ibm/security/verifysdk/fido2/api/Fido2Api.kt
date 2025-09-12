@@ -33,7 +33,6 @@ import io.ktor.http.HttpMethod
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.datetime.Clock
-import kotlinx.serialization.encodeToString
 import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
