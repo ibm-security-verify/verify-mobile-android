@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
             if (isGranted) {
                 startQRCodeScanning()
             } else {
-                log.debug("XXX Permission denied")
+                log.debug("Permission denied")
             }
         }
 
@@ -54,12 +54,6 @@ class MainActivity : ComponentActivity() {
 
         ContextHelper.init(applicationContext)
         setContentView(R.layout.activity_main)
-
-        log.debug("XXX DEBUG")
-        log.error("XXX ERROR")
-        log.warn("XXX WARN")
-        log.info("XXX INFO")
-        log.trace("XXX TRACE")
 
         findViewById<Button>(R.id.btn_scan_qr).setOnClickListener {
             requestCamera()
