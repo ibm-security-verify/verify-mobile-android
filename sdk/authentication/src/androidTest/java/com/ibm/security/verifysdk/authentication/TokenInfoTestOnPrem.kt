@@ -12,7 +12,6 @@ import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.authentication.model.shouldRefresh
 import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

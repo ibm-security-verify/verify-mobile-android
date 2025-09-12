@@ -145,7 +145,6 @@ class OAuthProvider(val clientId: String, val clientSecret: String? = null) : Ba
      * @return  [Result] with the `code` to be used in the subsequent authorization request or
      *                  with `Throwable` in case of an error.
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun authorizeWithBrowser(
         url: URL,
         redirectUrl: String,

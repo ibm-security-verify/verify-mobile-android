@@ -3,27 +3,25 @@
  */
 package com.ibm.security.verifysdk.authentication.model
 
-import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import com.ibm.security.verifysdk.core.extension.toJsonElement
-import com.ibm.security.verifysdk.core.extension.toJsonObject
+import com.ibm.security.verifysdk.core.extension.toKotlinType
 import com.ibm.security.verifysdk.core.extension.toNumberOrNull
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonEncoder
@@ -31,7 +29,6 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.intOrNull
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import org.json.JSONObject
@@ -109,7 +106,7 @@ data class TokenInfo(
     /**
      * Additional data parameters returned from the token server.
      */
-    val additionalData: Map<String, Any>
+    val additionalData: Map<String, Any?>
 ) : Parcelable {
 
     internal companion object : Parceler<TokenInfo> {
@@ -179,9 +176,9 @@ data class TokenInfo(
  * @param threshold  elapsed lifetime in % when the token should be refreshed
  */
 @Suppress("BooleanMethodIsAlwaysInverted")
-fun TokenInfo.shouldRefresh(threshold: Int = 90): Boolean {
-    return ((System.currentTimeMillis() / 1000) > createdOn.epochSeconds +
-            (expiresOn.epochSeconds - createdOn.epochSeconds) * threshold / 100)
+fun TokenInfo.shouldRefresh(instant: Instant = Clock.System.now(), threshold: Int = 90): Boolean {
+    return instant.epochSeconds > createdOn.epochSeconds +
+            (expiresOn.epochSeconds - createdOn.epochSeconds) * threshold / 100
 }
 
 internal object TokenInfoSerializer : KSerializer<TokenInfo> {
@@ -221,7 +218,7 @@ internal object TokenInfoSerializer : KSerializer<TokenInfo> {
     override val descriptor: SerialDescriptor = mapSerializerStringToJsonElement.descriptor
 
     override fun deserialize(decoder: Decoder): TokenInfo {
-        require(decoder is JsonDecoder)
+        require(decoder is JsonDecoder) { "Expected JsonDecoder but got ${decoder::class.simpleName}" }
         val decoderMap = decoder.decodeSerializableValue(mapSerializerStringToJsonElement)
 
         val accessToken = listOf(ACCESS_TOKEN, "access_token").stream().map(decoderMap::get)
@@ -243,7 +240,7 @@ internal object TokenInfoSerializer : KSerializer<TokenInfo> {
         val createdOn = listOf(CREATED_ON, "created_on").stream().map(decoderMap::get)
             .filter(Objects::nonNull)
             .collect(Collectors.toList()).getOrNull(0)?.jsonPrimitive?.longOrNull
-            ?: (System.currentTimeMillis() / 1000)
+            ?: (Clock.System.now().epochSeconds)
 
         val expiresOn = listOf(EXPIRES_ON, "expires_on").stream().map(decoderMap::get)
             .filter(Objects::nonNull)
@@ -261,7 +258,7 @@ internal object TokenInfoSerializer : KSerializer<TokenInfo> {
 
         val additionalData = decoderMap
             .filter { (key, _) -> !knownKeys.contains(key) }
-            .mapValues { (_, value) -> deserializeJsonElement(value.jsonPrimitive) }
+            .mapValues { (_, value) -> value.toKotlinType() }
 
         return TokenInfo(
             accessToken, refreshToken, idToken, Instant.fromEpochSeconds(createdOn), expiresIn,
@@ -290,7 +287,7 @@ internal object TokenInfoSerializer : KSerializer<TokenInfo> {
     }
 
     override fun serialize(encoder: Encoder, value: TokenInfo) {
-        require(encoder is JsonEncoder)
+        require(encoder is JsonEncoder) { "Expected JsonEncoder but got ${encoder::class.simpleName}" }
         val map: MutableMap<String, JsonElement> = mutableMapOf()
 
         map[ACCESS_TOKEN] = value.accessToken.toJsonElement()
@@ -301,7 +298,18 @@ internal object TokenInfoSerializer : KSerializer<TokenInfo> {
         map[EXPIRES_ON] = value.expiresOn.epochSeconds.toJsonElement()
         map[SCOPE] = value.scope.toJsonElement()
         map[TOKEN_TYPE] = value.tokenType.toJsonElement()
-        map.putAll(value.additionalData.toJsonObject())
+
+        value.additionalData.forEach { (key, v) ->
+            map[key] = when (v) {
+                null -> JsonNull
+                is String -> JsonPrimitive(v)
+                is Number -> JsonPrimitive(v)
+                is Boolean -> JsonPrimitive(v)
+                is Map<*, *> -> JsonObject((v as Map<String, Any?>).mapValues { (_, vv) -> JsonPrimitive(vv.toString()) })
+                is List<*> -> JsonArray(v.map { JsonPrimitive(it.toString()) })
+                else -> JsonPrimitive(v.toString())
+            }
+        }
 
         encoder.encodeSerializableValue(mapSerializerStringToJsonElement, map)
     }
