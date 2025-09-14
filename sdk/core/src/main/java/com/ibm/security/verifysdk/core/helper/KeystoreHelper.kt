@@ -150,7 +150,8 @@ object KeystoreHelper {
     fun createAESKey(alias: String) {
         val keyStore = KeyStore.getInstance(keystoreType).apply { load(null) }
         if (!keyStore.containsAlias(alias)) {
-            val keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, keystoreType)
+            val keyGenerator =
+                KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, keystoreType)
             val keySpec = KeyGenParameterSpec.Builder(
                 alias,
                 KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
@@ -328,12 +329,15 @@ object KeystoreHelper {
                     when (dataToSign) {
                         is String -> {
                             signature.update(dataToSign.toByteArray())
-                            signedData = Base64.encodeToString(signature.sign(), base64EncodingOption) as T
+                            signedData =
+                                Base64.encodeToString(signature.sign(), base64EncodingOption) as T
                         }
+
                         is ByteArray -> {
                             signature.update(dataToSign)
                             signedData = signature.sign() as T
                         }
+
                         else -> {
                             // Handle unsupported data type
                         }
@@ -362,12 +366,15 @@ object KeystoreHelper {
                 when (dataToSign) {
                     is String -> {
                         signature.update(dataToSign.toByteArray())
-                        signedData = Base64.encodeToString(signature.sign(), base64EncodingOption) as T
+                        signedData =
+                            Base64.encodeToString(signature.sign(), base64EncodingOption) as T
                     }
+
                     is ByteArray -> {
                         signature.update(dataToSign)
                         signedData = signature.sign() as T
                     }
+
                     else -> {
                         // Handle unsupported data type
                     }
