@@ -86,6 +86,7 @@ data class MDocCredential(
                 ?.let { CredentialFormat.fromSerialName(it) }
                 ?: throw SerializationException("Missing format")
             val credJson = jsonObject["cred_json"]
+                ?: throw SerializationException("Missing cred_json")
             val connection = DefaultJson.decodeFromJsonElement<ConnectionInfo>(
                 jsonObject["connection"]
                     ?: throw SerializationException("Missing connection")

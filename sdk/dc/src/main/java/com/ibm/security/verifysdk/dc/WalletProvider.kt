@@ -12,7 +12,6 @@ import com.ibm.security.verifysdk.dc.api.ConnectionsApi
 import com.ibm.security.verifysdk.dc.api.CredentialsApi
 import com.ibm.security.verifysdk.dc.api.InvitationsApi
 import com.ibm.security.verifysdk.dc.api.VerificationsApi
-import com.ibm.security.verifysdk.dc.model.CredentialState
 import com.ibm.security.verifysdk.dc.model.VerificationState
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.async
@@ -138,7 +137,7 @@ class WalletProvider(
                 agent = agentInfo,
                 connections = connections.toMutableList(),
                 invitations = invitations.toMutableList(),
-                credentials = credentials.filter { it.state == CredentialState.STORED }.toMutableList(),
+                credentials = credentials.toMutableList(),
                 verifications = verifications.toMutableList()
             )
         } catch (e: Exception) {
