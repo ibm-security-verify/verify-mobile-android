@@ -1,17 +1,18 @@
 [versions]
 activityComposeVersion = "1.10.0"
-agp = "8.8.2"
+agp = "8.2.1"
 appcompat = "1.7.0"
 biometric = "1.2.0-alpha05"
 browser = "1.8.0"
 composeBom = "2025.02.00"
 compose-compiler = "1.5.11"
+composeLintChecksVersion = "1.4.2"
 constraintlayout = "2.1.4"
 coreKtx = "1.13.1"
-dokka = "1.9.20"
+dokka = "2.0.0"
 espressoCore = "3.6.1"
 fuelAndroid = "2.3.1"
-jackson = "2.17.1"
+jackson = "2.15.3"
 jetbrainsKotlinJvmVersion = "2.1.0"
 jose4j = "0.9.6"
 jsonassert = "2.0-rc1"
@@ -28,6 +29,8 @@ ksp = "2.1.0-1.0.29"
 ktor = "3.1.1"
 lifecycleLivedata = "2.8.7"
 lifecycleProcess = "2.8.7"
+lintChecksAndroidVersion = "0.1.1"
+lintChecksVersion = "0.1.1"
 loggingInterceptor = "4.12.0"
 material = "1.12.0"
 material3 = "1.3.1"
@@ -36,16 +39,15 @@ material3AdaptiveVersion = "1.0.0"
 mockitoKotlin = "5.3.1"
 mockwebserver = "4.12.0"
 monitorVersion = "1.7.2"
-nettyCodecHttp2 = "4.1.118.Final"
 nimbusJoseJwt = "10.0.2"
 roomVersion = "2.6.1"
 rootCoverage = "1.9.0"
-rootbeerLib = "0.1.0"
+rootbeerLib = "0.1.1"
 rules = "1.6.0"
 runtimeLivedata = "1.7.8"
+slackLintChecksVersion = "0.9.0"
 slf4jVersion = "1.7.36"
 versioningPluginVersion = "2.0.0"
-woodstockCore = "6.6.2"
 zxingAndroidEmbeddedVersion = "4.3.0"
 adaptiveNavigationSuite = "1.3.1"
 navigationComposeVersion = "2.8.7"
@@ -79,12 +81,12 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+compose-lint-checks = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "composeLintChecksVersion" }
 fuel-android = { group = "com.github.kittinunf.fuel", name = "fuel-android", version.ref = "fuelAndroid" }
 jackson-core = { group = "com.fasterxml.jackson.core", name = "jackson-core", version.ref = "jackson" }
 jackson-dataformat-cbor = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-cbor", version.ref = "jackson" }
 jackson-dataformat-xml = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-xml", version.ref = "jackson" }
 jackson-module-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "jackson" }
-jackson-woodstox-core = { group = "com.fasterxml.woodstox", name = "woodstox-core", version.ref = "woodstockCore" }
 jose4j = { group = "org.bitbucket.b_c", name = "jose4j", version.ref = "jose4j" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter" }
@@ -104,15 +106,17 @@ ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.r
 ktor-client-serialization = { group = "io.ktor", name = "ktor-client-serialization", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedata" }
+lint-checks = { module = "com.uber.lint-checks:lint-checks", version.ref = "lintChecksVersion" }
+lint-checks-android = { module = "com.uber.lint-checks:lint-checks-android", version.ref = "lintChecksAndroidVersion" }
 logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "loggingInterceptor" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 materialx = { group = "androidx.compose.material", name = "material", version.ref = "materialx" }
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "mockwebserver" }
-netty-codec-http2 = { group = "io.netty", name = "netty-codec-http2", version.ref = "nettyCodecHttp2" }
 nimbus-jose-jwt = { module = "com.nimbusds:nimbus-jose-jwt", version.ref = "nimbusJoseJwt" }
 rootbeer-lib = { group = "com.scottyab", name = "rootbeer-lib", version.ref = "rootbeerLib" }
 skyscreamer-jsonassert = { group = "org.skyscreamer", name = "jsonassert", version.ref = "jsonassert" }
+slack-lint-checks = { module = "com.slack.lint:slack-lint-checks", version.ref = "slackLintChecksVersion" }
 slf4j-android = { group = "org.slf4j", name = "slf4j-android", version.ref = "slf4jVersion" }
 slf4j-api= { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4jVersion" }
 versioning-plugin = { group = "org.jetbrains.dokka", name = "versioning-plugin", version.ref = "versioningPluginVersion" }

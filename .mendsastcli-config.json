@@ -1,0 +1,5 @@
+{
+    "scans": {
+        "pathExclusions": [".*/src/androidTest/.*", ".*/src/test/.*"]
+    }   
+}

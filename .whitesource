@@ -1,0 +1,24 @@
+{
+  "scanSettings": {
+    "configMode": "LOCAL",
+    "configExternalURL": "",
+    "baseBranches": [
+      "main", "develop"
+    ]
+  },
+  "checkRunSettings": {
+    "vulnerableCheckRunConclusionLevel": "failure",
+    "displayMode": "diff"
+  },
+  "issueSettings": {
+    "minSeverityLevel": "LOW"
+  },
+  "scanSettingsSAST": {
+    "enableScan": true,
+    "scanPullRequests": true,
+    "incrementalScan": false,
+    "baseBranches": [
+      "main", "develop"
+    ]
+  }
+}
