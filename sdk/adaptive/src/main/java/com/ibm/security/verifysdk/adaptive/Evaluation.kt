@@ -42,7 +42,7 @@ data class PasswordEvaluation(
     /** The username used for evaluation. */
     val username: String,
     /** The associated password for the username. */
-    val password: String
+    var password: String
 ) : FactorEvaluation
 
 /**
