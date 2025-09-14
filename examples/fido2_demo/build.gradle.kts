@@ -16,7 +16,6 @@ android {
 
 dependencies {
 
-    implementation(project(":sdk:core"))
     implementation(project(":sdk:fido2"))
 
     implementation(libs.androidx.biometric)

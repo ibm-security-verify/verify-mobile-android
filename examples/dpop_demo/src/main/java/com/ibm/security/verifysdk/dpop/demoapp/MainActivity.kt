@@ -264,40 +264,40 @@ class MainActivity : ComponentActivity() {
             accessToken = dpopToken.accessToken
         )
 
-        apiServiceCustomSSL.validateDpopToken(
-            headers,
-            String.format("DPoP %s", dpopToken.accessToken),
-            resourceEndpoint
-        )
-            .enqueue(object : Callback<ResponseBody> {
-                override fun onResponse(
-                    call: Call<ResponseBody>,
-                    response: Response<ResponseBody>
-                ) {
-                    Log.d(TAG, String.format("Response code: %d", response.code()))
-                    if (response.isSuccessful) {
-                        Log.d(TAG, "DPoP token validation successful")
-                        tokenValidation.value =
-                            String.format(
-                                Locale.getDefault(),
-                                "%d - DPoP token validation successful",
-                                response.code()
-                            )
-                    } else {
-                        Log.d(TAG, "DPoP token validation failed")
-                        tokenValidation.value =
-                            String.format(
-                                Locale.getDefault(),
-                                "%d - DPoP token validation failed",
-                                response.code()
-                            )
-                    }
-                }
-
-                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    throw (t)
-                }
-            })
+//        apiServiceCustomSSL.validateDpopToken(
+//            headers,
+//            String.format("DPoP %s", dpopToken.accessToken),
+//            resourceEndpoint
+//        )
+//            .enqueue(object : Callback<ResponseBody> {
+//                override fun onResponse(
+//                    call: Call<ResponseBody>,
+//                    response: Response<ResponseBody>
+//                ) {
+//                    Log.d(TAG, String.format("Response code: %d", response.code()))
+//                    if (response.isSuccessful) {
+//                        Log.d(TAG, "DPoP token validation successful")
+//                        tokenValidation.value =
+//                            String.format(
+//                                Locale.getDefault(),
+//                                "%d - DPoP token validation successful",
+//                                response.code()
+//                            )
+//                    } else {
+//                        Log.d(TAG, "DPoP token validation failed")
+//                        tokenValidation.value =
+//                            String.format(
+//                                Locale.getDefault(),
+//                                "%d - DPoP token validation failed",
+//                                response.code()
+//                            )
+//                    }
+//                }
+//
+//                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+//                    throw (t)
+//                }
+//            })
 
     }
 
