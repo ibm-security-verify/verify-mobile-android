@@ -1,6 +1,5 @@
 package com.ibm.security.verifysdk.authentication
 
-import com.ibm.security.verifysdk.authentication.CodeChallengeMethod
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

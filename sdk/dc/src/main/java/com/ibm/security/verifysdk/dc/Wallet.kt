@@ -1,6 +1,8 @@
 /*
  * Copyright contributors to the IBM Verify Digital Credentials SDK for Android project
  */
+
+@file:UseSerializers(URLSerializer::class)
 package com.ibm.security.verifysdk.dc
 
 import com.ibm.security.verifysdk.authentication.model.TokenInfo
@@ -12,6 +14,7 @@ import com.ibm.security.verifysdk.dc.model.InvitationInfo
 import com.ibm.security.verifysdk.dc.model.VerificationInfo
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import java.net.URL
 
 /**
@@ -40,16 +43,14 @@ import java.net.URL
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class Wallet (
-    @Serializable(with = URLSerializer::class)
     val refreshUri: URL,
-    @Serializable(with = URLSerializer::class)
     val baseUri: URL,
     val clientId: String,
-    var clientSecret: String? = null,
-    var token: TokenInfo,
+    val clientSecret: String? = null,
+    val token: TokenInfo,
     val agent: AgentInfo,
-    var connections: MutableList<ConnectionInfo>,
-    var invitations: MutableList<InvitationInfo>,
-    var credentials: MutableList<CredentialDescriptor>, // pragma: allowlist secret
-    var verifications: MutableList<VerificationInfo>
-) : WalletDescriptor
+    val connections: MutableList<ConnectionInfo>,
+    val invitations: MutableList<InvitationInfo>,
+    val credentials: MutableList<CredentialDescriptor>, // pragma: allowlist secret
+    val verifications: MutableList<VerificationInfo>
+)

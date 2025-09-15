@@ -15,4 +15,4 @@ data class ErrorMessage(
 
     @JsonNames("error_description", "errorDescription", "messageDescription")
     val errorDescription: String = "No description available"
-)
+)  : Exception("$error : $errorDescription")

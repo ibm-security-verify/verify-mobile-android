@@ -38,6 +38,7 @@ import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.Parameters
 import io.ktor.http.contentType
+import io.ktor.http.formUrlEncode
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -71,8 +72,8 @@ class MainActivity : ComponentActivity() {
 
     // Change these parameters according to your IBM Security Verify tenant
     private val tenant = "verify.ice.ibmcloud.com" // without protocol
-    private val clientId = "<your-client-id>"
-    private val clientSecret = "<your-client-secret>"
+    private val clientId = ""
+    private val clientSecret = ""
     private val resourceServer = "10.0.2.2" // without protocol and port
     private val resourceServerPort = "8080"
 
@@ -140,7 +141,7 @@ class MainActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(vertical = 5.dp),
                 singleLine = true,
-                value =  resourceEndpoint,
+                value = resourceEndpoint,
                 enabled = false,
                 onValueChange = {},
                 label = { Text("Resource Endpoint") }
@@ -151,7 +152,7 @@ class MainActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(vertical = 5.dp),
                 singleLine = true,
-                value =  clientId,
+                value = clientId,
                 enabled = false,
                 onValueChange = {},
                 label = { Text("Client ID") }
@@ -162,7 +163,7 @@ class MainActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(vertical = 5.dp),
                 singleLine = true,
-                value =  clientSecret,
+                value = clientSecret,
                 enabled = false,
                 onValueChange = {},
                 label = { Text("Client secret") }
@@ -173,7 +174,7 @@ class MainActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(vertical = 5.dp),
                 singleLine = true,
-                value =  token ?: "...",
+                value = token ?: "...",
                 enabled = false,
                 onValueChange = {},
                 label = { Text("Access token") }
@@ -184,7 +185,7 @@ class MainActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .padding(vertical = 5.dp),
                 singleLine = true,
-                value =  validation ?: "...",
+                value = validation ?: "...",
                 enabled = false,
                 onValueChange = {},
                 label = { Text("Token validation") }
@@ -211,7 +212,7 @@ class MainActivity : ComponentActivity() {
 
                 }
                 Button(
-                    onClick = { }, // validateToken() },
+                    onClick = { validateToken() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 40.dp),
@@ -303,12 +304,12 @@ class MainActivity : ComponentActivity() {
     private suspend fun requestDpopToken(): Result<DpopToken> {
 
         return try {
-            val body = Parameters.build {
-                append("client_id", clientId)
-                append("client_secret", clientSecret)
-                append("grant_type", "client_credentials")
-                append("scope", "openid")
-            }
+            val formData = mutableMapOf(
+                "client_id" to clientId,
+                "client_secret" to clientSecret,
+                "grant_type" to "client_credentials",
+                "scope" to "openid"
+            )
 
             val response = networkHelper.client.post {
                 url(tokenEndpoint)
@@ -318,18 +319,18 @@ class MainActivity : ComponentActivity() {
                 )
                 accept(ContentType.Application.Json)
                 contentType(ContentType.Application.FormUrlEncoded)
-                setBody(body)
+                setBody(formData.toList().formUrlEncode())
             }
 
             if (response.status.isSuccess()) {
-                val token: DpopToken = response.body()
-                accessToken.value = dpopToken.accessToken
-                Result.success(token)
+                dpopToken = response.body()
+                accessToken.postValue(dpopToken.accessToken)
+                Result.success(dpopToken)
             } else {
-                throw(Exception("HTTP error: ${response.status}"))
+                throw (Exception("HTTP error: ${response.status}"))
             }
         } catch (e: Exception) {
-            throw(e)
+            throw (e)
         }
     }
 

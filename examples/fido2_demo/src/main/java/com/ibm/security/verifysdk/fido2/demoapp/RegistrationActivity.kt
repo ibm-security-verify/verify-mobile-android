@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.ibm.security.verifysdk.core.AuthorizationException
 import com.ibm.security.verifysdk.core.ErrorMessage
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import com.ibm.security.verifysdk.fido2.api.Fido2Api
 import com.ibm.security.verifysdk.fido2.demoapp.model.IvCreds
 import com.ibm.security.verifysdk.fido2.model.AttestationOptions
@@ -112,12 +113,6 @@ class RegistrationActivity : AppCompatActivity() {
         accessToken: String
     ): Result<IvCreds> {
 
-        val json =  Json {
-            encodeDefaults = true
-            explicitNulls = false
-            ignoreUnknownKeys = true
-        }
-
         return try {
             val response = NetworkHelper.getInstance.get {
                 url("https://fidointerop.securitypoc.com/ivcreds")
@@ -126,7 +121,7 @@ class RegistrationActivity : AppCompatActivity() {
             }
 
             if (response.status.isSuccess()) {
-                Result.success(json.decodeFromString<IvCreds>(response.bodyAsText()))
+                Result.success(DefaultJson.decodeFromString<IvCreds>(response.bodyAsText()))
            } else {
                 val errorResponse = response.body<ErrorMessage>()
                 Result.failure(

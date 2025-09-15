@@ -31,11 +31,10 @@ include(":sdk:fido2")
 include(":sdk:mfa")
 include(":sdk:test_utils")
 
+include(":examples:dc_demo")
 include(":examples:dpop_demo")
 include(":examples:fido2_demo")
 include(":examples:mfa_demo")
-include(":examples:dc_demo")
-
 
 project(":examples:dc_demo").projectDir = File("examples/dc_demo")
 project(":examples:dpop_demo").projectDir = File("examples/dpop_demo")

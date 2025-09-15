@@ -3,19 +3,15 @@
  */
 
 package com.ibm.security.verifysdk.dc.serializer
-
-import com.ibm.security.verifysdk.core.extension.toJsonElement
-import com.ibm.security.verifysdk.dc.model.ConnectionInfo
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import com.ibm.security.verifysdk.dc.model.CredentialDescriptor
 import com.ibm.security.verifysdk.dc.model.CredentialFormat
-import com.ibm.security.verifysdk.dc.model.CredentialFormat.Companion.serialName
 import com.ibm.security.verifysdk.dc.model.CredentialRole
 import com.ibm.security.verifysdk.dc.model.CredentialState
 import com.ibm.security.verifysdk.dc.model.DID
 import com.ibm.security.verifysdk.dc.model.IndyCredential
 import com.ibm.security.verifysdk.dc.model.JsonLdCredential
 import com.ibm.security.verifysdk.dc.model.MDocCredential
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -23,13 +19,9 @@ import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonEncoder
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
@@ -45,15 +37,7 @@ import kotlinx.serialization.json.jsonPrimitive
  *
  * @since 3.0.7
  */
-@OptIn(ExperimentalSerializationApi::class)
 object CredentialSerializer : KSerializer<CredentialDescriptor> {
-
-    val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
 
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Credential") {
         element("format", CredentialFormat.serializer().descriptor)
@@ -65,7 +49,7 @@ object CredentialSerializer : KSerializer<CredentialDescriptor> {
     }
 
     /**
-     * Deserializes a [CredentialDescriptor] from JSON.
+     * Deserializes a [CredentialSerializer] from JSON.
      *
      * The method identifies the credential format and constructs the appropriate credential type.
      *
@@ -76,77 +60,19 @@ object CredentialSerializer : KSerializer<CredentialDescriptor> {
      * @since 3.0.7
      */
     override fun deserialize(decoder: Decoder): CredentialDescriptor {
-        require(decoder is JsonDecoder)
+        require(decoder is JsonDecoder) { "Expected JsonDecoder but got ${decoder::class.simpleName}" }
         val jsonObject = decoder.decodeJsonElement().jsonObject
 
         val format = jsonObject["format"]?.jsonPrimitive?.content?.let {
             CredentialFormat.fromSerialName(it)
         } ?: throw SerializationException("Missing or invalid format")
 
-        val id = jsonObject["id"]?.jsonPrimitive?.content
-            ?: throw SerializationException("Missing id")
-
-        val role = jsonObject["role"]?.jsonPrimitive?.content?.let {
-            CredentialRole.fromSerialName(it)
-        } ?: throw SerializationException("Missing role")
-        val state = jsonObject["state"]?.jsonPrimitive?.content?.let {
-            CredentialState.fromSerialName(it)
-        } ?: throw SerializationException("Missing state")
-
-        val issuerDid: DID = jsonObject["issuer_did"]?.jsonPrimitive?.content
-            ?: throw SerializationException("Missing issuer_did")
-
-        val jsonRepresentation =
-            jsonObject["cred_json"] ?: throw SerializationException("Missing cred_json")
-
-        val credentialDefinitionId = jsonObject["cred_def_id"]?.jsonPrimitive?.content ?: ""
-        val schemaName = jsonObject["schema_name"]?.jsonPrimitive?.content ?: ""
-        val schemaVersion = jsonObject["schema_version"]?.jsonPrimitive?.content ?: ""
-
-        val connection = jsonObject["connection"]?.let {
-            json.decodeFromJsonElement<ConnectionInfo>(it)
-        } ?: throw SerializationException("Missing connection")
-        val properties = jsonObject["properties"]?.let {
-            json.decodeFromJsonElement<Map<String, JsonElement>>(it)
-        } ?: throw SerializationException("Missing properties")
-
         return when (format) {
-            CredentialFormat.INDY ->
-                IndyCredential(
-                    id = id,
-                    format = format,
-                    issuerDid = issuerDid,
-                    role = role,
-                    state = state,
-                    jsonRepresentation = jsonRepresentation,
-                    credentialDefinitionId = credentialDefinitionId,
-                    schemaName = schemaName,
-                    schemaVersion = schemaVersion,
-                    connection = connection,
-                    properties = properties
-                )
+            CredentialFormat.INDY -> IndyCredential.from(jsonObject)
+            CredentialFormat.JSON_LD -> JsonLdCredential.from(jsonObject)
+            CredentialFormat.MDOC -> MDocCredential.from(jsonObject)
 
-            CredentialFormat.JSON_LD -> JsonLdCredential(
-                id = id,
-                format = format,
-                issuerDid = issuerDid,
-                jsonRepresentation = jsonRepresentation,
-                role = role,
-                state = state,
-                connection = connection,
-                properties = properties
-            )
-
-            CredentialFormat.MDOC -> MDocCredential(
-                id = id,
-                format = format,
-                issuerDid = issuerDid,
-                jsonRepresentation = jsonRepresentation,
-                role = role,
-                state = state,
-                connection = connection,
-                properties = properties
-            )
+            else -> throw NotImplementedError("CredentialFormat $format not supported")
         }
     }
 
@@ -162,43 +88,13 @@ object CredentialSerializer : KSerializer<CredentialDescriptor> {
      * @since 3.0.7
      */
     override fun serialize(encoder: Encoder, value: CredentialDescriptor) {
-        require(encoder is JsonEncoder)
-        val jsonObject = buildJsonObject {
-            put("format", value.format.serialName.toJsonElement())
-            put("id", value.id.toJsonElement())
-            put("role", value.role.value.toJsonElement())
-            put("issuer_did", value.issuerDid.toJsonElement())
-            put("state", value.state.value.toJsonElement())
-            put("cred_json", value.jsonRepresentation.toJsonElement())
+        require(encoder is JsonEncoder) { "Expected JsonEncoder but got ${encoder::class.simpleName}" }
 
-            when (value) {
-                is IndyCredential -> {
-                    put("cred_def_id", value.credentialDefinitionId.toJsonElement())
-                    put("schema_name", value.schemaName.toJsonElement())
-                    put("schema_version", value.schemaVersion.toJsonElement())
-                    put(
-                        "connection",
-                        json.encodeToJsonElement(ConnectionInfo.serializer(), value.connection)
-                    )
-                    put("properties", json.encodeToJsonElement(value.properties))
-                }
-
-                is JsonLdCredential -> {
-                    put(
-                        "connection",
-                        json.encodeToJsonElement(ConnectionInfo.serializer(), value.connection)
-                    )
-                    put("properties", json.encodeToJsonElement(value.properties))
-                }
-
-                is MDocCredential -> {
-                    put(
-                        "connection",
-                        json.encodeToJsonElement(ConnectionInfo.serializer(), value.connection)
-                    )
-                    put("properties", json.encodeToJsonElement(value.properties))
-                }
-            }
+        val jsonObject = when (value) {
+            is IndyCredential -> value.toJsonObject(DefaultJson)
+            is JsonLdCredential -> value.toJsonObject(DefaultJson)
+            is MDocCredential -> value.toJsonObject(DefaultJson)
+            else -> throw NotImplementedError("Unsupported CredentialDescriptor type")
         }
         encoder.encodeJsonElement(jsonObject)
     }

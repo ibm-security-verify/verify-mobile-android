@@ -7,10 +7,14 @@ package com.ibm.security.verifysdk.dc.demoapp.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.ibm.security.verifysdk.core.extension.toJsonElement
+import com.ibm.security.verifysdk.dc.demoapp.ui.credential.BankingCredentialCardView
+import com.ibm.security.verifysdk.dc.demoapp.ui.credential.BankingCredentialOfferView
 import com.ibm.security.verifysdk.dc.demoapp.ui.credential.DriversLicenseCredentialCardView
 import com.ibm.security.verifysdk.dc.demoapp.ui.credential.DriversLicenseCredentialOfferView
 import com.ibm.security.verifysdk.dc.demoapp.ui.credential.EmployeeCredentialCardView
 import com.ibm.security.verifysdk.dc.demoapp.ui.credential.EmployeeCredentialOfferView
+import com.ibm.security.verifysdk.dc.demoapp.ui.credential.IbmEmployeeCredentialCardView
+import com.ibm.security.verifysdk.dc.demoapp.ui.credential.IbmEmployeeCredentialOfferView
 import com.ibm.security.verifysdk.dc.demoapp.ui.credential.MedicareCredentialCardView
 import com.ibm.security.verifysdk.dc.demoapp.ui.credential.MedicareCredentialOfferView
 import com.ibm.security.verifysdk.dc.demoapp.ui.credential.ResidentCredentialCardView
@@ -52,7 +56,7 @@ object ViewDescriptorSerializer : KSerializer<ViewDescriptor> {
     }
 
     override fun deserialize(decoder: Decoder): ViewDescriptor {
-        require(decoder is JsonDecoder)
+        require(decoder is JsonDecoder) { "Expected JsonDecoder but got ${decoder::class.simpleName}" }
 
         val jsonElement = decoder.decodeJsonElement().jsonObject
 
@@ -90,6 +94,25 @@ object ViewDescriptorSerializer : KSerializer<ViewDescriptor> {
                         }
                 }
 
+            ?: jsonElement["attributes"]?.jsonArray
+                ?.takeIf { attributes ->
+                    attributes.firstOrNull()?.jsonObject
+                        ?.get("ns")?.jsonPrimitive?.content == "com.ibm.example.employee"
+                }
+                ?.let { attributesArray ->
+                    IbmEmployeeCredentialCardView(jsonRepresentation = attributesArray)
+                }
+
+            ?: jsonElement["docType"]?.jsonPrimitive?.content
+                ?.takeIf { it == "com.ibm.example.employee" || it == "org.ibm.example.employee" }
+                ?.let {
+                    jsonElement["nameSpaces"]?.jsonObject
+                        ?.get("com.ibm.example.employee")?.jsonObject
+                        ?.let { employeeJsonElement ->
+                            IbmEmployeeCredentialOfferView(jsonRepresentation = employeeJsonElement)
+                        }
+                }
+
             ?: jsonElement["credential"]?.jsonObject
                 ?.get("type")?.jsonArray
                 ?.any { it.jsonPrimitive.content == "PermanentResidentCard" }
@@ -119,11 +142,26 @@ object ViewDescriptorSerializer : KSerializer<ViewDescriptor> {
                     EmployeeCredentialCardView(jsonRepresentation = jsonElement)
                 }
 
+            ?: jsonElement["nameSpaces"]?.jsonObject
+                ?.get("com.bbcu.example.customer")
+                ?.let { bankingJsonElement ->
+                    BankingCredentialOfferView(jsonRepresentation = bankingJsonElement)
+                }
+
+            ?: jsonElement["attributes"]?.jsonArray
+                ?.takeIf { attributes ->
+                    attributes.firstOrNull()?.jsonObject
+                        ?.get("ns")?.jsonPrimitive?.content == "com.bbcu.example.customer"
+                }
+                ?.let { attributesArray ->
+                    BankingCredentialCardView(jsonRepresentation = attributesArray)
+                }
+
             ?: throw IllegalArgumentException("Unknown credential in : $jsonElement")
     }
 
     override fun serialize(encoder: Encoder, value: ViewDescriptor) {
-        require(encoder is JsonEncoder)
+        require(encoder is JsonEncoder) { "Expected JsonEncoder but got ${encoder::class.simpleName}" }
         val jsonObject = buildJsonObject {
             put("jsonRepresentation", value.jsonRepresentation.toJsonElement())
         }

@@ -14,10 +14,12 @@ import com.ibm.security.verifysdk.dc.model.PreviewDescriptor
 import com.ibm.security.verifysdk.dc.model.VerificationAction
 import com.ibm.security.verifysdk.dc.model.VerificationInfo
 import com.ibm.security.verifysdk.dc.model.VerificationPreviewInfo
+import kotlinx.serialization.ExperimentalSerializationApi
 import java.net.URL
 
 class WalletManager(val walletEntity: WalletEntity, private val viewModel: WalletViewModel) {
 
+    @OptIn(ExperimentalSerializationApi::class)
     private suspend fun refreshToken() {
 
         if (walletEntity.wallet.token.shouldRefresh().not()) {
@@ -36,8 +38,9 @@ class WalletManager(val walletEntity: WalletEntity, private val viewModel: Walle
 
         walletService.refreshToken(refreshToken)
             .onSuccess { tokenInfo ->
-                walletEntity.wallet.token = tokenInfo
-                viewModel.update(walletEntity)
+                val updatedWallet = walletEntity.wallet.copy(token = tokenInfo)
+                val updatedEntity = walletEntity.copy(wallet = updatedWallet)
+                viewModel.update(updatedEntity)
             }
             .onFailure {
                 throw (it)

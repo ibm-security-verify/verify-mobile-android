@@ -1,12 +1,12 @@
 android {
-    namespace = "com.ibm.security.verifysdk." + project.name
-    testNamespace = "com.ibm.security.verifysdk." + project.name + ".test"
+    namespace = "com.ibm.security.verifysdk." + project.path.replaceFirst("^:sdk:", "").replace(":", ".")
+    testNamespace = "com.ibm.security.verifysdk." + project.path.replaceFirst("^:sdk:", "").replace(":", ".") + ".test"
 
     compileSdk = 35
     buildFeatures.buildConfig = true
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 29
         buildConfigField "String", "VERSION_NAME", "\"${rootProject.ext.versionName}\""
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -55,9 +55,13 @@ configurations.configureEach {
 }
 
 dependencies {
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.skyscreamer.jsonassert)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.skyscreamer.jsonassert)
     androidTestImplementation(libs.slf4j.android)
     androidTestImplementation(libs.slf4j.api)
+    lintChecks libs.compose.lint.checks
+    lintChecks libs.slack.lint.checks
+    lintChecks libs.lint.checks.android
+    lintChecks libs.lint.checks
+    testImplementation(libs.junit)
 }

@@ -6,6 +6,7 @@ package com.ibm.security.verifysdk.dc
 
 import com.ibm.security.verifysdk.authentication.api.OAuthProvider
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import com.ibm.security.verifysdk.dc.api.AgentsApi
 import com.ibm.security.verifysdk.dc.api.ConnectionsApi
 import com.ibm.security.verifysdk.dc.api.CredentialsApi
@@ -17,7 +18,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.json.Json
 
 /**
  * The [WalletProvider] class is responsible for initializing and providing a wallet instance.
@@ -51,13 +51,6 @@ class WalletProvider(
     private val ignoreSSLCertificate: Boolean = false
 ) {
 
-    private val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
-
     suspend fun initiate(
         name: String,
         username: String,
@@ -66,7 +59,7 @@ class WalletProvider(
     ): Wallet = coroutineScope {
 
         val walletInitializationInfo = try {
-            json.decodeFromString(WalletInitializationInfo.serializer(), jsonData)
+            DefaultJson.decodeFromString(WalletInitializationInfo.serializer(), jsonData)
         } catch (e: SerializationException) {
             throw WalletError.DataInitializationFailed()
         }
@@ -79,20 +72,22 @@ class WalletProvider(
             clientId = walletInitializationInfo.clientId,
             additionalParameters = additionalParameters
         )
+
         oauthProvider.ignoreSsl = ignoreSSLCertificate
 
         val token = try {
             oauthProvider.authorize(
                 url = walletInitializationInfo.tokenUrl,
                 username = username,
-                password = password
+                password = password,
+                scope = arrayOf("openid")
             ).getOrThrow()
         } catch (e: Exception) {
             throw WalletError.FailedToParse()
         }
 
         val agentDeferred = async {
-            AgentsApi(walletInitializationInfo.serviceBaseUrl).getAll(
+            AgentsApi(walletInitializationInfo.serviceBaseUrl).getOne(
                 httpClient = httpClient,
                 accessToken = token.accessToken
             )
@@ -139,7 +134,7 @@ class WalletProvider(
                 baseUri = walletInitializationInfo.serviceBaseUrl,
                 clientId = walletInitializationInfo.clientId,
                 token = token,
-                agent = agentInfo.first(),
+                agent = agentInfo,
                 connections = connections.toMutableList(),
                 invitations = invitations.toMutableList(),
                 credentials = credentials.toMutableList(),

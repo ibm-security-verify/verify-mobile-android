@@ -3,7 +3,6 @@ package com.ibm.security.verifysdk.dc.model
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.encodeToString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -28,8 +27,8 @@ class DirectivesTest {
 
     @Test
     fun encode_withInvalidData() {
-        assertNull(Directives.encode(null)) 
-        assertNull(Directives.encode("invalid")) 
+        assertNull(Directives.encode(null))
+        assertNull(Directives.encode("invalid"))
     }
 
     @Test
@@ -48,8 +47,8 @@ class DirectivesTest {
 
     @Test
     fun decode_withInvalidData() {
-        assertNull(Directives.decode(null)) 
-        assertNull(Directives.decode("invalid")) 
+        assertNull(Directives.decode(null))
+        assertNull(Directives.decode("invalid"))
     }
 
     @Test

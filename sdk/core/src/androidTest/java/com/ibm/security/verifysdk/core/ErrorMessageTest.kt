@@ -1,18 +1,12 @@
 package com.ibm.security.verifysdk.core
 
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import junit.framework.TestCase.assertEquals
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 import org.junit.Test
 
 @OptIn(ExperimentalSerializationApi::class)
 internal class ErrorMessageTest {
-
-    private val json =  Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = true
-    }
 
     @Test
     fun getError() {
@@ -36,10 +30,10 @@ internal class ErrorMessageTest {
 
     @Test
     fun serialize() {
-        val errorMessage = json.decodeFromString<ErrorMessage>(errorMessageResponse)
+        val errorMessage = DefaultJson.decodeFromString<ErrorMessage>(errorMessageResponse)
 
-        val serialized = json.encodeToJsonElement(ErrorMessage.serializer(), errorMessage)
-        val errorMessage2 = json.decodeFromJsonElement(ErrorMessage.serializer(), serialized)
+        val serialized = DefaultJson.encodeToJsonElement(ErrorMessage.serializer(), errorMessage)
+        val errorMessage2 = DefaultJson.decodeFromJsonElement(ErrorMessage.serializer(), serialized)
 
         assertEquals(errorMessage.error, errorMessage2.error)
         assertEquals(errorMessage.errorDescription, errorMessage2.errorDescription)

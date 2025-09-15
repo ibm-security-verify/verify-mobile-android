@@ -16,18 +16,17 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.CertificatePinner
 import okhttp3.Dns
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
+import kotlin.coroutines.cancellation.CancellationException
 
 @Suppress("MemberVisibilityCanBePrivate")
 object NetworkHelper {
@@ -108,61 +107,6 @@ object NetworkHelper {
             }
             configureClient()
         }
-
-//        httpClientEngine?.let {
-//            client = HttpClient(httpClientEngine) {
-//                install(Logging) {
-//                    logger = this@NetworkHelper.logger
-//                    level = this@NetworkHelper.logLevel
-//                }
-//
-//                install(ContentNegotiation) {
-//                    json(Json {
-//                        isLenient = true
-//                        ignoreUnknownKeys = true
-//                    })
-//                }
-//                install(HttpTimeout) {
-//                    NetworkHelper.connectTimeoutMillis.also { connectTimeoutMillis = it }
-//                    NetworkHelper.requestTimeoutMillis.also { requestTimeoutMillis = it }
-//                }
-//            }
-//        } ?: run {
-//            client = HttpClient(engineFactory = OkHttp) {
-//                engine {
-//                    config {
-//                        followRedirects(this@NetworkHelper.followRedirects)
-//                        followSslRedirects(this@NetworkHelper.followSslRedirects)
-//
-//                        this@NetworkHelper.customInterceptor?.let { customInterceptor ->
-//                            addInterceptor(customInterceptor)
-//                        }
-//
-//                        this@NetworkHelper.customLoggingInterceptor?.let { httpLoggingInterceptor ->
-//                            addInterceptor(httpLoggingInterceptor)
-//                        }
-//
-//                        preconfigured = createOkHttpClient()
-//                    }
-//                }
-//
-//                install(Logging) {
-//                    logger = this@NetworkHelper.logger
-//                    level = this@NetworkHelper.logLevel
-//                }
-//
-//                install(ContentNegotiation) {
-//                    json(Json {
-//                        isLenient = true
-//                        ignoreUnknownKeys = true
-//                    })
-//                }
-//                install(HttpTimeout) {
-//                    NetworkHelper.connectTimeoutMillis.also { connectTimeoutMillis = it }
-//                    NetworkHelper.requestTimeoutMillis.also { requestTimeoutMillis = it }
-//                }
-//            }
-//        }
     }
 
     private fun HttpClientConfig<*>.configureClient() {
@@ -183,26 +127,6 @@ object NetworkHelper {
             requestTimeoutMillis = this@NetworkHelper.requestTimeoutMillis
         }
     }
-
-//
-//    val okHttpClientBuilder = OkHttpClient.Builder()
-//
-//    okHttpClientBuilder.readTimeout(15000L, TimeUnit.MILLISECONDS)
-//
-//    if (customSslServer.isNullOrEmpty().not()) {
-//        val trustManager = getCustomTrustManager()
-//        val sslContext = SSLContext.getInstance("TLS").apply {
-//            init(null, arrayOf(trustManager), null)
-//        }
-//        val hostnameVerifier = HostnameVerifier { hostname, _ ->
-//            hostname == "localhost" || hostname == customSslServer
-//        }
-//
-//        okHttpClientBuilder.sslSocketFactory(sslContext.socketFactory, trustManager)
-//        okHttpClientBuilder.hostnameVerifier(hostnameVerifier)
-//    }
-//
-//    return okHttpClientBuilder.build()
 
     internal fun createOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder().apply {
@@ -245,5 +169,26 @@ object NetworkHelper {
         if (this::client.isInitialized) {
             client.close()
         }
+    }
+}
+
+
+inline fun <R> safeRunCatching(block: () -> R): Result<R> {
+    return try {
+        Result.success(block())
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+}
+
+inline fun <R> safeRunCatchingSuspend(block: () -> R): Result<R> {
+    return try {
+        Result.success(block())
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        Result.failure(e)
     }
 }

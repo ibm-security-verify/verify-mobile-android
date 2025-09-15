@@ -36,6 +36,7 @@ sealed interface CredentialDescriptor{
     val issuerDid: DID
     @SerialName("cred_json")
     val jsonRepresentation: JsonElement?
+    val connection: ConnectionInfo
 
     /**
      * Retrieves the type of the credential descriptor.
@@ -76,3 +77,6 @@ sealed interface CredentialDescriptor{
      */
     fun getAgentUrl(): String
 }
+
+typealias Verkey = String
+typealias DID = String

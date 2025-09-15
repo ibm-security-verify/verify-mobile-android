@@ -1,8 +1,8 @@
 /*
  * Copyright contributors to the IBM Verify Digital Credentials SDK for Android project
  */
-package com.ibm.security.verifysdk.dc.model
 
+package com.ibm.security.verifysdk.dc.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -53,4 +53,3 @@ enum class CredentialRole(val value: String) {
         }
     }
 }
-

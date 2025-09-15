@@ -4,6 +4,10 @@
 
 package com.ibm.security.verifysdk.dc.demoapp.ui
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -22,12 +26,22 @@ class WalletViewModel(private val repository: DcRepository) : ViewModel() {
     private val _allWallets = MutableStateFlow<List<WalletEntity>>(emptyList())
     val allWallets: StateFlow<List<WalletEntity>> = _allWallets
 
+    private val _hostLocal = mutableStateOf("")
+    var hostLocal by _hostLocal
+
+    private val _nickname = mutableStateOf("user")
+    var nickname by _nickname
+
     init {
         viewModelScope.launch {
             repository.allWallets.collect { walletList ->
                 _allWallets.value = walletList
             }
         }
+    }
+
+    fun updateHost(newHost: String) {
+        hostLocal = newHost
     }
 
     fun insert(walletEntity: WalletEntity) = viewModelScope.launch(Dispatchers.IO) {

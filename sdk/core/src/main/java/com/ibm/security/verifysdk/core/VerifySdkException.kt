@@ -3,9 +3,8 @@
  */
 package com.ibm.security.verifysdk.core
 
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
-import java.lang.System.getProperty
 
 /**
  * VerifySdkException is a generic exception that can be thrown when working with Verify SDKs.
@@ -19,17 +18,11 @@ abstract class VerifySdkException(
     private val throwable: Throwable? = null
 ) : Throwable(throwable) {
 
-    private val json =  Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = true
-    }
-
     val error: String
     val errorDescription: String
 
     init {
-        val decodedErrorMessage = json.decodeFromString<ErrorMessage>(errorMessage)
+        val decodedErrorMessage = DefaultJson.decodeFromString<ErrorMessage>(errorMessage)
         error = decodedErrorMessage.error
         errorDescription = decodedErrorMessage.errorDescription
     }
@@ -41,7 +34,7 @@ abstract class VerifySdkException(
      */
     override fun toString(): String {
 
-        val newLine: String = getProperty("line.separator") ?: "\n"
+        val newLine: String = System.lineSeparator() ?: "\n"
 
         val stringBuilder = StringBuilder()
         stringBuilder.append("error: $error")

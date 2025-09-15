@@ -26,13 +26,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.ibm.security.verifysdk.dc.demoapp.ui.AgentDialog
 import com.ibm.security.verifysdk.dc.demoapp.ui.WalletViewModel
-import com.ibm.security.verifysdk.dc.model.CredentialDescriptor
 import com.ibm.security.verifysdk.dc.model.VerificationInfo
+import com.ibm.security.verifysdk.dc.model.CredentialDescriptor
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,11 +46,14 @@ fun WalletScreen(
     innerPadding: PaddingValues,
     onCredentialsLoaded: (List<CredentialDescriptor>) -> Unit,
     onVerificationsLoaded: (List<VerificationInfo>) -> Unit,
-    getWallet: () -> Unit
+    getWallet: (String, String, String, String, String) -> Unit,
+    scanQrcCode: () -> Unit
 ) {
     val wallets by viewModel.allWallets.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val wallet = wallets.firstOrNull()
+
+    var showAgentDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(wallet?.wallet?.credentials) {
         wallet?.wallet?.credentials?.let(onCredentialsLoaded)
@@ -58,7 +65,7 @@ fun WalletScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Wallet",
+                        text = "${viewModel.nickname}'s Wallet",
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -68,12 +75,16 @@ fun WalletScreen(
                         IconButton(onClick = {
                             coroutineScope.launch { viewModel.delete(it) }
                         }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete Wallet",
-                                modifier = Modifier.size(48.dp))
+                            Icon(
+                                Icons.Default.Delete, contentDescription = "Delete Wallet",
+                                modifier = Modifier.size(48.dp)
+                            )
                         }
-                    } ?: IconButton(onClick = { getWallet() }) {
-                        Icon(Icons.Default.AddCircle, contentDescription = "Add Wallet",
-                            modifier = Modifier.size(48.dp))
+                    } ?: IconButton(onClick = { showAgentDialog = true }) {
+                        Icon(
+                            Icons.Default.AddCircle, contentDescription = "Add Wallet",
+                            modifier = Modifier.size(48.dp)
+                        )
                     }
                 }
             )
@@ -101,5 +112,20 @@ fun WalletScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+
+    if (showAgentDialog) {
+        AgentDialog(
+            onServerChanged = viewModel::updateHost,
+            onDismiss = { showAgentDialog = false },
+            onSubmit =  { server, nickname, user, clientId, secret ->
+                showAgentDialog = false
+                getWallet(server, nickname, user, clientId, secret)
+            },
+            onScanQRCode = {
+                showAgentDialog = false
+                scanQrcCode
+            }
+        )
     }
 }

@@ -10,8 +10,8 @@ apply(from = "$rootDir/common-publish.gradle")
 
 dependencies {
 
-    implementation(project(":sdk:core"))
-    implementation(project(":sdk:authentication"))
+    api(project(":sdk:core"))
+    api(project(":sdk:authentication"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.jackson.core)

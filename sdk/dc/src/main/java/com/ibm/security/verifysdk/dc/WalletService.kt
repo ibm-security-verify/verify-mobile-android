@@ -222,7 +222,7 @@ class WalletService(
     * as either accepted or rejected. The state is determined by the [action] provided.
     * If the update is successful, the updated [CredentialDescriptor] is returned.
     *
-    * @param identifier The unique identifier of the credential to be updated.
+    * @param credentialPreviewInfo The unique identifier of the credential to be updated.
     * @param action The action to apply to the credential—either [CredentialAction.ACCEPTED]
     * or [CredentialAction.REJECTED].
     *
@@ -232,8 +232,8 @@ class WalletService(
      *
      * @since 3.0.7
     */
-    suspend fun processCredential(
-        identifier: String,
+    private suspend fun processCredential(
+        credentialPreviewInfo: String,
         action: CredentialAction
     ): CredentialDescriptor {
 
@@ -253,7 +253,7 @@ class WalletService(
 
         return CredentialsApi(baseUri).update(
             accessToken = accessToken,
-            id = identifier,
+            id = credentialPreviewInfo,
             updateCredentialArgs = updateCredentialArgs
         ).getOrThrow()
     }
@@ -325,7 +325,7 @@ class WalletService(
             inspect = forePreview
         )
 
-        return InvitationsApi(offerUrl.baseUrl()).processInvitation(
+        return InvitationsApi(baseUri.baseUrl()).processInvitation(
             accessToken = this.accessToken,
             invitationProcessorRequest = invitationProcessorRequest,
         ).getOrThrow()

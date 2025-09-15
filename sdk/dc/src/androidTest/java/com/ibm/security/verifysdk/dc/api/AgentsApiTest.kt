@@ -7,6 +7,7 @@ package com.ibm.security.verifysdk.dc.api
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.model.AgentInfoList
+import com.ibm.security.verifysdk.dc.test.R.raw
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import com.ibm.security.verifysdk.testutils.json
 import com.ibm.security.verifysdk.testutils.loadJsonFromRawResource
@@ -14,7 +15,6 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToString
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -75,7 +75,7 @@ class AgentsApiTest(private val inputUrl: String?) {
     fun getAll() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.agents_get_all_response)
+            loadJsonFromRawResource(raw.agents_get_all_response)
 
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,
@@ -118,7 +118,7 @@ class AgentsApiTest(private val inputUrl: String?) {
     fun getOne() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.agents_get_one_response)
+            loadJsonFromRawResource(raw.agents_get_one_response)
 
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,

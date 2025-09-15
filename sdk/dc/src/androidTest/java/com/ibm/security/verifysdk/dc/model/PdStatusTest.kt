@@ -3,7 +3,6 @@ package com.ibm.security.verifysdk.dc.model
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.encodeToString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull

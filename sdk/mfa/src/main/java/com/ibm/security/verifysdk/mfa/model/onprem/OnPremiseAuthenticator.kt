@@ -1,7 +1,7 @@
 /*
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
-
+@file:UseSerializers(URLSerializer::class)
 package com.ibm.security.verifysdk.mfa.model.onprem
 
 import com.ibm.security.verifysdk.authentication.model.TokenInfo
@@ -9,14 +9,13 @@ import com.ibm.security.verifysdk.core.serializer.URLSerializer
 import com.ibm.security.verifysdk.mfa.FactorType
 import com.ibm.security.verifysdk.mfa.MFAAuthenticatorDescriptor
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import java.net.URL
 
 
 @Serializable
 class OnPremiseAuthenticator (
-    @Serializable(with = URLSerializer::class)
     override val refreshUri: URL,
-    @Serializable(with = URLSerializer::class)
     override val transactionUri: URL,
     override var theme: Map<String, String>,
     override var token: TokenInfo,
@@ -24,7 +23,6 @@ class OnPremiseAuthenticator (
     override val serviceName: String,
     override var accountName: String,
     override val allowedFactors: List<FactorType>,
-    @Serializable(with = URLSerializer::class)
     val qrLoginUri: URL?,
     val ignoreSSLCertificate: Boolean = false,
     val clientId: String

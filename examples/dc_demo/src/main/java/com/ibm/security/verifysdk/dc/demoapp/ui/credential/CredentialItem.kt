@@ -20,29 +20,25 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import com.ibm.security.verifysdk.dc.demoapp.ui.ViewDescriptor
 import com.ibm.security.verifysdk.dc.demoapp.ui.verification.LabelValueRow
 import com.ibm.security.verifysdk.dc.model.CredentialDescriptor
 import com.ibm.security.verifysdk.dc.serializer.CredentialSerializer
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
-
-@OptIn(ExperimentalSerializationApi::class)
-private val json = Json {
-    encodeDefaults = true
-    explicitNulls = false
-    ignoreUnknownKeys = true
-    isLenient = true
-}
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -51,7 +47,7 @@ fun CredentialListItem(
     navigator: ThreePaneScaffoldNavigator<Any>
 ) {
     val itemView = remember(credential.jsonRepresentation) {
-        credential.jsonRepresentation?.let { json.decodeFromJsonElement<ViewDescriptor>(it) }
+        credential.jsonRepresentation?.let { DefaultJson.decodeFromJsonElement<ViewDescriptor>(it) }
     }
 
     Column(
@@ -92,9 +88,39 @@ fun CredentialPreviewDialog(
     onAccept: () -> Unit,
     onReject: () -> Unit
 ) {
-    if (showDialog) {
-        val previewData = json.decodeFromJsonElement<ViewDescriptor>(
-            jsonRepresentation ?: buildJsonObject { })
+    if (!showDialog) return
+
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val previewData = try {
+        DefaultJson.decodeFromJsonElement<ViewDescriptor>(
+            jsonRepresentation ?: buildJsonObject { }
+        )
+    } catch (e: Exception) {
+        errorMessage = "Failed to parse credential: ${e.message ?: e.toString()}"
+        null
+    }
+
+    // Show error dialog if parsing failed
+    errorMessage?.let {
+        AlertDialog(
+            onDismissRequest = { errorMessage = null },
+            title = { Text("Error") },
+            text = { Text(it) },
+            confirmButton = {
+                Button(onClick = {
+                    errorMessage = null
+                    onReject()
+                }) {
+                    Text("OK")
+                }
+            }
+        )
+        return
+    }
+
+    // Show credential preview dialog if parsing was successful
+    if (previewData != null) {
         AlertDialog(
             onDismissRequest = {},
             title = { Text("Credential Preview") },
@@ -119,13 +145,15 @@ internal fun LabelValueInCard(
         Text(
             text = "$label:",
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-            color = textColor
+            color = textColor,
+            overflow = TextOverflow.Ellipsis
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium.copy(color = Color.White),
-            color = textColor
+            color = textColor,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

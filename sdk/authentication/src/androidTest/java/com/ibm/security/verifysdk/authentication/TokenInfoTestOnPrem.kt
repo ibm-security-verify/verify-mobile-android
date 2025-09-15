@@ -10,8 +10,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.authentication.model.shouldRefresh
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -23,12 +23,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 internal class TokenInfoTestOnPrem {
-
-    private val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = true
-    }
 
     @Test
     fun constructor_happyPath_shouldReturnObject() {
@@ -44,9 +38,9 @@ internal class TokenInfoTestOnPrem {
     @Test
     fun decodeAndEncodeInstance_shouldBeEqual() {
 
-        val tokenInfo = json.decodeFromString<TokenInfo>(onpremTokenDefault)
-        val tokenInfoSerialized = json.encodeToString(tokenInfo)
-        val tokenInfoDeserialized = json.decodeFromString<TokenInfo>(tokenInfoSerialized)
+        val tokenInfo = DefaultJson.decodeFromString<TokenInfo>(onpremTokenDefault)
+        val tokenInfoSerialized = DefaultJson.encodeToString(tokenInfo)
+        val tokenInfoDeserialized = DefaultJson.decodeFromString<TokenInfo>(tokenInfoSerialized)
 
         assertTrue("Encoding/decoding failed", tokenInfo == tokenInfoDeserialized)
     }
@@ -54,7 +48,7 @@ internal class TokenInfoTestOnPrem {
     @Test
     fun copyInstance_shouldBeEqual() {
 
-        val tokenInfoOne = json.decodeFromString<TokenInfo>(onpremTokenDefault)
+        val tokenInfoOne = DefaultJson.decodeFromString<TokenInfo>(onpremTokenDefault)
         val tokenInfoTwo = tokenInfoOne.copy()
         assertTrue("Instances not equal", tokenInfoOne == tokenInfoTwo)
     }
@@ -62,7 +56,7 @@ internal class TokenInfoTestOnPrem {
     @Test
     fun toJsonWithHumanReadableTimeStamp_shouldReturnJson() {
 
-        val tokenInfo = json.decodeFromString<TokenInfo>(onpremTokenDefault)
+        val tokenInfo = DefaultJson.decodeFromString<TokenInfo>(onpremTokenDefault)
         val tokenInfoJson = tokenInfo.toJson(true)
 
         assertTrue(tokenInfoJson.get("createdOn").toString().startsWith("202"))
@@ -73,14 +67,14 @@ internal class TokenInfoTestOnPrem {
 
     @Test
     fun tokenRefresh_useDefaultParameter_shouldReturnFalse() {
-        val tokenInfo = json.decodeFromString<TokenInfo>(onpremTokenDefault)
+        val tokenInfo = DefaultJson.decodeFromString<TokenInfo>(onpremTokenDefault)
         assertFalse(tokenInfo.shouldRefresh())
     }
 
     @Test
     fun tokenRefresh_markAsExpired_shouldReturnTrue() {
-        val tokenInfo = json.decodeFromString<TokenInfo>(onpremTokenDefault)
-        assertTrue(tokenInfo.shouldRefresh(-10))
+        val tokenInfo = DefaultJson.decodeFromString<TokenInfo>(onpremTokenDefault)
+        assertTrue(tokenInfo.shouldRefresh(threshold = -10))
     }
 
     fun ByteArray.toHexString() = joinToString("") { "%02x".format(it) }
@@ -88,7 +82,7 @@ internal class TokenInfoTestOnPrem {
     @Test
     fun parcelizeInstance_shouldBeEqual() {
 
-        val tokenInfo = json.decodeFromString<TokenInfo>(onpremTokenDefault)
+        val tokenInfo = DefaultJson.decodeFromString<TokenInfo>(onpremTokenDefault)
         val bundle = Bundle()
         bundle.putParcelable("foo", tokenInfo)
 

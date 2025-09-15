@@ -8,6 +8,7 @@ import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.model.ConnectionInfoList
 import com.ibm.security.verifysdk.dc.model.UpdateConnectionArgs
+import com.ibm.security.verifysdk.dc.test.R.raw
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import com.ibm.security.verifysdk.testutils.json
 import com.ibm.security.verifysdk.testutils.loadJsonFromRawResource
@@ -72,7 +73,7 @@ class ConnectionsApiTest(private val inputUrl: String?) {
     fun getAll() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_get_all_response)
+            loadJsonFromRawResource(raw.connections_get_all_response)
 
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,
@@ -115,7 +116,7 @@ class ConnectionsApiTest(private val inputUrl: String?) {
     fun getOne() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_get_one_response)
+            loadJsonFromRawResource(raw.connections_get_one_response)
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,
             urlPath = "/diagency/v1.0/diagency/connections/${id}",
@@ -187,9 +188,9 @@ class ConnectionsApiTest(private val inputUrl: String?) {
     fun update() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_patch_response)
+            loadJsonFromRawResource(raw.connections_patch_response)
         val requestBody =
-            json.decodeFromJsonElement<UpdateConnectionArgs>(loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_patch_request))
+            json.decodeFromJsonElement<UpdateConnectionArgs>(loadJsonFromRawResource(raw.connections_patch_request))
 
         apiMockEngine.addMockResponse(
             method = HttpMethod.Patch,

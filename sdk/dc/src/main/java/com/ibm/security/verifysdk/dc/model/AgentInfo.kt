@@ -45,6 +45,3 @@ data class AgentInfo (
     @SerialName("verkey")
     val verkey: Verkey
 )
-
-typealias Verkey = String
-typealias DID = String

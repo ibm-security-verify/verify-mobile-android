@@ -19,8 +19,8 @@ android {
 
 dependencies {
 
-    implementation(project(":sdk:core"))
-    implementation(project(":sdk:authentication"))
+    api(project(":sdk:core"))
+    api(project(":sdk:authentication"))
 
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.core.ktx)

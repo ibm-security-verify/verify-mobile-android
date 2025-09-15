@@ -8,6 +8,7 @@ import com.ibm.security.verifysdk.authentication.model.TokenInfo
 import com.ibm.security.verifysdk.core.AuthorizationException
 import com.ibm.security.verifysdk.core.ErrorMessage
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import com.ibm.security.verifysdk.mfa.MFAAttributeInfo
 import com.ibm.security.verifysdk.mfa.MFAServiceDescriptor
 import com.ibm.security.verifysdk.mfa.MFAServiceError
@@ -31,7 +32,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.URL
@@ -45,11 +45,6 @@ class CloudAuthenticatorService(
     private var _transactionUri: URL,
     private var _authenticatorId: String
 ) : MFAServiceDescriptor {
-
-    private val json = Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-    }
 
     private var _currentPendingTransaction: PendingTransactionInfo? = null
     private var transactionResult: TransactionResult? = null
@@ -148,7 +143,7 @@ class CloudAuthenticatorService(
      */
     private suspend fun refreshTokenHandleResponse(response: HttpResponse): Result<TokenInfo> {
         return if (response.status.isSuccess()) {
-            Result.success(json.decodeFromString<TokenInfo>(response.bodyAsText()))
+            Result.success(DefaultJson.decodeFromString<TokenInfo>(response.bodyAsText()))
         } else {
             val errorResponse = response.body<ErrorMessage>()
             Result.failure(
@@ -292,7 +287,7 @@ class CloudAuthenticatorService(
         return try {
             val responseBody = response.bodyAsText()
             val result: TransactionResult = try {
-                json.decodeFromString(responseBody)
+                DefaultJson.decodeFromString(responseBody)
             } catch (e: Exception) {
                 return Result.failure(MFAServiceError.DecodingFailed())
             }

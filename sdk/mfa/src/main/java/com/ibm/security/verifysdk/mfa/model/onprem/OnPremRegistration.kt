@@ -2,6 +2,7 @@
  * Copyright contributors to the IBM Security Verify SDK for Android project
  */
 
+@file:UseSerializers(URLSerializer::class)
 package com.ibm.security.verifysdk.mfa.model.onprem
 
 import com.ibm.security.verifysdk.core.serializer.URLSerializer
@@ -12,19 +13,15 @@ import com.ibm.security.verifysdk.mfa.SignatureEnrollableFactor
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import java.net.URL
 
 @Serializable
 internal data class Metadata(
-    @Serializable(with = URLSerializer::class)
     val registrationUri: URL,
-    @Serializable(with = URLSerializer::class)
     val transactionUri: URL,
-    @Serializable(with = URLSerializer::class)
     val signatureUri: URL,
-    @Serializable(with = URLSerializer::class)
     val totpUri: URL,
-    @Serializable(with = URLSerializer::class)
     val qrloginUri: URL,
     val serviceName: String,
     val availableFactors: ArrayList<EnrollableFactor>,
@@ -36,28 +33,22 @@ internal data class Metadata(
 @Serializable
 internal data class DetailsData @OptIn(ExperimentalSerializationApi::class) constructor(
     @SerialName("authntrxn_endpoint")
-    @Serializable(with = URLSerializer::class)
     val authntrxnEndpoint: URL,
     @SerialName("metadata")
     val metadataService: MetadataService,
     @SerialName("discovery_mechanisms")
     val discoveryMechanisms: ArrayList<DiscoveredMechanisms> = arrayListOf(),
     @SerialName("enrollment_endpoint")
-    @Serializable(with = URLSerializer::class)
     val enrollmentEndpoint: URL,
     @SerialName("qrlogin_endpoint")
-    @Serializable(with = URLSerializer::class)
     var qrloginEndpoint: URL,
     @SerialName("hotp_shared_secret_endpoint")
-    @Serializable(with = URLSerializer::class)
     val hotpSharedSecretEndpoint: URL,
     @SerialName("totp_shared_secret_endpoint")
-    @Serializable(with = URLSerializer::class)
     val totpSharedSecretEndpoint: URL,
     @SerialName("version")
     val version: String,
     @SerialName("token_endpoint")
-    @Serializable(with = URLSerializer::class)
     val tokenEndpoint: URL,
     val theme: Map<String, String>? = null
 ) {

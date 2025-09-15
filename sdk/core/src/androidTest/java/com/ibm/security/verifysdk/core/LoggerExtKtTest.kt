@@ -9,8 +9,6 @@ import androidx.test.filters.MediumTest
 import com.ibm.security.verifysdk.core.extension.entering
 import com.ibm.security.verifysdk.core.extension.exiting
 import com.ibm.security.verifysdk.core.extension.threadInfo
-import org.junit.Before
-import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith

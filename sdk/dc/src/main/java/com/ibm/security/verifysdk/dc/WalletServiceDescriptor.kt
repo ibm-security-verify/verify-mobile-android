@@ -53,6 +53,7 @@ interface WalletServiceDescriptor {
     ): VerificationInfo
 
     suspend fun <T : CredentialDescriptor> retrieveCredentials(type: Class<T>): List<T>
+
     suspend fun processCredential(
         credentialPreviewInfo: CredentialPreviewInfo,
         action: CredentialAction = CredentialAction.ACCEPTED

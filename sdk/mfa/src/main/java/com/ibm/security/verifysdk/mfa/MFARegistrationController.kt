@@ -4,9 +4,9 @@
 
 package com.ibm.security.verifysdk.mfa
 
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import com.ibm.security.verifysdk.mfa.api.CloudRegistrationProvider
 import com.ibm.security.verifysdk.mfa.api.OnPremiseRegistrationProvider
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import org.slf4j.LoggerFactory
@@ -20,13 +20,7 @@ class MFARegistrationController(private var data: String) {
 
     init {
 
-        val json =  Json {
-            encodeDefaults = true
-            explicitNulls = false
-            ignoreUnknownKeys = true
-        }
-
-        val jsonObject: JsonObject = json.parseToJsonElement(data).jsonObject
+        val jsonObject: JsonObject = DefaultJson.parseToJsonElement(data).jsonObject
 
         jsonObject.let {
             it.contains("options").let {

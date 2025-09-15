@@ -84,6 +84,33 @@ open class AgentsApi(private val baseUrl: URL) : BaseApi() {
     }
 
     /**
+     * Retrieves details of a specific agent.
+     *
+     * @param httpClient The [HttpClient] used for making the request. Defaults to [NetworkHelper.getInstance].
+     * @param url URL to override the default endpoint. Defaults to `null`.
+     * @param accessToken The access token required for authorization.
+     * @param additionalHeaders Optional map of additional headers to include in the request. See [BaseApi.performRequest] for additional information
+     * @return A [Result] containing either an [AgentInfo] on success or an error on failure.
+     *
+     * @since 3.0.9
+     */
+    open suspend fun getOne(
+        httpClient: HttpClient = NetworkHelper.getInstance,
+        url: URL? = null,
+        accessToken: String,
+        additionalHeaders: Map<String, String>? = null,
+    ): Result<AgentInfo> {
+
+        return performRequest(
+            httpClient = httpClient,
+            url = url ?: URL("$baseUrl/diagency/v1.0/diagency/info"),
+            accessToken = accessToken,
+            headers = additionalHeaders,
+            method = HttpMethod.Get
+        )
+    }
+
+    /**
      * Deletes an agent by its ID.
      *
      * @param httpClient The [HttpClient] used for making the request. Defaults to [NetworkHelper.getInstance].

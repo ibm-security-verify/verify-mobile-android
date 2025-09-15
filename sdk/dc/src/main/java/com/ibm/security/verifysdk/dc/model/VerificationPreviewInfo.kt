@@ -179,7 +179,9 @@ data class VerificationPreviewInfo(
             }
         }
 
-        override fun serialize(encoder: Encoder, value: VerificationPreviewInfo) = encoder.encodeStructure(descriptor) {
+        override fun serialize(encoder: Encoder, value: VerificationPreviewInfo) = encoder.encodeStructure(
+            descriptor
+        ) {
             encodeStringElement(descriptor, 0, value.id)
             encodeStringElement(descriptor, 1, value.url)
             value.label?.let { encodeStringElement(descriptor, 2, it) }

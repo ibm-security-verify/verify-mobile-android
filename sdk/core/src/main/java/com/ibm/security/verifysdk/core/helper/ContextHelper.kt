@@ -11,7 +11,7 @@ object ContextHelper {
 
     val context
         get() = applicationContext
-        ?: error("Android context has not been set. Please call init() in your application's onCreate()")
+            ?: error("Android context has not been set. Please call init() in your application's onCreate()")
 
     fun init(context: Context) {
         applicationContext = context.applicationContext

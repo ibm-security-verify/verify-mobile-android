@@ -19,7 +19,7 @@ android {
 
 dependencies {
 
-    implementation(project(":sdk:core"))
+    api(project(":sdk:core"))
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.biometric)

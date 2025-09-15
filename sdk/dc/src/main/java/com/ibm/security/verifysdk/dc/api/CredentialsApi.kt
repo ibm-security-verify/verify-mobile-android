@@ -61,7 +61,7 @@ open class CredentialsApi(private val baseUrl: URL) : BaseApi() {
         httpClient: HttpClient = NetworkHelper.getInstance,
         url: URL? = null,
         accessToken: String,
-        additionalHeaders: Map<String, String>? = null
+        additionalHeaders: Map<String, String>? = null,
     ): Result<List<CredentialDescriptor>> {
 
         return performRequest<CredentialList>(
@@ -150,7 +150,7 @@ open class CredentialsApi(private val baseUrl: URL) : BaseApi() {
         accessToken: String,
         additionalHeaders: Map<String, String>? = null,
         id: String,
-        updateCredentialArgs: UpdateCredentialArgs
+        updateCredentialArgs: UpdateCredentialArgs,
     ): Result<CredentialDescriptor> {
 
         return performRequest(

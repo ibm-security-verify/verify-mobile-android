@@ -4,6 +4,7 @@
 
 package com.ibm.security.verifysdk.dc.demoapp.ui.credential
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -48,16 +49,18 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.ibm.security.verifysdk.dc.demoapp.QrScanContract
 import com.ibm.security.verifysdk.dc.demoapp.data.WalletManager
 import com.ibm.security.verifysdk.dc.demoapp.ui.AddUrlDialog
 import com.ibm.security.verifysdk.dc.demoapp.ui.StatusDialog
 import com.ibm.security.verifysdk.dc.demoapp.ui.WalletViewModel
-import com.ibm.security.verifysdk.dc.model.CredentialFormat.Companion.serialName
 import com.ibm.security.verifysdk.dc.model.CredentialPreviewInfo
 import com.ibm.security.verifysdk.dc.serializer.CredentialSerializer
+import com.ibm.security.verifysdk.dc.model.CredentialFormat.Companion.serialName
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import org.json.JSONObject
 import java.net.URL
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class)
@@ -94,6 +97,30 @@ fun CredentialScreen(
             )
         )
     }
+
+    var scannedQr by remember { mutableStateOf<String?>(null) }
+
+    val qrScannerLauncher =
+        rememberLauncherForActivityResult(contract = QrScanContract()) { result ->
+            scannedQr = result
+            result?.let {
+                val json = JSONObject(it)
+                credentialUrl = json.getString("url")
+                coroutineScope.launch {
+                    walletManager?.previewInvitation(URL(credentialUrl))
+                        ?.onSuccess { data ->
+                            credentialPreviewInfo = data as CredentialPreviewInfo
+                            showPreviewDialog = true
+                        }
+                        ?.onFailure {
+                            errorTitle = "Error"
+                            errorMessage = "Failed to fetch data: ${it.message}"
+                            showErrorDialog = true
+                        }
+                }
+                showAddDialog = false
+            }
+        }
 
     Scaffold(
         topBar = {
@@ -145,12 +172,13 @@ fun CredentialScreen(
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(MaterialTheme.colorScheme.primaryContainer)
                                     .padding(16.dp)
                             ) {
                                 val credential = navigator.currentDestination?.content?.toString()
                                     ?.takeIf { it.isNotEmpty() && it != "null" }
-                                    ?.let { Json.decodeFromString(CredentialSerializer, it) }
+                                    ?.let {
+                                        Json.decodeFromString(CredentialSerializer, it)
+                                    }
 
                                 if (credential == null) {
                                     Text(
@@ -209,10 +237,15 @@ fun CredentialScreen(
                     "Credential",
                     credentialUrl,
                     onUrlChange = { credentialUrl = it },
-                    onDismiss = { showAddDialog = false },
+                    onDismiss = { showAddDialog = false
+                                credentialUrl = ""
+                                },
                     onSubmit = {
+                        val urlToLoad = credentialUrl
+                        credentialUrl = ""
+
                         coroutineScope.launch {
-                            walletManager?.previewInvitation(URL(credentialUrl))
+                            walletManager?.previewInvitation(URL(urlToLoad))
                                 ?.onSuccess { data ->
                                     credentialPreviewInfo = data as CredentialPreviewInfo
                                     showPreviewDialog = true
@@ -224,7 +257,8 @@ fun CredentialScreen(
                                 }
                         }
                         showAddDialog = false
-                    }
+                    },
+                    onScanQrClick = { qrScannerLauncher.launch(Unit) }
                 )
 
                 CredentialPreviewDialog(

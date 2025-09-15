@@ -4,6 +4,7 @@ package com.ibm.security.verifysdk.dc.api
 
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
+import com.ibm.security.verifysdk.dc.test.R.raw
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import com.ibm.security.verifysdk.testutils.loadJsonFromRawResource
 import io.ktor.http.HttpMethod
@@ -92,7 +93,7 @@ class InvitationsApiTest(private val inputUrl: String?) {
     @Test
     fun getAll() = runTest {
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.inivtations_get_all_response)
+            loadJsonFromRawResource(raw.inivtations_get_all_response)
 
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,
@@ -127,7 +128,7 @@ class InvitationsApiTest(private val inputUrl: String?) {
     @Test
     fun getOne() = runTest {
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.invitations_get_one_response)
+            loadJsonFromRawResource(raw.invitations_get_one_response)
 
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,

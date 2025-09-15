@@ -43,7 +43,7 @@ internal object AssertionResultResponseSerializer : KSerializer<AssertionResultR
     private val knownKeys = setOf("errorMessage", "status")
 
     override fun deserialize(decoder: Decoder): AssertionResultResponse {
-        require(decoder is JsonDecoder)
+        require(decoder is JsonDecoder) { "Expected JsonDecoder but got ${decoder::class.simpleName}" }
         val filtersMap = decoder.decodeSerializableValue(stringToJsonElementSerializer)
         val errorMessage = filtersMap["errorMessage"]?.jsonPrimitive?.content
         val status = filtersMap["status"]?.jsonPrimitive?.content
@@ -53,7 +53,7 @@ internal object AssertionResultResponseSerializer : KSerializer<AssertionResultR
     }
 
     override fun serialize(encoder: Encoder, value: AssertionResultResponse) {
-        require(encoder is JsonEncoder)
+        require(encoder is JsonEncoder) { "Expected JsonEncoder but got ${encoder::class.simpleName}" }
         val map: MutableMap<String, JsonElement> = mutableMapOf()
 
         value.errorMessage?.let { map["errorMessage"] = value.errorMessage.toJsonElement() }

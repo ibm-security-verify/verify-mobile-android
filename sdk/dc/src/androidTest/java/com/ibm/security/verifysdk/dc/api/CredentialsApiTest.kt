@@ -5,6 +5,7 @@ package com.ibm.security.verifysdk.dc.api
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
 import com.ibm.security.verifysdk.dc.model.UpdateCredentialArgs
+import com.ibm.security.verifysdk.dc.test.R.raw
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import com.ibm.security.verifysdk.testutils.json
 import com.ibm.security.verifysdk.testutils.loadJsonFromRawResource
@@ -71,7 +72,7 @@ class CredentialsApiTest(private val inputUrl: String?) {
     fun getAll() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.credentials_get_all_response)
+            loadJsonFromRawResource(raw.credentials_get_all_response)
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,
             urlPath = "/diagency/v1.0/diagency/credentials",
@@ -106,7 +107,7 @@ class CredentialsApiTest(private val inputUrl: String?) {
     fun getOne() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.credentials_get_one_response)
+            loadJsonFromRawResource(raw.credentials_get_one_response)
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,
             urlPath = "/diagency/v1.0/diagency/credentials/${id}",
@@ -177,9 +178,9 @@ class CredentialsApiTest(private val inputUrl: String?) {
     fun update() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.credentials_patch_response)
+            loadJsonFromRawResource(raw.credentials_patch_response)
         val requestBody =
-            json.decodeFromJsonElement<UpdateCredentialArgs>(loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.credentials_patch_request))
+            json.decodeFromJsonElement<UpdateCredentialArgs>(loadJsonFromRawResource(raw.credentials_patch_request))
 
         apiMockEngine.addMockResponse(
             method = HttpMethod.Patch,

@@ -14,5 +14,5 @@ class DcApplication : Application() {
 
     val applicationScope = CoroutineScope(SupervisorJob())
     private val database by lazy { DcDatabase.getDatabase(this)}
-    val repository by lazy { DcRepository(database.walletDao())}
+    val repository by lazy { DcRepository(database.walletDao()) }
 }

@@ -6,10 +6,12 @@ package com.ibm.security.verifysdk.adaptive.test
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ibm.security.verifysdk.adaptive.AdaptiveContext
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.*
+import java.util.UUID
 
 /**
  * Instrumented test, which will execute on an Android device.

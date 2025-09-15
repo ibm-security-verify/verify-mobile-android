@@ -2,7 +2,7 @@ package com.ibm.security.verifysdk.authentication
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ibm.security.verifysdk.authentication.api.OAuthProvider
-import com.ibm.security.verifysdk.core.extension.HttpResponseException
+import com.ibm.security.verifysdk.core.helper.ErrorResponse
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import io.ktor.client.engine.mock.toByteArray
@@ -148,9 +148,9 @@ internal class OAuthProviderTest {
         assertTrue(result.isFailure)
 
         result.onFailure { throwable ->
-            assertTrue(throwable is HttpResponseException)
-            assertEquals(HttpStatusCode.BadRequest, (throwable as HttpResponseException).response.status)
-            assertTrue(throwable.response.bodyAsText().contains("CSIAK2802E"))
+            assertTrue(throwable is ErrorResponse)
+            assertEquals(HttpStatusCode.BadRequest, (throwable as ErrorResponse).statusCode)
+            assertTrue(throwable.responseBody?.contains("CSIAK2802E") ?: false)
         }
     }
 
@@ -253,7 +253,7 @@ internal class OAuthProviderTest {
 
         assertTrue(result.isFailure)
         result.onFailure { it ->
-            assertTrue(it is HttpResponseException)
+            assertTrue(it is ErrorResponse)
         }
     }
 
@@ -431,8 +431,8 @@ internal class OAuthProviderTest {
 
         assertTrue(result.isFailure)
         result.onFailure { throwable ->
-            assertTrue(throwable is HttpResponseException)
-            assertEquals(HttpStatusCode.InternalServerError, (throwable as HttpResponseException).response.status)
+            assertTrue(throwable is ErrorResponse)
+            assertEquals(HttpStatusCode.InternalServerError, (throwable as ErrorResponse).statusCode)
         }
     }
 

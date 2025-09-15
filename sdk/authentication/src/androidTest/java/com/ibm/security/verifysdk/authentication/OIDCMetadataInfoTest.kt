@@ -7,8 +7,9 @@ package com.ibm.security.verifysdk.authentication
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.ibm.security.verifysdk.authentication.model.OIDCMetadataInfo
+import com.ibm.security.verifysdk.core.serializer.DefaultJson
+import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -22,16 +23,11 @@ import org.junit.runner.RunWith
 @SmallTest
 internal class OIDCMetadataInfoTest {
 
-    private val json = Json {
-        encodeDefaults = true
-        explicitNulls = false
-        ignoreUnknownKeys = true
-    }
     private lateinit var oidcMetadata: OIDCMetadataInfo
 
     @Before
     fun initialize() {
-        oidcMetadata = json.decodeFromString(openidConfiguration)
+        oidcMetadata = DefaultJson.decodeFromString(openidConfiguration)
     }
 
     @Test
