@@ -120,7 +120,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3.2.0
         with:
-          api-level: 30
+          api-level: 29
           target: default
           arch: x86_64
           profile: default
@@ -128,7 +128,7 @@ jobs:
       - name: Generate Jacoco report
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
+          api-level: 29
           target: default
           arch: x86
           profile: Nexus 6
