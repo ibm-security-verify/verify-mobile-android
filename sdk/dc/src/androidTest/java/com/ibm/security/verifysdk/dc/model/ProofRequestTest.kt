@@ -1,11 +1,5 @@
 package com.ibm.security.verifysdk.dc.model
 
-import com.ibm.security.verifysdk.dc.model.CredFilter
-import com.ibm.security.verifysdk.dc.model.InputDescriptor
-import com.ibm.security.verifysdk.dc.model.PresentationDefinition
-import com.ibm.security.verifysdk.dc.model.PresentationRequest
-import com.ibm.security.verifysdk.dc.model.ProofRequest
-import com.ibm.security.verifysdk.dc.model.Schema
 import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi

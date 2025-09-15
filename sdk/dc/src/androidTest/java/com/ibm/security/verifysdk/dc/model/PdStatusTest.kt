@@ -1,8 +1,6 @@
 package com.ibm.security.verifysdk.dc.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ibm.security.verifysdk.dc.model.Directives
-import com.ibm.security.verifysdk.dc.model.PdStatus
 import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.SerializationException
 import org.junit.Assert.assertEquals

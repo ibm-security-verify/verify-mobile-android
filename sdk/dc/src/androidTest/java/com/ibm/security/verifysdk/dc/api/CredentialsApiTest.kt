@@ -1,14 +1,11 @@
-/*
- * Copyright contributors to the IBM Verify Digital Credentials Sample App for Android project
- */
+@file:OptIn(ExperimentalDigitalCredentialsSdk::class)
 
 package com.ibm.security.verifysdk.dc.api
 
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
-import com.ibm.security.verifysdk.dc.api.ConnectionsApi
-import com.ibm.security.verifysdk.dc.model.ConnectionInfoList
-import com.ibm.security.verifysdk.dc.model.UpdateConnectionArgs
+import com.ibm.security.verifysdk.dc.model.UpdateCredentialArgs
+import com.ibm.security.verifysdk.dc.test.R.raw
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import com.ibm.security.verifysdk.testutils.json
 import com.ibm.security.verifysdk.testutils.loadJsonFromRawResource
@@ -24,15 +21,13 @@ import org.junit.BeforeClass
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import org.skyscreamer.jsonassert.JSONAssert
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URL
 
-@OptIn(ExperimentalDigitalCredentialsSdk::class)
 @ExperimentalSerializationApi
 @RunWith(Parameterized::class)
-class ConnectionsApiTest(private val inputUrl: String?) {
+class CredentialsApiTest(private val inputUrl: String?) {
 
     @Suppress("unused")
     private val log: Logger = LoggerFactory.getLogger(javaClass)
@@ -47,7 +42,7 @@ class ConnectionsApiTest(private val inputUrl: String?) {
         @Parameterized.Parameters
         fun data(): Collection<Array<String?>> {
             return listOf(
-                arrayOf("/diagency/v1.0/diagency/connections/"),
+                arrayOf("/diagency/v1.0/diagency/credentials/"),
                 arrayOf(null)
             )
         }
@@ -70,160 +65,156 @@ class ConnectionsApiTest(private val inputUrl: String?) {
     }
 
     @Test
+    fun getDecoder() {
+    }
+
+    @Test
     fun getAll() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_get_all_response)
-
+            loadJsonFromRawResource(raw.credentials_get_all_response)
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,
-            urlPath = "/diagency/v1.0/diagency/connections",
+            urlPath = "/diagency/v1.0/diagency/credentials",
             httpCode = HttpStatusCode.OK,
             responseBody = responseBody.toString()
         )
 
         val result = inputUrl?.let {
-            ConnectionsApi(baseUrl = baseUrl).getAll(
+            CredentialsApi(baseUrl = baseUrl).getAll(
                 accessToken = accessToken,
                 url = URL("${baseUrl}${inputUrl}")
             )
         } ?: run {
-            ConnectionsApi(baseUrl = baseUrl).getAll(
+            CredentialsApi(baseUrl = baseUrl).getAll(
                 accessToken = accessToken
             )
         }
 
         result
-            .onSuccess { connectionList ->
-                JSONAssert.assertEquals(
-                    json.encodeToString(json.decodeFromString<ConnectionInfoList>(responseBody.toString()).items),
-                    json.encodeToString(connectionList),
-                    true
-                )
-
-                assertEquals(1, connectionList.count())
-                assertEquals("string", connectionList[0].id)
+            .onSuccess {
+                log.info(it.toString())
             }
             .onFailure {
                 log.info(it.toString())
                 throw (it)
             }
 
-        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/connections/")
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/credentials/")
     }
 
     @Test
     fun getOne() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_get_one_response)
+            loadJsonFromRawResource(raw.credentials_get_one_response)
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,
-            urlPath = "/diagency/v1.0/diagency/connections/${id}",
+            urlPath = "/diagency/v1.0/diagency/credentials/${id}",
             httpCode = HttpStatusCode.OK,
             responseBody = responseBody.toString()
         )
 
+        CredentialsApi(baseUrl = baseUrl).getOne(
+            accessToken = accessToken,
+            id = id
+        )
+
         val result = inputUrl?.let {
-            ConnectionsApi(baseUrl = baseUrl).getOne(
+            CredentialsApi(baseUrl = baseUrl).getOne(
                 accessToken = accessToken,
                 url = URL("${baseUrl}${inputUrl}${id}"),
                 id = id
             )
         } ?: run {
-            ConnectionsApi(baseUrl = baseUrl).getOne(
+            CredentialsApi(baseUrl = baseUrl).getOne(
                 accessToken = accessToken,
                 id = id
             )
         }
 
         result
-            .onSuccess {
-                assertEquals("string", it.id)
+            .onSuccess { credential ->
+                assertEquals("string", credential.id)
+                assertEquals("string", credential.issuerDid)
             }
             .onFailure {
-                log.info(it.toString())
+                log.error(it.toString())
                 throw (it)
             }
-
-        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/connections/${id}")
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/credentials/${id}")
     }
 
     @Test
     fun delete() = runTest {
-
         apiMockEngine.addMockResponse(
             method = HttpMethod.Delete,
-            urlPath = "/diagency/v1.0/diagency/connections/${id}",
+            urlPath = "/diagency/v1.0/diagency/credentials/${id}",
             httpCode = HttpStatusCode.NoContent
         )
 
         val result = inputUrl?.let {
-            ConnectionsApi(baseUrl = baseUrl).delete(
+            CredentialsApi(baseUrl = baseUrl).delete(
                 accessToken = accessToken,
                 url = URL("${baseUrl}${inputUrl}${id}"),
                 id = id
             )
         } ?: run {
-            ConnectionsApi(baseUrl = baseUrl).delete(
+            CredentialsApi(baseUrl = baseUrl).delete(
                 accessToken = accessToken,
                 id = id
             )
         }
 
         result
-            .onSuccess {
-                assert(it === Unit)
-            }
             .onFailure {
                 log.info(it.toString())
                 throw (it)
             }
-
-        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/connections/${id}")
-
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/credentials/${id}")
     }
 
     @Test
     fun update() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_patch_response)
+            loadJsonFromRawResource(raw.credentials_patch_response)
         val requestBody =
-            json.decodeFromJsonElement<UpdateConnectionArgs>(loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_patch_request))
+            json.decodeFromJsonElement<UpdateCredentialArgs>(loadJsonFromRawResource(raw.credentials_patch_request))
 
         apiMockEngine.addMockResponse(
             method = HttpMethod.Patch,
-            urlPath = "/diagency/v1.0/diagency/connections/${id}",
+            urlPath = "/diagency/v1.0/diagency/credentials/${id}",
             httpCode = HttpStatusCode.OK,
             responseBody = responseBody.toString()
         )
 
         val result = inputUrl?.let {
-            ConnectionsApi(baseUrl = baseUrl).update(
+            CredentialsApi(baseUrl = baseUrl).update(
                 accessToken = accessToken,
                 url = URL("${baseUrl}${inputUrl}${id}"),
-                updateConnectionArgs = requestBody,
-                id = id
+                id = id,
+                updateCredentialArgs = requestBody
             )
         } ?: run {
-            ConnectionsApi(baseUrl = baseUrl).update(
+            CredentialsApi(baseUrl = baseUrl).update(
                 accessToken = accessToken,
-                updateConnectionArgs = requestBody,
-                id = id
+                id = id,
+                updateCredentialArgs = requestBody
             )
         }
 
         result
-            .onSuccess { connection ->
-                assertEquals("string", connection.invitation?.id)
-            }.onFailure {
-                log.info(it.toString())
+            .onSuccess { credential ->
+                assertEquals("string", credential.id)
+                assertEquals("string", credential.issuerDid)
+            }
+            .onFailure {
+                log.error(it.toString())
                 throw (it)
             }
-
         apiMockEngine.checkLastRequestedUrl(
-            "/diagency/v1.0/diagency/connections/${id}",
+            "/diagency/v1.0/diagency/credentials/${id}",
             HttpMethod.Patch
         )
     }

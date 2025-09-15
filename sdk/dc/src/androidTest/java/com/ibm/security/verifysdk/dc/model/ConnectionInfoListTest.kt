@@ -1,11 +1,6 @@
 package com.ibm.security.verifysdk.dc.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ibm.security.verifysdk.dc.model.ConnectionAgentInfo
-import com.ibm.security.verifysdk.dc.model.ConnectionInfo
-import com.ibm.security.verifysdk.dc.model.ConnectionInfoList
-import com.ibm.security.verifysdk.dc.model.ConnectionRole
-import com.ibm.security.verifysdk.dc.model.ConnectionState
 import com.ibm.security.verifysdk.testutils.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import org.junit.Assert.assertEquals

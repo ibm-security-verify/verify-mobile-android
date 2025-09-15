@@ -1,7 +1,12 @@
+/*
+ * Copyright contributors to the IBM Verify Digital Credentials SDK for Android project
+ */
+
 package com.ibm.security.verifysdk.dc
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
+import com.ibm.security.verifysdk.dc.test.R.raw
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import com.ibm.security.verifysdk.testutils.loadJsonFromRawResource
 import io.ktor.http.HttpMethod
@@ -67,13 +72,13 @@ class WalletProviderTest {
             """
 
         val agentResponseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.agents_get_one_response)
+            loadJsonFromRawResource(raw.agents_get_one_response)
 
         val invitationResponseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.invitations_get_all_response)
+            loadJsonFromRawResource(raw.invitations_get_all_response)
 
         val connectionResponseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.connections_get_all_response)
+            loadJsonFromRawResource(raw.connections_get_all_response)
 
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,

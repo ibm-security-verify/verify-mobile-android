@@ -1,11 +1,6 @@
 package com.ibm.security.verifysdk.dc.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ibm.security.verifysdk.dc.model.Constraints
-import com.ibm.security.verifysdk.dc.model.Field
-import com.ibm.security.verifysdk.dc.model.HolderSubject
-import com.ibm.security.verifysdk.dc.model.Optionality
-import com.ibm.security.verifysdk.dc.model.Statuses
 import com.ibm.security.verifysdk.testutils.json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals

@@ -1,10 +1,6 @@
 package com.ibm.security.verifysdk.dc.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ibm.security.verifysdk.dc.model.CredentialDescriptor
-import com.ibm.security.verifysdk.dc.model.IndyCredential
-import com.ibm.security.verifysdk.dc.model.JsonLdCredential
-import com.ibm.security.verifysdk.dc.model.MDocCredential
 import com.ibm.security.verifysdk.dc.serializer.CredentialSerializer
 import com.ibm.security.verifysdk.testutils.LogHelper
 import com.ibm.security.verifysdk.testutils.json

@@ -6,8 +6,9 @@ package com.ibm.security.verifysdk.dc.api
 
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.dc.ExperimentalDigitalCredentialsSdk
-import com.ibm.security.verifysdk.dc.api.AgentsApi
-import com.ibm.security.verifysdk.dc.model.AgentInfoList
+import com.ibm.security.verifysdk.dc.model.ConnectionInfoList
+import com.ibm.security.verifysdk.dc.model.UpdateConnectionArgs
+import com.ibm.security.verifysdk.dc.test.R.raw
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import com.ibm.security.verifysdk.testutils.json
 import com.ibm.security.verifysdk.testutils.loadJsonFromRawResource
@@ -15,6 +16,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.decodeFromJsonElement
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -28,8 +30,9 @@ import org.slf4j.LoggerFactory
 import java.net.URL
 
 @OptIn(ExperimentalDigitalCredentialsSdk::class)
+@ExperimentalSerializationApi
 @RunWith(Parameterized::class)
-class AgentsApiTest(private val inputUrl: String?) {
+class ConnectionsApiTest(private val inputUrl: String?) {
 
     @Suppress("unused")
     private val log: Logger = LoggerFactory.getLogger(javaClass)
@@ -44,7 +47,7 @@ class AgentsApiTest(private val inputUrl: String?) {
         @Parameterized.Parameters
         fun data(): Collection<Array<String?>> {
             return listOf(
-                arrayOf("/diagency/v1.0/diagency/agents/"),
+                arrayOf("/diagency/v1.0/diagency/connections/"),
                 arrayOf(null)
             )
         }
@@ -67,90 +70,83 @@ class AgentsApiTest(private val inputUrl: String?) {
     }
 
     @Test
-    fun getDecoder() {
-    }
-
-    @OptIn(ExperimentalSerializationApi::class)
-    @Test
     fun getAll() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.agents_get_all_response)
+            loadJsonFromRawResource(raw.connections_get_all_response)
 
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,
-            urlPath = "/diagency/v1.0/diagency/agents/",
+            urlPath = "/diagency/v1.0/diagency/connections",
             httpCode = HttpStatusCode.OK,
             responseBody = responseBody.toString()
         )
 
         val result = inputUrl?.let {
-            AgentsApi(baseUrl = baseUrl).getAll(
+            ConnectionsApi(baseUrl = baseUrl).getAll(
                 accessToken = accessToken,
                 url = URL("${baseUrl}${inputUrl}")
             )
         } ?: run {
-            AgentsApi(baseUrl = baseUrl).getAll(
+            ConnectionsApi(baseUrl = baseUrl).getAll(
                 accessToken = accessToken
             )
         }
 
         result
-            .onSuccess { agentList ->
+            .onSuccess { connectionList ->
                 JSONAssert.assertEquals(
-                    json.encodeToString(json.decodeFromString<AgentInfoList>(responseBody.toString()).items),
-                    json.encodeToString(agentList),
+                    json.encodeToString(json.decodeFromString<ConnectionInfoList>(responseBody.toString()).items),
+                    json.encodeToString(connectionList),
                     true
                 )
 
-                assertEquals(1, agentList.count())
-                assertEquals("string", agentList[0].id)
+                assertEquals(1, connectionList.count())
+                assertEquals("string", connectionList[0].id)
             }
             .onFailure {
                 log.info(it.toString())
                 throw (it)
             }
 
-        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/agents/")
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/connections/")
     }
 
     @Test
     fun getOne() = runTest {
 
         val responseBody =
-            loadJsonFromRawResource(com.ibm.security.verifysdk.dc.test.R.raw.agents_get_one_response)
-
+            loadJsonFromRawResource(raw.connections_get_one_response)
         apiMockEngine.addMockResponse(
             method = HttpMethod.Get,
-            urlPath = "/diagency/v1.0/diagency/agents/${id}",
+            urlPath = "/diagency/v1.0/diagency/connections/${id}",
             httpCode = HttpStatusCode.OK,
             responseBody = responseBody.toString()
         )
 
         val result = inputUrl?.let {
-            AgentsApi(baseUrl = baseUrl).getOne(
+            ConnectionsApi(baseUrl = baseUrl).getOne(
                 accessToken = accessToken,
                 url = URL("${baseUrl}${inputUrl}${id}"),
                 id = id
             )
         } ?: run {
-            AgentsApi(baseUrl = baseUrl).getOne(
+            ConnectionsApi(baseUrl = baseUrl).getOne(
                 accessToken = accessToken,
                 id = id
             )
         }
 
         result
-            .onSuccess { agent ->
-                assertEquals("string", agent.id)
-                assertEquals("string", agent.name)
+            .onSuccess {
+                assertEquals("string", it.id)
             }
             .onFailure {
                 log.info(it.toString())
                 throw (it)
             }
 
-        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/agents/${id}")
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/connections/${id}")
     }
 
     @Test
@@ -158,29 +154,77 @@ class AgentsApiTest(private val inputUrl: String?) {
 
         apiMockEngine.addMockResponse(
             method = HttpMethod.Delete,
-            urlPath = "/diagency/v1.0/diagency/agents/${id}",
+            urlPath = "/diagency/v1.0/diagency/connections/${id}",
             httpCode = HttpStatusCode.NoContent
         )
 
         val result = inputUrl?.let {
-            AgentsApi(baseUrl = baseUrl).delete(
+            ConnectionsApi(baseUrl = baseUrl).delete(
                 accessToken = accessToken,
                 url = URL("${baseUrl}${inputUrl}${id}"),
                 id = id
             )
         } ?: run {
-            AgentsApi(baseUrl = baseUrl).delete(
+            ConnectionsApi(baseUrl = baseUrl).delete(
                 accessToken = accessToken,
                 id = id
             )
         }
 
         result
+            .onSuccess {
+                assert(it === Unit)
+            }
             .onFailure {
                 log.info(it.toString())
                 throw (it)
             }
 
-        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/agents/${id}")
+        apiMockEngine.checkLastRequestedUrl("/diagency/v1.0/diagency/connections/${id}")
+
+    }
+
+    @Test
+    fun update() = runTest {
+
+        val responseBody =
+            loadJsonFromRawResource(raw.connections_patch_response)
+        val requestBody =
+            json.decodeFromJsonElement<UpdateConnectionArgs>(loadJsonFromRawResource(raw.connections_patch_request))
+
+        apiMockEngine.addMockResponse(
+            method = HttpMethod.Patch,
+            urlPath = "/diagency/v1.0/diagency/connections/${id}",
+            httpCode = HttpStatusCode.OK,
+            responseBody = responseBody.toString()
+        )
+
+        val result = inputUrl?.let {
+            ConnectionsApi(baseUrl = baseUrl).update(
+                accessToken = accessToken,
+                url = URL("${baseUrl}${inputUrl}${id}"),
+                updateConnectionArgs = requestBody,
+                id = id
+            )
+        } ?: run {
+            ConnectionsApi(baseUrl = baseUrl).update(
+                accessToken = accessToken,
+                updateConnectionArgs = requestBody,
+                id = id
+            )
+        }
+
+        result
+            .onSuccess { connection ->
+                assertEquals("string", connection.invitation?.id)
+            }.onFailure {
+                log.info(it.toString())
+                throw (it)
+            }
+
+        apiMockEngine.checkLastRequestedUrl(
+            "/diagency/v1.0/diagency/connections/${id}",
+            HttpMethod.Patch
+        )
     }
 }
