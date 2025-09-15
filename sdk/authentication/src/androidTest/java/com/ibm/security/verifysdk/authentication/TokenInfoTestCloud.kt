@@ -206,7 +206,7 @@ internal class TokenInfoTestCloud {
     @Test
     fun tokenRefresh_markAsExpired_shouldReturnTrue() {
         val tokenInfo = DefaultJson.decodeFromString<TokenInfo>(cloudTokenDefault)
-        assertTrue(tokenInfo.shouldRefresh(-10))
+        assertTrue(tokenInfo.shouldRefresh(threshold = -10))
     }
 
     fun ByteArray.toHexString() = joinToString("") { "%02x".format(it) }
