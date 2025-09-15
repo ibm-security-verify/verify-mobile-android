@@ -91,10 +91,6 @@ subprojects {
         plugin("org.jetbrains.dokka")
     }
 
-//    dependencies {
-//        dokkaRuntime(enforcedPlatform("com.fasterxml.jackson:jackson-bom:2.15.3"))
-//    }
-
     /**
      * List all first-level dependencies for a specific module.
      */
