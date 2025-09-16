@@ -9,7 +9,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
-import java.util.*
+import java.util.Date
+import java.util.UUID
 
 // TODO: Handle TasStop on app termination (or handle on app stop, and TasStart on onResume)
 

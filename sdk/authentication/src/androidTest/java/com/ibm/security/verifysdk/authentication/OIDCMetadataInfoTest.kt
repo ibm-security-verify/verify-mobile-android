@@ -9,7 +9,6 @@ import androidx.test.filters.SmallTest
 import com.ibm.security.verifysdk.authentication.model.OIDCMetadataInfo
 import com.ibm.security.verifysdk.core.serializer.DefaultJson
 import com.ibm.security.verifysdk.testutils.json
-import kotlinx.serialization.encodeToString
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
