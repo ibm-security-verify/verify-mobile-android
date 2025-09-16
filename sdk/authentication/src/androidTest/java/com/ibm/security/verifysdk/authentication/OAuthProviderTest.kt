@@ -6,7 +6,6 @@ import com.ibm.security.verifysdk.core.helper.ErrorResponse
 import com.ibm.security.verifysdk.core.helper.NetworkHelper
 import com.ibm.security.verifysdk.testutils.ApiMockEngine
 import io.ktor.client.engine.mock.toByteArray
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.test.runTest
