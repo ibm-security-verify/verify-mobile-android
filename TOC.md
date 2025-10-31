@@ -1,4 +1,4 @@
-* [IBM Security Verify SDK for Android](README.md#ibm-security-verify-sdk-for-android)
+* [IBM Verify SDK for Android](README.md#ibm-verify-sdk-for-android)
    * [Getting started](README.md#getting-started)
    * [Prerequisites](README.md#prerequisites)
    * [Components](README.md#components)
@@ -7,11 +7,11 @@
       * [Jitpack](README.md#jitpack)
       * [Manually from GitHub release](README.md#manually-from-github-release)
 ----
-* [IBM Security Verify Core SDK for Andriod](./sdk/core/README.md#ibm-security-verify-core-sdk-for-andriod)
+* [IBM Verify Core SDK for Andriod](./sdk/core/README.md#ibm-verify-core-sdk-for-andriod)
    * [Download](./sdk/core/README.md#download)
       * [Gradle](./sdk/core/README.md#gradle)
 ----
-* [IBM Security Verify Adaptive SDK for Android](./sdk/adaptive/README.md#ibm-security-verify-adaptive-sdk-for-android)
+* [IBM Verify Adaptive SDK for Android](./sdk/adaptive/README.md#ibm-verify-adaptive-sdk-for-android)
    * [Getting started](./sdk/adaptive/README.md#getting-started)
       * [Prerequisites](./sdk/adaptive/README.md#prerequisites)
       * [Download](./sdk/adaptive/README.md#download)

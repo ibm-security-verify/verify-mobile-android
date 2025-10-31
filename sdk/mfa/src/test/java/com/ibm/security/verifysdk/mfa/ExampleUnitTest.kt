@@ -1,5 +1,5 @@
 /*
- * Copyright contributors to the IBM Security Verify Adaptive SDK for Android project
+ * Copyright contributors to the IBM Verify Adaptive SDK for Android project
  */
 package com.ibm.security.verifysdk.mfa
 

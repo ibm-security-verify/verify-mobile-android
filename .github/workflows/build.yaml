@@ -87,7 +87,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.1
         with:
           name: maven-local
-          path: ~/.m2/repository/com/github/ibm-security-verify
+          path: ~/.m2/repository/com/github/ibm-verify
 
       - name: Publish to GitHub packages
         run: ./gradlew publish
@@ -220,7 +220,7 @@ jobs:
         uses: actions/download-artifact@v4.1.7
         with:
           name: maven-local
-          path: ~/.m2/repository/com/github/ibm-security-verify
+          path: ~/.m2/repository/com/github/ibm-verify
 
       - name: Collect code coverage result
         uses: actions/download-artifact@v4.1.7
@@ -240,12 +240,12 @@ jobs:
       - name: Move maven files to accessible folder
         run: |
           mkdir -p ./sdk/maven 
-          mv ~/.m2/repository/com/github/ibm-security-verify/verify-sdk-core/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/* ./sdk/maven/
-          mv ~/.m2/repository/com/github/ibm-security-verify/verify-sdk-fido2/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/* ./sdk/maven/
-          mv ~/.m2/repository/com/github/ibm-security-verify/verify-sdk-adaptive/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
-          mv ~/.m2/repository/com/github/ibm-security-verify/verify-sdk-authentication/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
-          mv ~/.m2/repository/com/github/ibm-security-verify/verify-sdk-mfa/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
-          mv ~/.m2/repository/com/github/ibm-security-verify/verify-sdk-dc/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
+          mv ~/.m2/repository/com/github/ibm-verify/verify-sdk-core/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/* ./sdk/maven/
+          mv ~/.m2/repository/com/github/ibm-verify/verify-sdk-fido2/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/* ./sdk/maven/
+          mv ~/.m2/repository/com/github/ibm-verify/verify-sdk-adaptive/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
+          mv ~/.m2/repository/com/github/ibm-verify/verify-sdk-authentication/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
+          mv ~/.m2/repository/com/github/ibm-verify/verify-sdk-mfa/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
+          mv ~/.m2/repository/com/github/ibm-verify/verify-sdk-dc/${{ needs.setup_environment.outputs.VERIFY_SDK_VERSION_NAME}}/*  ./sdk/maven/
 
       - name: Update documentation folder structure for GitHub commit
         run: |
@@ -296,8 +296,8 @@ jobs:
           SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
         with: 
           source-directory: './sdk/documentation/android'
-          destination-github-username: 'ibm-security-verify'
-          destination-repository-name: 'ibm-security-verify.github.io'
+          destination-github-username: 'ibm-verify'
+          destination-repository-name: 'ibm-verify.github.io'
           user-email: chageman@au1.ibm.com
           target-branch: android_sdk_v3
           target-directory: 'android'
@@ -315,7 +315,7 @@ jobs:
         run: |
           echo '## Build Summary :white_check_mark:' >> $GITHUB_STEP_SUMMARY
           echo '### Documentation' >> $GITHUB_STEP_SUMMARY
-          echo 'The documentation has been successfully created, and can be accessed [here.](https://ibm-security-verify.github.io/)' >> $GITHUB_STEP_SUMMARY
+          echo 'The documentation has been successfully created, and can be accessed [here.](https://ibm-verify.github.io/)' >> $GITHUB_STEP_SUMMARY
           echo '### Files Changed' >> $GITHUB_STEP_SUMMARY
           echo -n 'Count: '  >> $GITHUB_STEP_SUMMARY
           git diff --name-only HEAD~ | wc -l | awk '{$1=$1;print}' >> $GITHUB_STEP_SUMMARY

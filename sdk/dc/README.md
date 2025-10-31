@@ -15,7 +15,7 @@ See [here](../../README.md#integrating-with-your-project)
 
 ### API documentation
 
-The Digital Credentials SDK API can be reviewed [here](https://ibm-security-verify.github.io/android/dc/docs/).
+The Digital Credentials SDK API can be reviewed [here](https://ibm-verify.github.io/android/dc/docs/).
 
 ## Usage
 

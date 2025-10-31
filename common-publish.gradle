@@ -41,22 +41,22 @@ afterEvaluate {
             release(MavenPublication) {
                 from components.release
                 artifactId = "verify${project.path.replace(":","-")}"
-                groupId 'com.github.ibm-security-verify'
+                groupId 'com.github.ibm-verify'
                 version "$versionName"
                 pom {
                     name = artifactId
                     description = "IBM Verify ${project.name.toUpperCase()} SDK for Android"
-                    url = 'https://github.com/ibm-security-verify/verify-sdk-android'
+                    url = 'https://github.com/ibm-verify/verify-mobile-android'
                     licenses {
                         license {
                             name = 'MIT License'
-                            url = 'https://github.com/ibm-security-verify/verify-sdk-android/blob/main/LICENSE'
+                            url = 'https://github.com/ibm-verify/verify-mobile-android/blob/main/LICENSE'
                         }
                     }
                     scm {
-                        connection = 'scm:git:git://github.com/ibm-security-verify/verify-sdk-android.git'
-                        developerConnection = 'scm:git:ssh://github.com/ibm-security-verify/verify-sdk-android.git'
-                        url = 'https://github.com/ibm-security-verify/verify-sdk-android'
+                        connection = 'scm:git:git://github.com/ibm-verify/verify-mobile-android.git'
+                        developerConnection = 'scm:git:ssh://github.com/ibm-verify/verify-mobile-android.git'
+                        url = 'https://github.com/ibm-verify/verify-mobile-android'
                     }
                     developers {
                         developer {

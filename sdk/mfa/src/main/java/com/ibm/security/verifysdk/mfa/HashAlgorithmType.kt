@@ -1,5 +1,5 @@
 /*
- * Copyright contributors to the IBM Security Verify SDK for Android project
+ * Copyright contributors to the IBM Verify SDK for Android project
  */
 
 package com.ibm.security.verifysdk.mfa
@@ -77,7 +77,7 @@ enum class HashAlgorithmType(private val rawValue: String) {
         }
 
         /**
-         * Converts a given `HashAlgorithmType` to its corresponding IBM Security Verify format string.
+         * Converts a given `HashAlgorithmType` to its corresponding IBM Verify format string.
          *
          * @param value The `HashAlgorithmType` to be converted.
          * @return The ISV format string corresponding to the provided `HashAlgorithmType`.

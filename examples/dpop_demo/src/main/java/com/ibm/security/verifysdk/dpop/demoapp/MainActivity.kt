@@ -70,7 +70,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var dpopToken: DpopToken
     private lateinit var keyStore: KeyStore
 
-    // Change these parameters according to your IBM Security Verify tenant
+    // Change these parameters according to your IBM Verify tenant
     private val tenant = "verify.ice.ibmcloud.com" // without protocol
     private val clientId = ""
     private val clientSecret = ""
