@@ -1,4 +1,4 @@
-# IBM Security Verify Adaptive SDK for Android
+# IBM Verify Adaptive SDK for Android
 
 ![SDK Version](https://img.shields.io/badge/IBM%20Security%20Verify%20Adaptive%20SDK-3.0.0-blue.svg)
 ![Android Version](https://img.shields.io/badge/Android-12-green.svg)
@@ -11,9 +11,9 @@ The adaptive component provides device assessment. Based on cloud risk policies,
 ### Prerequisites
 
 - Install and configure the
-[Proxy SDK](https://github.com/IBM-Security/adaptive-proxy-sdk-javascript) on a Node server by running `npm install adaptive-proxy-sdk`
+[Proxy SDK](https://github.com/IBM-Verify/adaptive-proxy-sdk-javascript) on a Node server by running `npm install adaptive-proxy-sdk`
 
-- Generate and download the Trusteer SDK via IBM Security Verify admin portal for the application.
+- Generate and download the Trusteer SDK via IBM Verify admin portal for the application.
 
 See [On-board a native application](https://docs.verify.ibm.com/verify/docs/on-boarding-a-native-application)
 
@@ -22,12 +22,12 @@ See [On-board a native application](https://docs.verify.ibm.com/verify/docs/on-b
 See [here](../../README.md#integrating-with-your-project)
 
 ### API documentation
-The Adaptive component API can be reviewed [here](https://ibm-security-verify.github.io/android/adaptive/docs/).
+The Adaptive component API can be reviewed [here](https://ibm-verify.github.io/android/adaptive/docs/).
 
 
 ### Trusteer configuration settings
 
-To start a device collection analysis, you will need to initialise a `TrusteerCollectionService` structure.  This structure is part of the Trusteer zip you can obtain via your tenant configuration or via the [IBM Security Verify Developer Portal](https://www.ibm.com/docs/en/security-verify?topic=applications-accessing-security-verify-developer-portal).  Also included in the Trusteer zip will be your `vendorId`, `clientId` and `clientKey`. 
+To start a device collection analysis, you will need to initialise a `TrusteerCollectionService` structure.  This structure is part of the Trusteer zip you can obtain via your tenant configuration or via the [IBM Verify Developer Portal](https://www.ibm.com/docs/en/security-verify?topic=applications-accessing-security-verify-developer-portal).  Also included in the Trusteer zip will be your `vendorId`, `clientId` and `clientKey`. 
 
 
 ## Usage

@@ -1,10 +1,10 @@
-# IBM Security Verify FIDO2™ Sample App for Android
+# IBM Verify FIDO2™ Sample App for Android
 
-The FIDO2 sample app is an end-to-end mobile app which uses the FIDO2 server features in IBM Security Verify Access (on-premises) and IBM Security Verify (cloud).
+The FIDO2 sample app is an end-to-end mobile app which uses the FIDO2 server features in IBM Verify Access (on-premises) and IBM Verify (cloud).
 
 
 ## Getting started
-This demo works with an IBM Security Verify Access instance, hosted on https://fidointerop.securitypoc.com An IBMid is required to access it.
+This demo works with an IBM Verify Access instance, hosted on https://fidointerop.securitypoc.com An IBMid is required to access it.
 
 1. Clone this repository and open it in Android Studio
 1. Create a "Run/Debug configuration" for the `fido2_demo` module

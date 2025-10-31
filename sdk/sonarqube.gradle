@@ -1,5 +1,5 @@
 /*
- * Copyright contributors to the IBM Security Verify SDK for Android project
+ * Copyright contributors to the IBM Verify SDK for Android project
  */
 
 apply plugin: "org.sonarqube"
@@ -10,7 +10,7 @@ sonarqube {
         property "sonar.login", "<pass_as_build_paramter -Dsonar.login=...>"
         property "sonar.projectBaseDir", "${rootDir}"
         property "sonar.projectKey", "com.ibm.security.verifysdk"
-        property "sonar.projectName", "IBM Security Verify SDK for Android"
+        property "sonar.projectName", "IBM Verify SDK for Android"
         property "sonar.projectVersion", "${project.android.defaultConfig.versionName}"
         property "sonar.sourceEncoding", "UTF-8"
         property "sonar.coverage.jacoco.xmlReportPaths", [

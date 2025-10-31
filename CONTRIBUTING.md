@@ -7,7 +7,7 @@ This SDK follows coding style based on [Coding conventions﻿](https://kotlinlan
 
 ## Issues and Questions
 
-If you encounter an issue, have a question or want to suggest an enhancement to the IBM Security Verify SDK, you are welcome to submit a [request](https://github.com/ibm-security-verify/verify-sdk-android/issues).
+If you encounter an issue, have a question or want to suggest an enhancement to the IBM Verify SDK, you are welcome to submit a [request](https://github.com/ibm-verify/verify-mobile-android/issues).
 Before that, please search for similar issues. It's possible somebody has encountered this issue already.
 
 ## Pull Requests
